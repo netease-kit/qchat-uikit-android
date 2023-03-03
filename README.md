@@ -57,3 +57,7 @@ private void startLogin() {
 ```
 
 3、点击运行即可
+
+### 其他
+本工程包含Demo和圈组UIKit源码，Demo默认采用Maven的方式引入qchatKit-ui（圈组模块）、chatkit-ui（会话模块）等。如果想修改为源码依赖，请在app/build.
+gradle文件中修改依赖方式即可。
