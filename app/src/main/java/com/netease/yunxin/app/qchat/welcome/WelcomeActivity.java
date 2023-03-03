@@ -58,7 +58,7 @@ public class WelcomeActivity extends BaseActivity {
       LoginInfo loginInfo = LoginInfo.LoginInfoBuilder.loginInfoDefault(account,token).build();
 
       if (!TextUtils.isEmpty(account) && !TextUtils.isEmpty(token)) {
-          loginIM(loginInfo);
+        loginQChat(loginInfo);
       } else {
         activityWelcomeBinding.appDesc.setVisibility(View.GONE);
         activityWelcomeBinding.loginButton.setVisibility(View.VISIBLE);
@@ -73,7 +73,7 @@ public class WelcomeActivity extends BaseActivity {
   }
 
   /** when your own page login success, you should login IM SDK */
-  private void loginIM(LoginInfo loginInfo) {
+  private void loginQChat(LoginInfo loginInfo) {
     ALog.d(Constant.PROJECT_TAG, TAG, "loginIM");
     activityWelcomeBinding.getRoot().setVisibility(View.GONE);
     QChatKitClient.loginIMWithQChat(
