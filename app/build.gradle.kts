@@ -15,7 +15,7 @@ android {
         minSdk = 21
         targetSdk = 30
         versionCode = 1
-        versionName = "9.4.0"
+        versionName = "9.4.1"
         multiDexEnabled = true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -50,13 +50,13 @@ dependencies {
     implementation("androidx.multidex:multidex:2.0.1")
     //local module code
 //    implementation(project(":qchatkit-ui"))
-    implementation("com.netease.yunxin.kit.contact:contactkit-ui:9.4.0")
-    implementation("com.netease.yunxin.kit.qchat:qchatkit-ui:9.4.0")
-    implementation("com.netease.yunxin.kit.conversation:conversationkit-ui:9.4.0")
-    implementation("com.netease.yunxin.kit.team:teamkit-ui:9.4.0")
-    implementation("com.netease.yunxin.kit.chat:chatkit-ui:9.4.0")
-    implementation("com.netease.yunxin.kit.search:searchkit-ui:9.4.0")
-    implementation("com.netease.yunxin.kit.locationkit:locationkit:9.4.0")
+    implementation("com.netease.yunxin.kit.contact:contactkit-ui:9.4.1")
+    implementation("com.netease.yunxin.kit.qchat:qchatkit-ui:9.4.1")
+    implementation("com.netease.yunxin.kit.conversation:conversationkit-ui:9.4.1")
+    implementation("com.netease.yunxin.kit.team:teamkit-ui:9.4.1")
+    implementation("com.netease.yunxin.kit.chat:chatkit-ui:9.4.1")
+    implementation("com.netease.yunxin.kit.search:searchkit-ui:9.4.1")
+    implementation("com.netease.yunxin.kit.locationkit:locationkit:9.4.1")
     implementation("com.netease.yunxin.kit.call:call-ui:1.8.2") //呼叫组件 UI 包
     implementation("com.airbnb.android:lottie:5.0.3")
     implementation("com.github.bumptech.glide:glide:4.13.1")
