@@ -19,6 +19,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -37,16 +38,18 @@ import com.netease.yunxin.kit.qchatkit.ui.databinding.QChatMessageBottomLayoutBi
 import com.netease.yunxin.kit.qchatkit.ui.message.emoji.IEmojiSelectedListener;
 import com.netease.yunxin.kit.qchatkit.ui.message.interfaces.IItemActionListener;
 import com.netease.yunxin.kit.qchatkit.ui.message.interfaces.IMessageProxy;
-import com.netease.yunxin.kit.qchatkit.ui.message.utils.MessageUtil;
+import com.netease.yunxin.kit.qchatkit.ui.utils.MessageUtil;
 import java.io.File;
 import java.util.List;
 
+/** 聊天页面底部输入框 自定义View，包括输入框，操作列表，更多，表情，录音等 */
 public class QChatMessageBottomLayout extends FrameLayout
     implements IAudioRecordCallback, IItemActionListener {
   public static final String TAG = "MessageBottomLayout";
   private static final long SHOW_DELAY_TIME = 200;
   private QChatMessageBottomLayoutBinding mBinding;
   private InputActionAdapter actionAdapter;
+  //消息操作接口，由外部实现
   private IMessageProxy mProxy;
   private boolean mMute = false;
 
@@ -55,6 +58,18 @@ public class QChatMessageBottomLayout extends FrameLayout
   private boolean isKeyboardShow = false;
   private InputState mInputState = InputState.none;
   private IEmojiSelectedListener emojiSelectedListener;
+
+  public void configEnable(boolean enable, String hint) {
+    if (enable) {
+      mBinding.chatMessageInputEt.setBackgroundResource(R.color.color_ffffff);
+      mBinding.chatMessageInputEt.setEnabled(true);
+    } else {
+      mBinding.chatMessageInputEt.setBackgroundResource(R.color.color_e4e4e5);
+      mBinding.chatMessageInputEt.setEnabled(false);
+    }
+    actionAdapter.disableAll(!enable);
+    mBinding.chatMessageInputEt.setHint(hint);
+  }
 
   public QChatMessageBottomLayout(@NonNull Context context) {
     this(context, null);
@@ -150,21 +165,27 @@ public class QChatMessageBottomLayout extends FrameLayout
   public void onClick(View view, int position, ActionItem item) {
     ALog.d(TAG, "action click, inputState:" + mInputState);
     switch (item.getAction()) {
+        // 点击语音按钮
       case ActionConstants.ACTION_TYPE_RECORD:
         switchRecord();
         break;
+        // 点击表情按钮
       case ActionConstants.ACTION_TYPE_EMOJI:
         switchEmoji();
         break;
+        // 点击图片按钮
       case ActionConstants.ACTION_TYPE_ALBUM:
         onAlbumClick();
         break;
+        // 点击文件按钮
       case ActionConstants.ACTION_TYPE_FILE:
         mProxy.sendFile();
         break;
+        // 点击更多按钮
       case ActionConstants.ACTION_TYPE_MORE:
         switchMore();
         break;
+        // 点击拍摄按钮
       case ActionConstants.ACTION_TYPE_CAMERA:
         onCameraClick();
         break;
@@ -215,13 +236,25 @@ public class QChatMessageBottomLayout extends FrameLayout
   }
 
   public void sendText() {
-    String msg = mBinding.chatMessageInputEt.getEditableText().toString();
+    String originalMsg = mBinding.chatMessageInputEt.getEditableText().toString();
+    String msg = originalMsg.trim();
     if (!TextUtils.isEmpty(msg) && mProxy != null) {
-      if (mProxy.sendTextMessage(msg)) {
+      if (mProxy.sendTextMessage(originalMsg)) {
         mBinding.chatMessageInputEt.setText("");
         clearReplyMsg();
       }
     }
+  }
+
+  public void setInputText(String text) {
+    mBinding.chatMessageInputEt.setText(text);
+    if (!TextUtils.isEmpty(text)) {
+      mBinding.chatMessageInputEt.setSelection(text.length());
+    }
+  }
+
+  public EditText getEditText() {
+    return mBinding.chatMessageInputEt;
   }
 
   public void hideCurrentInput() {

@@ -17,16 +17,20 @@ import com.netease.yunxin.app.qchat.R;
 import com.netease.yunxin.app.qchat.databinding.ActivityWelcomeBinding;
 import com.netease.yunxin.app.qchat.main.MainActivity;
 import com.netease.yunxin.app.qchat.utils.Constant;
+import com.netease.yunxin.app.qchat.utils.DataUtils;
 import com.netease.yunxin.kit.alog.ALog;
 import com.netease.yunxin.kit.common.ui.activities.BaseActivity;
 import com.netease.yunxin.kit.common.ui.utils.ToastX;
 import com.netease.yunxin.kit.corekit.im.login.LoginCallback;
 import com.netease.yunxin.kit.corekit.qchat.QChatKitClient;
 
+
 /** Welcome Page is launch page */
 public class WelcomeActivity extends BaseActivity {
 
   private static final String TAG = "WelcomeActivity";
+  private static final int LOGIN_PARENT_SCOPE = 2;
+  private static final int LOGIN_SCOPE = 7;
   private ActivityWelcomeBinding activityWelcomeBinding;
 
   @Override
@@ -55,27 +59,51 @@ public class WelcomeActivity extends BaseActivity {
       //填入你的 account and token
       String account = "";
       String token = "";
-      LoginInfo loginInfo = LoginInfo.LoginInfoBuilder.loginInfoDefault(account,token).build();
 
       if (!TextUtils.isEmpty(account) && !TextUtils.isEmpty(token)) {
-        loginQChat(loginInfo);
+          loginQChatAndIM(account,token);
       } else {
-        activityWelcomeBinding.appDesc.setVisibility(View.GONE);
-        activityWelcomeBinding.loginButton.setVisibility(View.VISIBLE);
-        activityWelcomeBinding.loginButton.setOnClickListener(view -> launchLoginPage());
+          showLoginView();
       }
+  }
+
+  private void showLoginView() {
+    ALog.d(Constant.PROJECT_TAG, TAG, "showLoginView");
+    activityWelcomeBinding.appDesc.setVisibility(View.GONE);
+    activityWelcomeBinding.loginButton.setVisibility(View.VISIBLE);
+    activityWelcomeBinding.appBottomIcon.setVisibility(View.GONE);
+    activityWelcomeBinding.appBottomName.setVisibility(View.GONE);
+    activityWelcomeBinding.tvEmailLogin.setVisibility(View.VISIBLE);
+    activityWelcomeBinding.tvServerConfig.setVisibility(View.VISIBLE);
+    activityWelcomeBinding.vEmailLine.setVisibility(View.VISIBLE);
+    activityWelcomeBinding.loginButton.setOnClickListener(
+        view -> {
+
+        });
+    activityWelcomeBinding.tvEmailLogin.setOnClickListener(
+        view -> {
+
+        });
+    activityWelcomeBinding.tvServerConfig.setOnClickListener(
+        view -> {
+          Intent intent = new Intent(WelcomeActivity.this, ServerActivity.class);
+          startActivity(intent);
+        });
   }
 
   /** launch login activity */
   private void launchLoginPage() {
     ALog.d(Constant.PROJECT_TAG, TAG, "launchLoginPage");
-    ToastX.showShortToast("请在WelcomeActivity类startLogin方法添加账号信息即可进入");
   }
 
   /** when your own page login success, you should login IM SDK */
-  private void loginQChat(LoginInfo loginInfo) {
+  private void loginQChatAndIM(String account, String token) {
     ALog.d(Constant.PROJECT_TAG, TAG, "loginIM");
     activityWelcomeBinding.getRoot().setVisibility(View.GONE);
+    LoginInfo loginInfo =
+        LoginInfo.LoginInfoBuilder.loginInfoDefault(account, token)
+            .withAppKey(DataUtils.readAppKey(this))
+            .build();
     QChatKitClient.loginIMWithQChat(
         loginInfo,
         new LoginCallback<QChatLoginResult>() {

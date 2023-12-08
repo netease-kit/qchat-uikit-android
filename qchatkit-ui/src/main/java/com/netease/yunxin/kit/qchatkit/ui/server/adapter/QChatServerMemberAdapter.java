@@ -12,6 +12,8 @@ import com.netease.yunxin.kit.common.ui.utils.AvatarColor;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatServerMemberWithRoleInfo;
 import com.netease.yunxin.kit.qchatkit.ui.common.QChatCommonAdapter;
 import com.netease.yunxin.kit.qchatkit.ui.databinding.QChatServerMbemberInfoWithRoleItemBinding;
+import java.util.ArrayList;
+import java.util.List;
 
 public class QChatServerMemberAdapter
     extends QChatCommonAdapter<
@@ -25,18 +27,18 @@ public class QChatServerMemberAdapter
   public void onBindViewHolder(
       @NonNull ItemViewHolder<QChatServerMbemberInfoWithRoleItemBinding> holder,
       int position,
-      QChatServerMemberWithRoleInfo data) {
+      @NonNull QChatServerMemberWithRoleInfo data) {
     super.onBindViewHolder(holder, position, data);
     QChatServerMbemberInfoWithRoleItemBinding binding = holder.binding;
 
     String nickname;
     if (TextUtils.isEmpty(data.getNick())) {
-      nickname = data.getNicknameOfIM();
+      nickname = data.getAccId();
       binding.tvAccount.setVisibility(View.GONE);
     } else {
       nickname = data.getNick();
       binding.tvAccount.setVisibility(View.VISIBLE);
-      binding.tvAccount.setText(data.getNicknameOfIM());
+      binding.tvAccount.setText(data.getAccId());
     }
     if (data.getRoleList() != null && !data.getRoleList().isEmpty()) {
       binding.flGroup.setVisibility(View.VISIBLE);
@@ -52,5 +54,16 @@ public class QChatServerMemberAdapter
     binding.tvName.setText(nickname);
     binding.cavIcon.setData(
         data.getAvatarUrl(), nickname, AvatarColor.avatarColor(data.getAccId()));
+  }
+
+  public List<String> getDataOnlyAccIdList() {
+    List<String> result = new ArrayList<>();
+    for (QChatServerMemberWithRoleInfo item : dataSource) {
+      if (item == null) {
+        continue;
+      }
+      result.add(item.getAccId());
+    }
+    return result;
   }
 }

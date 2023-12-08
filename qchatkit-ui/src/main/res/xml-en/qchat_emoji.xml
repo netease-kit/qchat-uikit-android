@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2022 NetEase, Inc. All rights reserved.
+  ~ Use of this source code is governed by a MIT license that can be
+  ~ found in the LICENSE file.
+  -->
+
+<PopoEmoticons>
+    <Catalog Title="default">
+    <Emoticon File="emoji_000.png" ID="emoticon_emoji_0" Tag="[laugh]" />
+    <Emoticon File="emoji_001.png" ID="emoticon_emoji_01" Tag="[happy]" />
+    <Emoticon File="emoji_002.png" ID="emoticon_emoji_02" Tag="[sexy]" />
+    <Emoticon File="emoji_003.png" ID="emoticon_emoji_03" Tag="[cool]" />
+    <Emoticon File="emoji_004.png" ID="emoticon_emoji_04" Tag="[mischievous]" />
+    <Emoticon File="emoji_005.png" ID="emoticon_emoji_05" Tag="[kiss]" />
+    <Emoticon File="emoji_006.png" ID="emoticon_emoji_06" Tag="[spit]" />
+    <Emoticon File="emoji_007.png" ID="emoticon_emoji_07" Tag="[squint]" />
+    <Emoticon File="emoji_008.png" ID="emoticon_emoji_08" Tag="[cute]" />
+    <Emoticon File="emoji_009.png" ID="emoticon_emoji_09" Tag="[grimace]" />
+    <Emoticon File="emoji_010.png" ID="emoticon_emoji_10" Tag="[snicker]" />
+    <Emoticon File="emoji_011.png" ID="emoticon_emoji_11" Tag="[joy]" />
+    <Emoticon File="emoji_012.png" ID="emoticon_emoji_12" Tag="[ecstasy]" />
+    <Emoticon File="emoji_013.png" ID="emoticon_emoji_13" Tag="[surprise]" />
+    <Emoticon File="emoji_014.png" ID="emoticon_emoji_14" Tag="[speechless]" />
+    <Emoticon File="emoji_015.png" ID="emoticon_emoji_15" Tag="[sweat]" />
+    <Emoticon File="emoji_016.png" ID="emoticon_emoji_16" Tag="[angle]" />
+    <Emoticon File="emoji_017.png" ID="emoticon_emoji_17" Tag="[Funny]" />
+    <Emoticon File="emoji_018.png" ID="emoticon_emoji_18" Tag="[awkward]" />
+    <Emoticon File="emoji_019.png" ID="emoticon_emoji_19" Tag="[thrill]" />
+    <Emoticon File="emoji_020.png" ID="emoticon_emoji_20" Tag="[cry]" />
+    <Emoticon File="emoji_021.png" ID="emoticon_emoji_21" Tag="[fretting]" />
+    <Emoticon File="emoji_022.png" ID="emoticon_emoji_22" Tag="[terrorist]" />
+    <Emoticon File="emoji_023.png" ID="emoticon_emoji_23" Tag="[halo]" />
+    <Emoticon File="emoji_024.png" ID="emoticon_emoji_24" Tag="[shame]" />
+    <Emoticon File="emoji_025.png" ID="emoticon_emoji_25" Tag="[sleep]" />
+    <Emoticon File="emoji_026.png" ID="emoticon_emoji_26" Tag="[tired]" />
+    <Emoticon File="emoji_027.png" ID="emoticon_emoji_27" Tag="[mask]" />
+    <Emoticon File="emoji_028.png" ID="emoticon_emoji_28" Tag="[ok]" />
+    <Emoticon File="emoji_029.png" ID="emoticon_emoji_29" Tag="[all right]" />
+    <Emoticon File="emoji_030.png" ID="emoticon_emoji_30" Tag="[Despise]" />
+    <Emoticon File="emoji_031.png" ID="emoticon_emoji_31" Tag="[uncomfortable]" />
+    <Emoticon File="emoji_032.png" ID="emoticon_emoji_32" Tag="[disdain]" />
+    <Emoticon File="emoji_033.png" ID="emoticon_emoji_33" Tag="[ill]" />
+    <Emoticon File="emoji_034.png" ID="emoticon_emoji_34" Tag="[Mad]" />
+    <Emoticon File="emoji_035.png" ID="emoticon_emoji_35" Tag="[salute]" />
+    <Emoticon File="emoji_036.png" ID="emoticon_emoji_36" Tag="[face-palm]" />
+    <Emoticon File="emoji_037.png" ID="emoticon_emoji_37" Tag="[put rotten]" />
+    <Emoticon File="emoji_038.png" ID="emoticon_emoji_38" Tag="[wild with joy]" />
+    <Emoticon File="emoji_039.png" ID="emoticon_emoji_39" Tag="[think]" />
+    <Emoticon File="emoji_040.png" ID="emoticon_emoji_40" Tag="[doggy]" />
+    <Emoticon File="emoji_041.png" ID="emoticon_emoji_41" Tag="[freeze]" />
+    <Emoticon File="emoji_042.png" ID="emoticon_emoji_42" Tag="[vomit]" />
+    <Emoticon File="emoji_043.png" ID="emoticon_emoji_43" Tag="[cowboy]" />
+    <Emoticon File="emoji_044.png" ID="emoticon_emoji_44" Tag="[pinocchio]" />
+    <Emoticon File="emoji_045.png" ID="emoticon_emoji_45" Tag="[close to tear]" />
+    <Emoticon File="emoji_046.png" ID="emoticon_emoji_46" Tag="[sigh]" />
+    <Emoticon File="emoji_047.png" ID="emoticon_emoji_47" Tag="[nothing to say]" />
+    <Emoticon File="emoji_048.png" ID="emoticon_emoji_48" Tag="[celebrate]" />
+    <Emoticon File="emoji_049.png" ID="emoticon_emoji_49" Tag="[evil]" />
+    <Emoticon File="emoji_050.png" ID="emoticon_emoji_50" Tag="[freak out]" />
+    <Emoticon File="emoji_051.png" ID="emoticon_emoji_51" Tag="[trash Talk]" />
+    <Emoticon File="emoji_052.png" ID="emoticon_emoji_52" Tag="[angry]" />
+    <Emoticon File="emoji_053.png" ID="emoticon_emoji_53" Tag="[human skeleton]" />
+    <Emoticon File="emoji_054.png" ID="emoticon_emoji_54" Tag="[heart broken]" />
+    <Emoticon File="emoji_055.png" ID="emoticon_emoji_55" Tag="[heart]" />
+    <Emoticon File="emoji_056.png" ID="emoticon_emoji_56" Tag="[On Fire]" />
+    <Emoticon File="emoji_057.png" ID="emoticon_emoji_57" Tag="[cupid]" />
+    <Emoticon File="emoji_058.png" ID="emoticon_emoji_58" Tag="[Finger heart]" />
+    <Emoticon File="emoji_059.png" ID="emoticon_emoji_59" Tag="[have a look]" />
+    <Emoticon File="emoji_060.png" ID="emoticon_emoji_60" Tag="[hammer]" />
+    <Emoticon File="emoji_061.png" ID="emoticon_emoji_61" Tag="[knife]" />
+    <Emoticon File="emoji_062.png" ID="emoticon_emoji_62" Tag="[100%]" />
+    <Emoticon File="emoji_063.png" ID="emoticon_emoji_63" Tag="[night]" />
+    <Emoticon File="emoji_064.png" ID="emoticon_emoji_64" Tag="[son]" />
+    <Emoticon File="emoji_065.png" ID="emoticon_emoji_65" Tag="[Scatter flowers ]" />
+    <Emoticon File="emoji_066.png" ID="emoticon_emoji_66" Tag="[gift]" />
+    <Emoticon File="emoji_067.png" ID="emoticon_emoji_67" Tag="[congrats]" />
+    <Emoticon File="emoji_068.png" ID="emoticon_emoji_68" Tag="[buss]" />
+    <Emoticon File="emoji_069.png" ID="emoticon_emoji_69" Tag="[Explore]" />
+    <Emoticon File="emoji_070.png" ID="emoticon_emoji_70" Tag="[Rose]" />
+    <Emoticon File="emoji_071.png" ID="emoticon_emoji_71" Tag="[flower]" />
+    <Emoticon File="emoji_072.png" ID="emoticon_emoji_72" Tag="[decline]" />
+    <Emoticon File="emoji_073.png" ID="emoticon_emoji_73" Tag="[cake]" />
+    <Emoticon File="emoji_074.png" ID="emoticon_emoji_74" Tag="[hug]" />
+    <Emoticon File="emoji_075.png" ID="emoticon_emoji_75" Tag="[lamp]" />
+    <Emoticon File="emoji_076.png" ID="emoticon_emoji_76" Tag="[question]" />
+    <Emoticon File="emoji_077.png" ID="emoticon_emoji_77" Tag="[lip]" />
+    <Emoticon File="emoji_078.png" ID="emoticon_emoji_78" Tag="[have a drink]" />
+    <Emoticon File="emoji_079.png" ID="emoticon_emoji_79" Tag="[cheers]" />
+    <Emoticon File="emoji_080.png" ID="emoticon_emoji_80" Tag="[coffee]" />
+    <Emoticon File="emoji_081.png" ID="emoticon_emoji_81" Tag="[red packet]" />
+    <Emoticon File="emoji_082.png" ID="emoticon_emoji_82" Tag="[maroon]" />
+    <Emoticon File="emoji_083.png" ID="emoticon_emoji_83" Tag="[majiang]" />
+    <Emoticon File="emoji_084.png" ID="emoticon_emoji_84" Tag="[NP]" />
+    <Emoticon File="emoji_085.png" ID="emoticon_emoji_85" Tag="[bad]" />
+    <Emoticon File="emoji_086.png" ID="emoticon_emoji_86" Tag="[thumb]" />
+    <Emoticon File="emoji_087.png" ID="emoticon_emoji_87" Tag="[clap]" />
+    <Emoticon File="emoji_088.png" ID="emoticon_emoji_88" Tag="[good job]" />
+    <Emoticon File="emoji_089.png" ID="emoticon_emoji_89" Tag="[fist]" />
+    <Emoticon File="emoji_090.png" ID="emoticon_emoji_90" Tag="[hands together]" />
+    <Emoticon File="emoji_091.png" ID="emoticon_emoji_91" Tag="[wave]" />
+    <Emoticon File="emoji_092.png" ID="emoticon_emoji_92" Tag="[1]" />
+    <Emoticon File="emoji_093.png" ID="emoticon_emoji_93" Tag="[10]" />
+    <Emoticon File="emoji_094.png" ID="emoticon_emoji_94" Tag="[yeah]" />
+    <Emoticon File="emoji_095.png" ID="emoticon_emoji_95" Tag="[handshake]" />
+    <Emoticon File="emoji_096.png" ID="emoticon_emoji_96" Tag="[hand heart]" />
+    <Emoticon File="emoji_097.png" ID="emoticon_emoji_97" Tag="[no way]" />
+    <Emoticon File="emoji_098.png" ID="emoticon_emoji_98" Tag="[doubt femal]" />
+    <Emoticon File="emoji_099.png" ID="emoticon_emoji_99" Tag="[doubt male]" />
+    <Emoticon File="emoji_100.png" ID="emoticon_emoji_100" Tag="[facepalm female]" />
+    <Emoticon File="emoji_101.png" ID="emoticon_emoji_101" Tag="[facepalm male]" />
+    <Emoticon File="emoji_102.png" ID="emoticon_emoji_102" Tag="[pig]" />
+    <Emoticon File="emoji_103.png" ID="emoticon_emoji_103" Tag="[no listen]" />
+    <Emoticon File="emoji_104.png" ID="emoticon_emoji_104" Tag="[no look]" />
+    <Emoticon File="emoji_105.png" ID="emoticon_emoji_105" Tag="[no words]" />
+    <Emoticon File="emoji_106.png" ID="emoticon_emoji_106" Tag="[monkey]" />
+    <Emoticon File="emoji_107.png" ID="emoticon_emoji_107" Tag="[bomb]" />
+    <Emoticon File="emoji_108.png" ID="emoticon_emoji_108" Tag="[cloud]" />
+    <Emoticon File="emoji_109.png" ID="emoticon_emoji_109" Tag="[rocket]" />
+    <Emoticon File="emoji_110.png" ID="emoticon_emoji_110" Tag="[wish]" />
+    <Emoticon File="emoji_111.png" ID="emoticon_emoji_111" Tag="[poop]" />
+    </Catalog>
+</PopoEmoticons>
+
+

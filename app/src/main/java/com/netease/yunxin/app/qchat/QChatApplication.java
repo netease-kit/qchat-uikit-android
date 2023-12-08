@@ -11,6 +11,7 @@ import androidx.multidex.MultiDexApplication;
 import com.heytap.msp.push.HeytapPushManager;
 import com.huawei.hms.support.common.ActivityMgr;
 import com.netease.nimlib.sdk.SDKOptions;
+import com.netease.nimlib.sdk.util.NIMUtil;
 import com.netease.yunxin.app.qchat.crash.AppCrashHandler;
 import com.netease.yunxin.app.qchat.main.MainActivity;
 import com.netease.yunxin.app.qchat.main.mine.MineInfoActivity;
@@ -21,8 +22,8 @@ import com.netease.yunxin.app.qchat.welcome.WelcomeActivity;
 import com.netease.yunxin.kit.alog.ALog;
 import com.netease.yunxin.kit.corekit.im.IMKitClient;
 import com.netease.yunxin.kit.corekit.im.repo.SettingRepo;
-import com.netease.yunxin.kit.corekit.im.utils.IMKitUtils;
 import com.netease.yunxin.kit.corekit.im.utils.RouterConstant;
+import com.netease.yunxin.kit.corekit.qchat.QChatKitClient;
 import com.netease.yunxin.kit.corekit.route.XKitRouter;
 import com.netease.yunxin.kit.locationkit.LocationKitClient;
 import com.vivo.push.PushClient;
@@ -52,12 +53,12 @@ public class QChatApplication extends MultiDexApplication {
 
   private void initUIKit() {
     SDKOptions options = NimSDKOptionConfig.getSDKOptions(this, DataUtils.readAppKey(this));
-    IMKitClient.init(this, null, options);
+    QChatKitClient.init(this, null, options);
     ALog.d(Constant.PROJECT_TAG, TAG, "initUIKit");
 
-    if (IMKitUtils.isMainProcess(this)) {
+    if (NIMUtil.isMainProcess(this)) {
       ALog.d(Constant.PROJECT_TAG, TAG, "initUIKit:isMainProcess");
-      LocationKitClient.init();
+      LocationKitClient.init(this);
       //huawei push
       ActivityMgr.INST.init(this);
       //oppo push
@@ -68,8 +69,9 @@ public class QChatApplication extends MultiDexApplication {
       } catch (VivoPushException e) {
         e.printStackTrace();
       }
-      IMKitClient.toggleNotification(SettingRepo.isPushNotify());
-      IMKitClient.registerMixPushMessageHandler(new PushMessageHandler());
+      QChatKitClient.toggleNotification(SettingRepo.isPushNotify());
+      QChatKitClient.registerMixPushMessageHandler(new PushMessageHandler());
+      IMKitClient.getConfigCenter().setTeamEnable(false);
     }
   }
 

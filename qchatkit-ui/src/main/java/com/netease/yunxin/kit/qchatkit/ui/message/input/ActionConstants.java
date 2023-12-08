@@ -49,6 +49,10 @@ public class ActionConstants {
   public static final String POP_ACTION_DELETE = "POP_ACTION_DELETE";
   //消息长按菜单-转发
   public static final String POP_ACTION_TRANSMIT = "POP_ACTION_TRANSMIT";
+  //消息长按菜单-emoji表情
+  public static final String POP_ACTION_EMOJI = "POP_ACTION_TRANSMIT";
+  //消息长按参数数据KEY
+  public static final String POP_ACTION_EXT_DATA = "POP_ACTION_DATA";
 
   //消息列表payload
   public static final String PAYLOAD_STATUS = "messageStatus";

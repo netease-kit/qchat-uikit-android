@@ -5,13 +5,10 @@
 package com.netease.yunxin.kit.qchatkit.ui.server.adapter;
 
 import android.content.Context;
+import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
-import androidx.annotation.Nullable;
-import com.netease.nimlib.sdk.qchat.result.QChatApplyServerJoinResult;
+import androidx.annotation.NonNull;
 import com.netease.yunxin.kit.common.ui.utils.AvatarColor;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
-import com.netease.yunxin.kit.qchatkit.repo.QChatServerRepo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatSearchResultInfo;
 import com.netease.yunxin.kit.qchatkit.ui.R;
 import com.netease.yunxin.kit.qchatkit.ui.common.QChatCommonAdapter;
@@ -20,18 +17,27 @@ import com.netease.yunxin.kit.qchatkit.ui.databinding.QChatServerSearchResultIte
 /** Adapter for searching server. */
 public class QChatSearchResultAdapter
     extends QChatCommonAdapter<QChatSearchResultInfo, QChatServerSearchResultItemBinding> {
-  public QChatSearchResultAdapter(Context context) {
+  private final boolean isAnnouncement;
+
+  private OnClickListener<QChatSearchResultInfo, QChatServerSearchResultItemBinding>
+      tipClickListener;
+
+  public QChatSearchResultAdapter(Context context, boolean isAnnouncement) {
     super(context, QChatServerSearchResultItemBinding.class);
+    this.isAnnouncement = isAnnouncement;
+  }
+
+  public void setTipClickListener(
+      OnClickListener<QChatSearchResultInfo, QChatServerSearchResultItemBinding> tipClickListener) {
+    this.tipClickListener = tipClickListener;
   }
 
   @Override
   public void onBindViewHolder(
-      QChatServerSearchResultItemBinding binding,
+      @NonNull ItemViewHolder<QChatServerSearchResultItemBinding> holder,
       int position,
-      QChatSearchResultInfo data,
-      int bingingAdapterPosition) {
-    super.onBindViewHolder(binding, position, data, bingingAdapterPosition);
-
+      @NonNull QChatSearchResultInfo data) {
+    QChatServerSearchResultItemBinding binding = holder.binding;
     binding.cavIcon.setData(
         data.serverInfo.getIconUrl(),
         data.serverInfo.getName(),
@@ -42,44 +48,27 @@ public class QChatSearchResultAdapter
     binding.tvServerId.setText(String.valueOf(data.serverInfo.getServerId()));
 
     TextView tvActionAndTip = binding.tvActionAndTip;
-    if (data.state == QChatSearchResultInfo.STATE_NOT_JOIN) {
-      tvActionAndTip.setText(R.string.qchat_server_state_join);
-      tvActionAndTip.setEnabled(true);
-    } else if (data.state == QChatSearchResultInfo.STATE_JOINED) {
-      tvActionAndTip.setText(R.string.qchat_server_state_joined);
-      tvActionAndTip.setEnabled(false);
-    } else if (data.state == QChatSearchResultInfo.STATE_HAD_APPLIED) {
-      tvActionAndTip.setText(R.string.qchat_server_state_applied);
-      tvActionAndTip.setEnabled(false);
+    if (isAnnouncement) {
+      tvActionAndTip.setVisibility(View.VISIBLE);
+      if (data.state == QChatSearchResultInfo.STATE_NOT_JOIN) {
+        tvActionAndTip.setText(R.string.qchat_server_state_join);
+        tvActionAndTip.setEnabled(true);
+      } else if (data.state == QChatSearchResultInfo.STATE_JOINED) {
+        tvActionAndTip.setText(R.string.qchat_server_state_joined);
+        tvActionAndTip.setEnabled(false);
+      }
+      tvActionAndTip.setOnClickListener(
+          v -> {
+            if (tipClickListener != null) {
+              tipClickListener.onClick(data, holder);
+            }
+          });
+    } else {
+      tvActionAndTip.setVisibility(View.GONE);
     }
+  }
 
-    tvActionAndTip.setOnClickListener(
-        v ->
-            QChatServerRepo.applyServerJoin(
-                data.serverInfo.getServerId(),
-                new FetchCallback<QChatApplyServerJoinResult>() {
-                  @Override
-                  public void onSuccess(@Nullable QChatApplyServerJoinResult param) {
-                    data.state = QChatSearchResultInfo.STATE_HAD_APPLIED;
-                    notifyItemChanged(bingingAdapterPosition);
-                    Context context = v.getContext();
-                    Toast.makeText(
-                            context,
-                            context.getString(R.string.qchat_server_had_appled_tip),
-                            Toast.LENGTH_SHORT)
-                        .show();
-                  }
-
-                  @Override
-                  public void onFailed(int code) {
-                    Toast.makeText(v.getContext(), "failed " + code, Toast.LENGTH_SHORT).show();
-                  }
-
-                  @Override
-                  public void onException(@Nullable Throwable exception) {
-                    Toast.makeText(v.getContext(), "exception " + exception, Toast.LENGTH_SHORT)
-                        .show();
-                  }
-                }));
+  public void updateItemState() {
+    notifyItemRangeChanged(0, getItemCount());
   }
 }

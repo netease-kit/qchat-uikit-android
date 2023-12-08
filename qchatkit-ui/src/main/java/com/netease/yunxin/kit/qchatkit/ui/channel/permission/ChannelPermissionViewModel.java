@@ -29,34 +29,33 @@ import com.netease.yunxin.kit.qchatkit.ui.utils.ErrorUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-/** channel permission setting view model modify member and role permission */
+/** 话题权限设置和修改ViewModel */
 public class ChannelPermissionViewModel extends BaseViewModel {
 
   private static final String TAG = "ChannelPermissionViewModel";
 
+  //身份组列表LiveData
   private final MutableLiveData<FetchResult<List<QChatBaseBean>>> roleLiveData =
       new MutableLiveData<>();
   private final FetchResult<List<QChatBaseBean>> roleFetchResult =
       new FetchResult<>(LoadStatus.Finish);
+  //身份组更多列表LiveData
   private final MutableLiveData<FetchResult<List<QChatBaseBean>>> roleMoreLiveData =
       new MutableLiveData<>();
-  private final FetchResult<List<QChatBaseBean>> roleMoreFetchResult =
-      new FetchResult<>(LoadStatus.Finish);
+  //成员列表LiveData
   private final MutableLiveData<FetchResult<List<QChatBaseBean>>> memberLiveData =
       new MutableLiveData<>();
   private final FetchResult<List<QChatBaseBean>> memberFetchResult =
       new FetchResult<>(LoadStatus.Finish);
-  private ArrayList<QChatBaseBean> moreRoleList = new ArrayList<>();
   //member list default page size
   private final int memberPageSize = 100;
   //role list request page size
-  private final int rolePageLimit = 100;
+  private final int rolePageLimit = 200;
   //role list show size
   private final int rolePageSize = 5;
 
   private long serverId;
   private long channelId;
-  private QChatChannelRoleInfo lastRoleInfo;
   private QChatChannelMember lastMemberInfo;
   private QChatMoreBean roleMoreBean;
   private int moreRoleIndex = 0;
@@ -77,7 +76,7 @@ public class ChannelPermissionViewModel extends BaseViewModel {
     return memberLiveData;
   }
 
-  /** fetch role data base on serverId and channelId */
+  /** 获取话题下身份组和成员列表数据 */
   public void fetchData(long serverId, long channelId) {
     ALog.d(TAG, "fetchData", "serverId:" + serverId + "channelId:" + channelId);
     this.serverId = serverId;
@@ -87,7 +86,7 @@ public class ChannelPermissionViewModel extends BaseViewModel {
     fetchMemberData(serverId, channelId, 0);
   }
 
-  /** delete role or member from channel */
+  /** 移除身份组或者成员 */
   public void delete(QChatBaseBean data, int position) {
     if (data instanceof QChatChannelRoleBean) {
       deleteRole((QChatChannelRoleBean) data, position);
@@ -96,6 +95,7 @@ public class ChannelPermissionViewModel extends BaseViewModel {
     }
   }
 
+  /** 获取身份组列表数据 */
   private void fetchRoleData(long serverId, long channelId, long offset) {
     ALog.d(TAG, "fetchRoleData", "serverId:" + serverId + "channelId:" + channelId);
     QChatChannelRepo.fetchChannelRoles(
@@ -107,7 +107,6 @@ public class ChannelPermissionViewModel extends BaseViewModel {
           @Override
           public void onSuccess(@Nullable List<QChatChannelRoleInfo> param) {
             ArrayList<QChatBaseBean> addList = new ArrayList<>();
-            moreRoleList.clear();
             if (param != null && param.size() > 0) {
               ALog.d(TAG, "fetchRoleData", "onSuccess:" + param.size());
               if (offset == 0) {
@@ -120,16 +119,11 @@ public class ChannelPermissionViewModel extends BaseViewModel {
                 int topRadius = index == 0 && offset == 0 ? QChatConstant.CORNER_RADIUS_ARROW : 0;
                 QChatChannelRoleBean bean = new QChatChannelRoleBean(roleInfo, topRadius, 0);
                 bean.router = QChatConstant.ROUTER_ROLE_PERMISSION;
-                if (index < size) {
-                  addList.add(bean);
-                } else {
-                  moreRoleList.add(bean);
-                }
+                addList.add(bean);
               }
-              lastRoleInfo = param.get(size - 1);
               if (offset == 0 && rolePageSize < param.size()) {
                 roleMoreBean = new QChatMoreBean(R.string.qchat_more_title);
-                roleMoreBean.extend = String.valueOf(param.size());
+                roleMoreBean.extend = param.size();
                 addList.add(roleMoreBean);
                 size++;
               }
@@ -163,19 +157,7 @@ public class ChannelPermissionViewModel extends BaseViewModel {
         });
   }
 
-  private void removeRoleMoreData(long offset) {
-    if (offset > 0) {
-      ArrayList<QChatBaseBean> removeList = new ArrayList<>();
-      removeList.add(roleMoreBean);
-      roleMoreFetchResult.setData(removeList);
-      FetchResult.FetchType type = FetchResult.FetchType.Remove;
-      roleMoreFetchResult.setFetchType(type);
-      roleMoreFetchResult.setTypeIndex(moreRoleIndex);
-      roleMoreLiveData.setValue(roleMoreFetchResult);
-    }
-  }
-
-  /** delete role from channel */
+  /** 移除身份组 */
   public void deleteRole(QChatChannelRoleBean bean, int position) {
     QChatRoleRepo.deleteChannelRole(
         serverId,
@@ -185,6 +167,9 @@ public class ChannelPermissionViewModel extends BaseViewModel {
           @Override
           public void onSuccess(@Nullable Void param) {
             ALog.d(TAG, "deleteRole", "onSuccess:" + position);
+            if (roleMoreBean != null) {
+              roleMoreBean.extend--;
+            }
             FetchResult.FetchType type = FetchResult.FetchType.Remove;
             roleFetchResult.setFetchType(type);
             roleFetchResult.setTypeIndex(position);
@@ -211,6 +196,7 @@ public class ChannelPermissionViewModel extends BaseViewModel {
         });
   }
 
+  /** 获取成员列表数据 */
   public void fetchMemberData(long serverId, long channelId, long offset) {
     QChatChannelRepo.fetchChannelRoleMembers(
         serverId,
@@ -222,6 +208,7 @@ public class ChannelPermissionViewModel extends BaseViewModel {
           public void onSuccess(@Nullable List<QChatChannelMember> param) {
             ALog.d(TAG, "fetchMemberData", "onSuccess:" + serverId + "," + channelId);
             ArrayList<QChatBaseBean> addList = new ArrayList<>();
+            memberFetchResult.setData(null);
             if (param != null && param.size() > 0) {
               if (offset == 0) {
                 QChatBaseBean titleBean = new QChatTitleBean(R.string.qchat_member_list_title);
@@ -243,8 +230,8 @@ public class ChannelPermissionViewModel extends BaseViewModel {
               FetchResult.FetchType type = FetchResult.FetchType.Add;
               memberFetchResult.setFetchType(type);
               memberFetchResult.setTypeIndex(-1);
-              memberLiveData.setValue(memberFetchResult);
             }
+            memberLiveData.setValue(memberFetchResult);
 
             memberHasMore = param != null && param.size() >= memberPageSize;
           }
@@ -269,7 +256,7 @@ public class ChannelPermissionViewModel extends BaseViewModel {
         });
   }
 
-  /** delete member from channel */
+  /** 移除成员 */
   public void deleteMember(QChatChannelMemberBean bean, int position) {
     ALog.d(
         TAG,
@@ -308,22 +295,7 @@ public class ChannelPermissionViewModel extends BaseViewModel {
         });
   }
 
-  public void loadMoreRole() {
-    if (moreRoleList.size() > 0) {
-      ALog.d(TAG, "loadMoreRole");
-      FetchResult.FetchType type = FetchResult.FetchType.Add;
-      roleFetchResult.setFetchType(type);
-      roleFetchResult.setTypeIndex(moreRoleIndex);
-      ArrayList<QChatBaseBean> addMore = new ArrayList<>();
-      addMore.addAll(moreRoleList);
-      moreRoleList.clear();
-      roleFetchResult.setData(addMore);
-      roleLiveData.setValue(roleFetchResult);
-      moreRoleIndex += addMore.size();
-      removeRoleMoreData(moreRoleIndex);
-    }
-  }
-
+  /** 加载更多成员 */
   public void loadMoreMember() {
     if (memberHasMore) {
       long offset = lastMemberInfo != null ? lastMemberInfo.getCreateTime() : 0;
@@ -332,11 +304,12 @@ public class ChannelPermissionViewModel extends BaseViewModel {
     }
   }
 
+  /** 是否还有更多成员 */
   public boolean hasMore() {
     return memberHasMore;
   }
 
-  /** get list header include add member and add role */
+  /** 获取页面顶部操作栏数据 */
   public List<QChatBaseBean> getHeaderData(String[] titleArray, String[] routerArray) {
     if (titleArray == null || titleArray.length < 1) {
       return null;

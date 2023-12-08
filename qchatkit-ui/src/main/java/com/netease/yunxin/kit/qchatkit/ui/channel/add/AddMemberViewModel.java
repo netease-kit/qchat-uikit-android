@@ -7,6 +7,7 @@ package com.netease.yunxin.kit.qchatkit.ui.channel.add;
 import android.text.TextUtils;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;
+import com.netease.nimlib.sdk.ResponseCode;
 import com.netease.yunxin.kit.alog.ALog;
 import com.netease.yunxin.kit.common.ui.viewmodel.BaseViewModel;
 import com.netease.yunxin.kit.common.ui.viewmodel.FetchResult;
@@ -27,15 +28,22 @@ import java.util.List;
 /** add member to channel permission view model */
 public class AddMemberViewModel extends BaseViewModel {
 
-  private static final String TAG = "BlackWhiteViewModel";
+  private static final String TAG = "AddMemberViewModel";
+
+  //社区成员列表数据查询LiveData
   private final MutableLiveData<FetchResult<List<QChatServerMemberBean>>> resultLiveData =
       new MutableLiveData<>();
+  //社区成员列表数据查询结果
   private final FetchResult<List<QChatServerMemberBean>> fetchResult =
       new FetchResult<>(LoadStatus.Finish);
+  //添加社区成员LiveData
   private final MutableLiveData<FetchResult<QChatChannelMember>> addLiveData =
       new MutableLiveData<>();
+  //添加社区成员结果
   private final FetchResult<QChatChannelMember> addResult = new FetchResult<>(LoadStatus.Finish);
+  //成员列表查询最后一个成员记录，用于分页查询
   private QChatServerMemberInfo lastMemberInfo;
+  //身份组列表是否还有更多数据
   private boolean roleHasMore = false;
 
   //server member live data
@@ -48,12 +56,24 @@ public class AddMemberViewModel extends BaseViewModel {
     return addLiveData;
   }
 
-  /** fetch server member list */
+  /**
+   * 查询成员列表接口
+   *
+   * @param serverId 社区ID
+   * @param channelId 话题ID
+   */
   public void fetchMemberList(long serverId, long channelId) {
     ALog.d(TAG, "fetchMemberList", "info:" + serverId + "," + channelId);
     fetchMemberData(serverId, channelId, 0);
   }
 
+  /**
+   * 查询成员列表接口
+   *
+   * @param serverId 社区ID
+   * @param channelId 话题ID
+   * @param timeTag 查询时间戳
+   */
   private void fetchMemberData(long serverId, long channelId, long timeTag) {
     QChatServerRepo.fetchServerMemberWithoutChannel(
         serverId,
@@ -105,7 +125,13 @@ public class AddMemberViewModel extends BaseViewModel {
         });
   }
 
-  /** add member to channel permission */
+  /**
+   * 添加成员接口
+   *
+   * @param serverId 社区ID
+   * @param channelId 话题ID
+   * @param accId 成员ID
+   */
   public void addMemberToChannel(long serverId, long channelId, String accId) {
     QChatRoleRepo.addChannelMemberRole(
         serverId,
@@ -123,8 +149,15 @@ public class AddMemberViewModel extends BaseViewModel {
           @Override
           public void onFailed(int code) {
             ALog.d(TAG, "fetchMemberData", "onFailed:" + code + accId);
-            addResult.setError(
-                code, ErrorUtils.getErrorText(code, R.string.qchat_channel_add_member_error));
+            int tipRes;
+            if (code == ResponseCode.RES_ENONEXIST) {
+              tipRes = R.string.qchat_channel_add_member_error_not_found;
+            } else if (code == ResponseCode.RES_EEXIST) {
+              tipRes = R.string.qchat_channel_add_member_error_exist;
+            } else {
+              tipRes = R.string.qchat_channel_add_member_error;
+            }
+            addResult.setError(code, ErrorUtils.getErrorText(code, tipRes));
             addLiveData.postValue(addResult);
           }
 
@@ -140,7 +173,12 @@ public class AddMemberViewModel extends BaseViewModel {
         });
   }
 
-  /** load next page */
+  /**
+   * 加载更多成员列表接口
+   *
+   * @param serverId 社区ID
+   * @param channelId 话题ID
+   */
   public void loadMore(long serverId, long channelId) {
     long offset = 0;
     if (lastMemberInfo != null) {
@@ -149,11 +187,21 @@ public class AddMemberViewModel extends BaseViewModel {
     fetchMemberData(serverId, channelId, offset);
   }
 
-  /** member filter to exclude current user */
+  /**
+   * 过滤器，用来过滤自己
+   *
+   * @param accId 成员ID
+   * @return 是否过滤
+   */
   public boolean memberFilter(String accId) {
     return !TextUtils.equals(accId, IMKitClient.account());
   }
 
+  /**
+   * 是否还有更多数据
+   *
+   * @return 是否还有更多数据
+   */
   public boolean hasMore() {
     return roleHasMore;
   }

@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+/** 社区身份组创建管理 */
 public class QChatRoleCreateViewModel extends BaseViewModel {
 
   private final Set<String> selectedUsers = new ArraySet<>();
@@ -22,6 +23,12 @@ public class QChatRoleCreateViewModel extends BaseViewModel {
 
   private final MutableLiveData<ErrorMsg> errorLiveData = new MutableLiveData<>();
 
+  /**
+   * 创建身份组
+   *
+   * @param serverId 社区 id
+   * @param name 身份组名称
+   */
   public void createRole(Long serverId, String name) {
     if (selectedUsers.isEmpty()) {
       QChatRoleRepo.createRole(
@@ -44,8 +51,8 @@ public class QChatRoleCreateViewModel extends BaseViewModel {
     }
   }
 
-  private void operatorResult(ResultInfo result) {
-    createResult.postValue(true);
+  private void operatorResult(ResultInfo<?> result) {
+    createResult.postValue(result.getSuccess());
     if (!result.getSuccess()) {
       errorLiveData.postValue(result.getMsg());
     }

@@ -9,8 +9,10 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import com.netease.yunxin.kit.common.utils.NetworkUtils;
 import com.netease.yunxin.kit.qchatkit.ui.R;
 import com.netease.yunxin.kit.qchatkit.ui.databinding.QChatThreeStatusSwitchLayoutBinding;
 
@@ -117,6 +119,10 @@ public class ThreeStatusSwitch extends LinearLayout implements View.OnClickListe
 
   @Override
   public void onClick(View v) {
+    if (!NetworkUtils.isConnected()) {
+      Toast.makeText(getContext(), R.string.qchat_network_error_tip, Toast.LENGTH_SHORT).show();
+      return;
+    }
 
     if (v.getId() == viewBinding.qchatThreeStatusOpenLayout.getId()) {
       switchStatus(SWITCH_OPEN);

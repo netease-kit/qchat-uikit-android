@@ -17,6 +17,7 @@ public class LoadMoreRecyclerViewDecorator<T> {
   public final QChatCommonAdapter<?, ?> adapter;
   public LoadMoreListener<T> loadMoreListener;
   private T lastDataAnchor = null;
+  private T toNewDataAnchor = null;
 
   public LoadMoreRecyclerViewDecorator(
       RecyclerView innerView, LinearLayoutManager layoutManager, QChatCommonAdapter<?, ?> adapter) {
@@ -29,6 +30,19 @@ public class LoadMoreRecyclerViewDecorator<T> {
 
   public void setLoadMoreListener(LoadMoreListener<T> loadMoreListener) {
     this.loadMoreListener = loadMoreListener;
+  }
+
+  public void init() {
+    lastDataAnchor = null;
+    toNewDataAnchor = null;
+  }
+
+  public void notifyResult(boolean success) {
+    if (success) {
+      lastDataAnchor = toNewDataAnchor;
+    } else {
+      toNewDataAnchor = null;
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -45,9 +59,10 @@ public class LoadMoreRecyclerViewDecorator<T> {
             if (loadMoreListener != null && total < position + LOAD_MORE_LIMIT) {
               Object data = adapter.getItemData(total - 1);
               T newAnchor = data != null ? (T) data : null;
-              if (!Objects.equals(newAnchor, lastDataAnchor) || lastDataAnchor == null) {
+              if ((!Objects.equals(newAnchor, lastDataAnchor) || lastDataAnchor == null)
+                  && !Objects.equals(newAnchor, toNewDataAnchor)) {
                 loadMoreListener.onLoadMore(newAnchor);
-                lastDataAnchor = newAnchor;
+                toNewDataAnchor = newAnchor;
               }
             }
           }

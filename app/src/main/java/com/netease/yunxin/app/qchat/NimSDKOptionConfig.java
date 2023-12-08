@@ -45,6 +45,8 @@ public class NimSDKOptionConfig {
     options.checkManifestConfig = false;
     options.enableTeamMsgAck = true;
     options.enableFcs = false;
+    // 圈组支持自动订阅模式
+    options.qchatAutoSubscribe = true;
     options.shouldConsiderRevokedMessageUnreadCount = true;
     // 会话置顶是否漫游
     options.notifyStickTopSession = true;
@@ -120,30 +122,30 @@ public class NimSDKOptionConfig {
   private static MixPushConfig buildMixPushConfig() {
     MixPushConfig config = new MixPushConfig();
     // xiaomi
-//        config.xmAppId = "xiao mi push app id"; //apply in xiaomi
-//        config.xmAppKey = "xiao mi push app key";//apply in xiaomi
-//        config.xmCertificateName = "Certificate Name";//config in yunxin platform
+    config.xmAppId = "";
+    config.xmAppKey = "";
+    config.xmCertificateName = "";
 
     // huawei
-//        config.hwAppId = "huawei app id";//apply in huawei
-//        config.hwCertificateName = "Certificate Name";//config in yunxin platform
+    config.hwAppId = "";
+    config.hwCertificateName = "";
 
     // meizu
-//        config.mzAppId = "meizu push app id";//apply in meizu
-//        config.mzAppKey = "meizu push app key";//apply in meizu
-//        config.mzCertificateName = "Certificate Name";//config in yunxin platform
+    config.mzAppId = "";
+    config.mzAppKey = "";
+    config.mzCertificateName = "";
 
     // fcm
-//        config.fcmCertificateName = "DEMO_FCM_PUSH";
+    //        config.fcmCertificateName = "DEMO_FCM_PUSH";
 
     // vivo
-//        config.vivoCertificateName = "Certificate Name";//config in yunxin platform
+    config.vivoCertificateName = "";
 
     // oppo
-//        config.oppoAppId = "oppo push app id";//apply in oppo
-//        config.oppoAppKey = "oppo push app key";//apply in oppo
-//        config.oppoAppSercet = "oppo push app secret"; //apply in oppo
-//        config.oppoCertificateName = "Certificate Name";//config in yunxin platform
+    config.oppoAppId = "";
+    config.oppoAppKey = "";
+    config.oppoAppSercet = "";
+    config.oppoCertificateName = "";
     return config;
   }
 }

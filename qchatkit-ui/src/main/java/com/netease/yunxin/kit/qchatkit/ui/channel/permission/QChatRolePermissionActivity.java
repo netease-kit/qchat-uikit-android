@@ -11,19 +11,19 @@ import android.text.TextUtils;
 import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
-import com.netease.yunxin.kit.common.ui.activities.BaseActivity;
 import com.netease.yunxin.kit.common.ui.viewmodel.LoadStatus;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatChannelRoleInfo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatRoleOptionEnum;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatRoleResourceEnum;
 import com.netease.yunxin.kit.qchatkit.ui.R;
+import com.netease.yunxin.kit.qchatkit.ui.common.QChatChannelBaseActivity;
 import com.netease.yunxin.kit.qchatkit.ui.databinding.QChatRolePermissionActivityBinding;
 import com.netease.yunxin.kit.qchatkit.ui.model.QChatConstant;
 import java.util.HashMap;
 import java.util.Map;
 
-/** role permission activity modify role's permission in channel */
-public class QChatRolePermissionActivity extends BaseActivity {
+/** 话题身份组权限配置页面 */
+public class QChatRolePermissionActivity extends QChatChannelBaseActivity {
 
   private QChatRolePermissionActivityBinding viewBiding;
   private RolePermissionViewModel viewModel;
@@ -50,7 +50,10 @@ public class QChatRolePermissionActivity extends BaseActivity {
       finish();
       return;
     }
+    // 设置父类的serverId，用去通用Server变化处理
+    configServerIdAndChannelId(roleInfo.getServerId(), roleInfo.getChannelId());
 
+    // 监听权限数据获取
     viewModel
         .getRolePermissionLiveData()
         .observe(
@@ -85,6 +88,7 @@ public class QChatRolePermissionActivity extends BaseActivity {
     }
   }
 
+  /** 加载权限数据 */
   private void loadPermissionData() {
     Map<QChatRoleResourceEnum, QChatRoleOptionEnum> auth = roleInfo.getAuths();
     if (auth.size() > 0) {
@@ -131,6 +135,7 @@ public class QChatRolePermissionActivity extends BaseActivity {
     }
   }
 
+  /** 开关状态变化 */
   private void switchChange(QChatRoleResourceEnum type, int value) {
     Map<QChatRoleResourceEnum, QChatRoleOptionEnum> valueMap = new HashMap<>();
     valueMap.put(type, QChatRoleOptionEnum.Companion.typeOfValue(value));
@@ -138,6 +143,7 @@ public class QChatRolePermissionActivity extends BaseActivity {
         roleInfo.getServerId(), roleInfo.getChannelId(), roleInfo.getRoleId(), valueMap);
   }
 
+  /** 启动权限配置页面 */
   public static void launch(Activity activity, QChatChannelRoleInfo data) {
     Intent intent = new Intent(activity, QChatRolePermissionActivity.class);
     Bundle bundle = new Bundle();

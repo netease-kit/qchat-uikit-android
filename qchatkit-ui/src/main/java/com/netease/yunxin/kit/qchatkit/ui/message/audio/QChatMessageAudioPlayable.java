@@ -8,7 +8,7 @@ import com.netease.nimlib.sdk.msg.attachment.AudioAttachment;
 import com.netease.yunxin.kit.corekit.im.audioplayer.Playable;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatMessageInfo;
 
-/** support audio message control */
+/** 语义消息播放对象 */
 public class QChatMessageAudioPlayable implements Playable {
   private final QChatMessageInfo message;
 

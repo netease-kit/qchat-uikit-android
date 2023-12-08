@@ -26,7 +26,6 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import com.netease.yunxin.kit.alog.ALog;
-import com.netease.yunxin.kit.common.ui.activities.BaseActivity;
 import com.netease.yunxin.kit.common.utils.SizeUtils;
 import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
 import com.netease.yunxin.kit.corekit.im.utils.RouterConstant;
@@ -36,6 +35,7 @@ import com.netease.yunxin.kit.qchatkit.repo.model.NextInfo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatServerMemberWithRoleInfo;
 import com.netease.yunxin.kit.qchatkit.ui.R;
 import com.netease.yunxin.kit.qchatkit.ui.common.LoadMoreRecyclerViewDecorator;
+import com.netease.yunxin.kit.qchatkit.ui.common.QChatServerBaseActivity;
 import com.netease.yunxin.kit.qchatkit.ui.databinding.QChatServerMbemberInfoWithRoleItemBinding;
 import com.netease.yunxin.kit.qchatkit.ui.databinding.QChatServerMemberListActivityBinding;
 import com.netease.yunxin.kit.qchatkit.ui.model.QChatConstant;
@@ -44,10 +44,11 @@ import com.netease.yunxin.kit.qchatkit.ui.utils.QChatUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class QChatServerMemberListActivity extends BaseActivity {
+/** 社区成员列表页面 */
+public class QChatServerMemberListActivity extends QChatServerBaseActivity {
   private static final String TAG = "QChatServerMemberListActivity";
   private static final String KEY_PARAM_SERVER_ID = "key_param_server_id";
-  private static final int LOAD_MORE_LIMIT = 30;
+  private static final int LOAD_MORE_LIMIT = 100;
   private static final int DEFAULT_DP_TIP_TRANSLATION_Y = 55;
 
   private long serverId;
@@ -57,6 +58,7 @@ public class QChatServerMemberListActivity extends BaseActivity {
   private final AnimatorSet animatorSet = new AnimatorSet();
 
   private ActivityResultLauncher<Intent> launcher;
+  private LoadMoreRecyclerViewDecorator<QChatServerMemberWithRoleInfo> decorator;
 
   @Override
   protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -70,13 +72,18 @@ public class QChatServerMemberListActivity extends BaseActivity {
       finish();
       return;
     }
+    configServerId(serverId);
 
     initView();
 
+    // 处理添加成员页面返回的用户列表，批量邀请成员或删除成员等
     launcher =
         registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
+              if (isFinishing()) {
+                return;
+              }
               if (result.getResultCode() != RESULT_OK) {
                 return;
               }
@@ -99,7 +106,7 @@ public class QChatServerMemberListActivity extends BaseActivity {
                                   if (failedList != null && !failedList.isEmpty()) {
                                     Toast.makeText(
                                             QChatServerMemberListActivity.this,
-                                            "failed list is " + failedList,
+                                            R.string.qchat_server_request_fail,
                                             Toast.LENGTH_SHORT)
                                         .show();
                                   }
@@ -177,17 +184,31 @@ public class QChatServerMemberListActivity extends BaseActivity {
 
     binding.ivInviteMember.setOnClickListener(
         v ->
-            XKitRouter.withKey(RouterConstant.PATH_CONTACT_SELECTOR_PAGE)
-                .withContext(this)
-                .navigate(launcher));
+            QChatUtils.isConnectedToastAndRun(
+                this,
+                () -> {
+                  // 跳转通讯录选择用户进入该社区
+                  XKitRouter.withKey(RouterConstant.PATH_CONTACT_SELECTOR_PAGE)
+                      .withContext(this)
+                      .withParam(
+                          RouterConstant.SELECTOR_CONTACT_FILTER_KEY,
+                          adapter.getDataOnlyAccIdList())
+                      .navigate(launcher);
+                }));
 
     adapter = new QChatServerMemberAdapter(this, QChatServerMbemberInfoWithRoleItemBinding.class);
     adapter.setItemClickListener(
         (data, holder) -> {
-          Intent intent =
-              new Intent(QChatServerMemberListActivity.this, QChatServerMemberInfoActivity.class);
-          intent.putExtra(QChatConstant.SERVER_MEMBER, data);
-          launcher.launch(intent);
+          QChatUtils.isConnectedToastAndRun(
+              this,
+              () -> {
+                // 跳转成员详情页面
+                Intent intent =
+                    new Intent(
+                        QChatServerMemberListActivity.this, QChatServerMemberInfoActivity.class);
+                intent.putExtra(QChatConstant.SERVER_MEMBER, data);
+                launcher.launch(intent);
+              });
         });
 
     LinearLayoutManager layoutManager =
@@ -195,8 +216,7 @@ public class QChatServerMemberListActivity extends BaseActivity {
     binding.ryMemberList.setLayoutManager(layoutManager);
     binding.ryMemberList.setAdapter(adapter);
 
-    LoadMoreRecyclerViewDecorator<QChatServerMemberWithRoleInfo> decorator =
-        new LoadMoreRecyclerViewDecorator<>(binding.ryMemberList, layoutManager, adapter);
+    decorator = new LoadMoreRecyclerViewDecorator<>(binding.ryMemberList, layoutManager, adapter);
     decorator.setLoadMoreListener(
         data -> {
           NextInfo info;
@@ -229,6 +249,12 @@ public class QChatServerMemberListActivity extends BaseActivity {
           @Override
           public void onSuccess(@Nullable List<QChatServerMemberWithRoleInfo> param) {
             adapter.addDataList(param, clear);
+            if (decorator != null) {
+              if (clear) {
+                decorator.init();
+              }
+              decorator.notifyResult(true);
+            }
           }
 
           public void onFailed(int code) {
@@ -250,6 +276,12 @@ public class QChatServerMemberListActivity extends BaseActivity {
         });
   }
 
+  /**
+   * 页面启动方法
+   *
+   * @param context 上下文
+   * @param serverId 对应的社区 id
+   */
   public static void launch(Context context, long serverId) {
     Intent intent = new Intent(context, QChatServerMemberListActivity.class);
     intent.putExtra(KEY_PARAM_SERVER_ID, serverId);
@@ -259,6 +291,7 @@ public class QChatServerMemberListActivity extends BaseActivity {
     context.startActivity(intent);
   }
 
+  /** 处理邀请成员时展示的提示动画 */
   private void prepareAnim() {
     // the duration of executing anim is 0.5s
     ObjectAnimator showTransYAnimator =

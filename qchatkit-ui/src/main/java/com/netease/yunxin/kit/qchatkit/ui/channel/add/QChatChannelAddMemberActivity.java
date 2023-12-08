@@ -26,8 +26,9 @@ import com.netease.yunxin.kit.qchatkit.ui.model.QChatBaseBean;
 import com.netease.yunxin.kit.qchatkit.ui.model.QChatConstant;
 import com.netease.yunxin.kit.qchatkit.ui.model.QChatServerMemberBean;
 import com.netease.yunxin.kit.qchatkit.ui.model.QChatViewType;
+import com.netease.yunxin.kit.qchatkit.ui.utils.QChatUtils;
 
-/** add member to channel permission page show the server member list */
+/** 话题添加成员页面 */
 public class QChatChannelAddMemberActivity extends CommonListActivity {
 
   private static final String TAG = "QChatChannelAddMemberActivity";
@@ -50,7 +51,9 @@ public class QChatChannelAddMemberActivity extends CommonListActivity {
     serverId = getIntent().getLongExtra(QChatConstant.SERVER_ID, 0);
     channelId = getIntent().getLongExtra(QChatConstant.CHANNEL_ID, 0);
     ALog.d(TAG, "initData", "info:" + serverId + "," + channelId);
+    configServerIdAndChannelId(serverId, channelId);
     viewModel = new ViewModelProvider(this).get(AddMemberViewModel.class);
+    // 成员查询Livedata
     viewModel
         .getResultLiveData()
         .observe(
@@ -77,6 +80,7 @@ public class QChatChannelAddMemberActivity extends CommonListActivity {
                 ALog.d(TAG, "ResultLiveData", "Error");
               }
             });
+    // 添加成员Livedata
     viewModel
         .getAddLiveData()
         .observe(
@@ -108,35 +112,39 @@ public class QChatChannelAddMemberActivity extends CommonListActivity {
     viewModel.fetchMemberList(serverId, channelId);
   }
 
+  /** 显示空视图 */
   private void showEmptyView(boolean isShow) {
     ALog.d(TAG, "showEmptyView");
     String content = "";
     if (isShow) {
-      String memberText = getResources().getString(R.string.qchat_member);
-      String tipsText = getResources().getString(R.string.qchat_empty_text);
-      content = String.format(tipsText, memberText);
+      content = getString(R.string.qchat_channel_add_member_empty);
     }
-    showEmptyView(content, isShow);
+    showEmptyView(content, R.drawable.ic_qchat_tip_no_members, isShow);
   }
 
+  /** 加载更多 */
   @Override
   public void loadMore(QChatBaseBean bean) {
     viewModel.loadMore(serverId, channelId);
   }
 
+  /** 标题栏右侧按钮点击事件 */
   @Override
   public void onTitleActionClick(View view) {}
 
+  /** 获取标题栏标题 */
   @Override
   public String getTitleText() {
     return getResources().getString(R.string.qchat_channel_add_member_title);
   }
 
+  /** 是否加载更多 */
   @Override
   public boolean isLoadMore() {
     return viewModel.hasMore();
   }
 
+  /** 创建成员列表中的ViewHolder */
   @Override
   public CommonViewHolder<QChatBaseBean> onCreateViewHolder(
       @NonNull ViewGroup parent, int viewType) {
@@ -147,8 +155,13 @@ public class QChatChannelAddMemberActivity extends CommonListActivity {
       addRoleViewHolder.setItemOnClickListener(
           (data, position) -> {
             if (data instanceof QChatServerMemberBean) {
-              viewModel.addMemberToChannel(
-                  serverId, channelId, ((QChatServerMemberBean) data).serverMember.getAccId());
+              QChatUtils.isConnectedToastAndRun(
+                  this,
+                  () ->
+                      viewModel.addMemberToChannel(
+                          serverId,
+                          channelId,
+                          ((QChatServerMemberBean) data).serverMember.getAccId()));
             }
           });
       return addRoleViewHolder;
@@ -156,6 +169,13 @@ public class QChatChannelAddMemberActivity extends CommonListActivity {
     return null;
   }
 
+  /**
+   * 启动话题添加成员页面
+   *
+   * @param activity activity
+   * @param serverId 话题id
+   * @param channelId 频道id
+   */
   public static void launch(Activity activity, long serverId, long channelId) {
     Intent intent = new Intent(activity, QChatChannelAddMemberActivity.class);
     intent.putExtra(QChatConstant.SERVER_ID, serverId);

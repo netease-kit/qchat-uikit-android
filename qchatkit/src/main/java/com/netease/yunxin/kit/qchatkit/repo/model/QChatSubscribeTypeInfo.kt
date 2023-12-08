@@ -1,0 +1,14 @@
+/*
+ * Copyright (c) 2022 NetEase, Inc. All rights reserved.
+ * Use of this source code is governed by a MIT license that can be
+ * found in the LICENSE file.
+ */
+
+package com.netease.yunxin.kit.qchatkit.repo.model
+
+sealed class QChatSubscribeTypeInfo
+object ChannelMsg : QChatSubscribeTypeInfo()
+object ChannelMsgUnreadCount : QChatSubscribeTypeInfo()
+object ChannelMsgUnreadStatus : QChatSubscribeTypeInfo()
+object ServerMsg : QChatSubscribeTypeInfo()
+object ChannelMsgTyping : QChatSubscribeTypeInfo()

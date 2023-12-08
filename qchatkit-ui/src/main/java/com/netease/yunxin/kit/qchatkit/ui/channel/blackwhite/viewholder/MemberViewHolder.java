@@ -4,11 +4,13 @@
 
 package com.netease.yunxin.kit.qchatkit.ui.channel.blackwhite.viewholder;
 
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import com.netease.yunxin.kit.common.ui.utils.AvatarColor;
 import com.netease.yunxin.kit.common.ui.widgets.ContactAvatarView;
+import com.netease.yunxin.kit.corekit.im.IMKitClient;
 import com.netease.yunxin.kit.qchatkit.ui.common.CommonClickListener;
 import com.netease.yunxin.kit.qchatkit.ui.common.CommonViewHolder;
 import com.netease.yunxin.kit.qchatkit.ui.databinding.QChatChannelNameListMemberViewHolderBinding;
@@ -59,7 +61,7 @@ public class MemberViewHolder extends CommonViewHolder<QChatBaseBean> {
           bean.serverMember.getAvatarUrl(),
           bean.serverMember.getNickName(),
           AvatarColor.avatarColor(bean.serverMember.getAccId()));
-      if (editStatus) {
+      if (editStatus && !TextUtils.equals(bean.serverMember.getAccId(), IMKitClient.account())) {
         binding.qChatNameListDelete.setVisibility(View.VISIBLE);
       } else {
         binding.qChatNameListDelete.setVisibility(View.GONE);

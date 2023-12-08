@@ -4,21 +4,22 @@
 
 package com.netease.yunxin.kit.qchatkit.ui.server;
 
-import static com.netease.yunxin.kit.qchatkit.repo.QChatRoleRepoKt.MAX_ROLE_PAGE_SIZE;
+import static com.netease.yunxin.kit.qchatkit.repo.QChatRoleRepo.MAX_ROLE_PAGE_SIZE;
 import static com.netease.yunxin.kit.qchatkit.ui.model.QChatConstant.ROLE_EVERYONE_TYPE;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.netease.yunxin.kit.common.ui.activities.CommonActivity;
 import com.netease.yunxin.kit.common.ui.dialog.ChoiceListener;
 import com.netease.yunxin.kit.common.ui.dialog.CommonChoiceDialog;
+import com.netease.yunxin.kit.common.utils.NetworkUtils;
 import com.netease.yunxin.kit.corekit.im.IMKitClient;
 import com.netease.yunxin.kit.qchatkit.repo.QChatRoleRepo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatServerInfo;
@@ -26,6 +27,7 @@ import com.netease.yunxin.kit.qchatkit.repo.model.QChatServerRoleInfo;
 import com.netease.yunxin.kit.qchatkit.repo.model.ServerRoleResult;
 import com.netease.yunxin.kit.qchatkit.ui.R;
 import com.netease.yunxin.kit.qchatkit.ui.common.QChatCallback;
+import com.netease.yunxin.kit.qchatkit.ui.common.QChatServerCommonBaseActivity;
 import com.netease.yunxin.kit.qchatkit.ui.databinding.QChatRoleSortActivityLayoutBinding;
 import com.netease.yunxin.kit.qchatkit.ui.model.QChatConstant;
 import com.netease.yunxin.kit.qchatkit.ui.server.adapter.QChatServerRolesAdapter;
@@ -33,7 +35,8 @@ import com.netease.yunxin.kit.qchatkit.ui.server.viewholder.QChatServerRoleViewH
 import java.util.List;
 import java.util.Set;
 
-public class QChatRoleSortActivity extends CommonActivity {
+/** 社区身份组优先级排序页面，用户仅能管理已加入的最高优先级身份组之下的身份组优先级 */
+public class QChatRoleSortActivity extends QChatServerCommonBaseActivity {
 
   private QChatRoleSortActivityLayoutBinding binding;
 
@@ -66,6 +69,14 @@ public class QChatRoleSortActivity extends CommonActivity {
         .setActionEnable(false)
         .setActionListener(
             v -> {
+              if (!NetworkUtils.isConnected()) {
+                Toast.makeText(
+                        QChatRoleSortActivity.this,
+                        R.string.qchat_network_error_tip,
+                        Toast.LENGTH_SHORT)
+                    .show();
+                return;
+              }
               //no roles will return directly
               if (rolesAdapter.getItemCount() == 0) {
                 finish();
@@ -100,6 +111,7 @@ public class QChatRoleSortActivity extends CommonActivity {
     initSort();
   }
 
+  /** 处理排序逻辑 */
   private void initSort() {
     ItemTouchHelper.Callback touchCallback =
         new ItemTouchHelper.Callback() {
@@ -157,6 +169,9 @@ public class QChatRoleSortActivity extends CommonActivity {
   @Override
   public void initData() {
     serverInfo = (QChatServerInfo) getIntent().getSerializableExtra(QChatConstant.SERVER_INFO);
+    if (serverInfo != null) {
+      configServerId(serverInfo.getServerId());
+    }
     LinearLayoutManager layoutManager = new LinearLayoutManager(this);
     binding.rvMembers.setLayoutManager(layoutManager);
     rolesAdapter = new QChatServerRolesAdapter();
@@ -166,6 +181,7 @@ public class QChatRoleSortActivity extends CommonActivity {
     getRolesList();
   }
 
+  /** 获取身份组列表 */
   private void getRolesList() {
     QChatRoleRepo.fetchServerRoles(
         serverInfo.getServerId(),
@@ -208,6 +224,11 @@ public class QChatRoleSortActivity extends CommonActivity {
         });
   }
 
+  /**
+   * 展示删除身份组的确认弹窗
+   *
+   * @param roleInfo 待删除的身份组
+   */
   private void showDeleteConfirmDialog(QChatServerRoleInfo roleInfo) {
     CommonChoiceDialog dialog = new CommonChoiceDialog();
     dialog
@@ -230,6 +251,11 @@ public class QChatRoleSortActivity extends CommonActivity {
         .show(getSupportFragmentManager());
   }
 
+  /**
+   * 删除社区身份组
+   *
+   * @param roleInfo 待删除的身份组
+   */
   private void deleteRole(QChatServerRoleInfo roleInfo) {
     QChatRoleRepo.deleteServerRole(
         roleInfo.getServerId(),
@@ -245,6 +271,12 @@ public class QChatRoleSortActivity extends CommonActivity {
   @Override
   protected void initViewModel() {}
 
+  /**
+   * 页面启动方法
+   *
+   * @param activity 页面启动 activity
+   * @param serverInfo 待排序身份组对应的社区信息
+   */
   public static void launch(Activity activity, QChatServerInfo serverInfo) {
     Intent intent = new Intent(activity, QChatRoleSortActivity.class);
     intent.putExtra(QChatConstant.SERVER_INFO, serverInfo);

@@ -18,18 +18,18 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 import com.netease.yunxin.kit.alog.ALog;
-import com.netease.yunxin.kit.common.ui.activities.BaseActivity;
 import com.netease.yunxin.kit.common.ui.viewmodel.FetchResult;
 import com.netease.yunxin.kit.common.ui.viewmodel.LoadStatus;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatChannelInfo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatChannelModeEnum;
 import com.netease.yunxin.kit.qchatkit.ui.R;
+import com.netease.yunxin.kit.qchatkit.ui.common.QChatServerBaseActivity;
 import com.netease.yunxin.kit.qchatkit.ui.databinding.QChatChannelCreateActivityBinding;
 import com.netease.yunxin.kit.qchatkit.ui.model.QChatConstant;
 import java.util.ArrayList;
 
-/** channel create activity */
-public class QChatChannelCreateActivity extends BaseActivity {
+/** 话题创建页面 */
+public class QChatChannelCreateActivity extends QChatServerBaseActivity {
 
   private static final String TAG = "QChatChannelCreateActivity";
 
@@ -39,6 +39,7 @@ public class QChatChannelCreateActivity extends BaseActivity {
   private QChatChannelCreateActivityBinding viewBinding;
   private ChannelCreateViewModel viewModel;
   private ActivityResultLauncher<Intent> activityResultLauncher;
+  // 频道类型列表
   private final ArrayList<String> channelTypeList = new ArrayList<>(2);
   private int selectIndex = 0;
   private long serverId;
@@ -59,6 +60,7 @@ public class QChatChannelCreateActivity extends BaseActivity {
 
   private void initView() {
 
+    // 选择频道类型,结果回调
     activityResultLauncher =
         registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -100,7 +102,7 @@ public class QChatChannelCreateActivity extends BaseActivity {
           }
         });
 
-    /** choice channel type. default type is public */
+    /** 话题类型选择 */
     viewBinding.channelCreateTypeRtv.setOnClickListener(
         view -> {
           ALog.d(TAG, "channelCreateTypeRtv:choice type");
@@ -111,6 +113,7 @@ public class QChatChannelCreateActivity extends BaseActivity {
           intent.putExtra(QChatConstant.SELECTED_INDEX, selectIndex);
           intent.putExtra(
               QChatConstant.TITLE, getResources().getString(R.string.qchat_channel_type));
+          intent.putExtra(QChatConstant.SERVER_ID, serverId);
           activityResultLauncher.launch(intent);
         });
 
@@ -135,6 +138,8 @@ public class QChatChannelCreateActivity extends BaseActivity {
           .show();
       finish();
     }
+    configServerId(serverId);
+    // 监听创建话题结果
     viewModel
         .getFetchResult()
         .observe(
@@ -170,6 +175,7 @@ public class QChatChannelCreateActivity extends BaseActivity {
             });
   }
 
+  /** 创建话题 */
   private void createChannel() {
 
     String channelName = viewBinding.channelCreateNameEt.getText();
@@ -193,6 +199,7 @@ public class QChatChannelCreateActivity extends BaseActivity {
     viewModel.createChannel(serverId, channelName, channelTopic, type);
   }
 
+  /** 启动话题创建页面 */
   public static void launch(Activity activity, long serverId) {
     Intent intent = new Intent(activity, QChatChannelCreateActivity.class);
     intent.putExtra(QChatConstant.SERVER_ID, serverId);

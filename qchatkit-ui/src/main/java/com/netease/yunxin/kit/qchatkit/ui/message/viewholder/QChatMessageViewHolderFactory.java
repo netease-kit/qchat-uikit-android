@@ -8,14 +8,15 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import com.netease.nimlib.sdk.msg.constant.MsgTypeEnum;
-import com.netease.yunxin.kit.qchatkit.ui.databinding.QchatBaseMessageViewHolderBinding;
+import com.netease.yunxin.kit.qchatkit.ui.databinding.QChatBaseMessageViewHolderBinding;
 
+/** 圈组消息ViewHolder工厂 */
 public class QChatMessageViewHolderFactory {
   public QChatBaseMessageViewHolder getViewHolder(@NonNull ViewGroup parent, int viewType) {
 
     QChatBaseMessageViewHolder viewHolder = null;
-    QchatBaseMessageViewHolderBinding viewHolderBinding =
-        QchatBaseMessageViewHolderBinding.inflate(
+    QChatBaseMessageViewHolderBinding viewHolderBinding =
+        QChatBaseMessageViewHolderBinding.inflate(
             LayoutInflater.from(parent.getContext()), parent, false);
     if (viewType == MsgTypeEnum.image.getValue()) {
       viewHolder = new QChatImageMessageViewHolder(viewHolderBinding);

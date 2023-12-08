@@ -8,28 +8,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="4dp"
-    android:paddingBottom="4dp">
-
-    <com.netease.yunxin.kit.common.ui.widgets.ContactAvatarView
-        android:id="@+id/cavIcon"
-        android:layout_width="42dp"
-        android:layout_height="42dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/ivMsgTip"
-        android:layout_width="8dp"
-        android:layout_height="8dp"
-        android:layout_marginTop="2dp"
-        android:layout_marginEnd="2dp"
-        android:src="@drawable/bg_shape_red_dot"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="@id/cavIcon"
-        app:layout_constraintTop_toTopOf="@id/cavIcon" />
+    xmlns:tools="http://schemas.android.com/tools">
 
     <ImageView
         android:id="@+id/ivFocus"
@@ -40,5 +19,51 @@
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/cavIcon" />
+
+    <com.netease.yunxin.kit.common.ui.widgets.ContactAvatarView
+        android:id="@+id/cavIcon"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:layout_marginVertical="@dimen/dimen_4_dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/anchorForCount"
+        android:layout_width="@dimen/dimen_48_dp"
+        android:layout_height="@dimen/dimen_48_dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvUnReadCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_shape_red_dot"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp"
+        android:textColor="@color/color_white"
+        android:gravity="center"
+        android:textSize="12dp"
+        android:visibility="gone"
+        android:layout_marginTop="@dimen/dimen_1_dp"
+        app:layout_constraintEnd_toEndOf="@id/anchorForCount"
+        app:layout_constraintTop_toTopOf="@id/anchorForCount"
+        tools:ignore="SpUsage" />
+
+    <ImageView
+        android:id="@+id/ivAnnounceFlag"
+        android:layout_width="@dimen/dimen_12_dp"
+        android:layout_height="@dimen/dimen_12_dp"
+        android:src="@drawable/ic_qchat_announce_flag_with_bg"
+        android:layout_marginEnd="@dimen/dimen_3_dp"
+        android:visibility="gone"
+        android:layout_marginBottom="@dimen/dimen_3_dp"
+        app:layout_constraintBottom_toBottomOf="@id/anchorForCount"
+        app:layout_constraintEnd_toEndOf="@id/anchorForCount" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

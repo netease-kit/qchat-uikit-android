@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2022 NetEase, Inc. All rights reserved.
+  ~ Use of this source code is governed by a MIT license that can be
+  ~ found in the LICENSE file.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/content_layout"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:layout_margin="@dimen/dimen_5_dp"
+    android:background="@drawable/bg_qchat_pop_menu"
+    android:orientation="vertical"
+    android:visibility="visible">
+
+    <FrameLayout android:id="@+id/q_chat_menu_bar_layout"
+        android:layout_width="320dp"
+        android:layout_height="50dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp">
+
+        <LinearLayout
+            android:id="@+id/q_chat_menu_emoji_bar_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginStart="@dimen/dimen_3_dp"
+            android:orientation="horizontal">
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/q_chat_menu_emoji_bar_back"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="center_vertical|end"
+            android:src="@drawable/ic_qchat_emoji_arrow_down"
+            android:layout_marginEnd="@dimen/dimen_16_dp"
+            android:visibility="visible" />
+    </FrameLayout>
+
+    <View android:id="@+id/q_chat_menu_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="@dimen/dimen_16_dp"
+        android:layout_marginEnd="@dimen/dimen_16_dp"
+        android:background="#e4e9f2" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingVertical="@dimen/dimen_8_dp" />
+
+
+        <GridView
+            android:id="@+id/q_chat_menu_emoji_grid_view"
+            android:layout_width="305dp"
+            android:layout_height="200dp"
+            android:background="@color/color_white"
+            android:scrollbars="none"
+            android:visibility="gone"
+            android:layout_marginStart="@dimen/dimen_10_dp"
+            android:layout_marginEnd="@dimen/dimen_5_dp"
+            android:numColumns="7"
+            android:layout_marginBottom="@dimen/dimen_5_dp"/>
+    </FrameLayout>
+
+</LinearLayout>

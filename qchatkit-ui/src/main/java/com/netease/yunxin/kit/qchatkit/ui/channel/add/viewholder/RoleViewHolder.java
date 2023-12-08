@@ -11,6 +11,7 @@ import com.netease.yunxin.kit.qchatkit.ui.databinding.QChatAddRoleViewHolderBind
 import com.netease.yunxin.kit.qchatkit.ui.model.QChatArrowBean;
 import com.netease.yunxin.kit.qchatkit.ui.model.QChatBaseBean;
 
+/** 身份组列表ViewHolder */
 public class RoleViewHolder extends CommonViewHolder<QChatBaseBean> {
 
   private QChatAddRoleViewHolderBinding binding;

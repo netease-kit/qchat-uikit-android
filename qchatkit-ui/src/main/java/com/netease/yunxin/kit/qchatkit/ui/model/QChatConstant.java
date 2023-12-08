@@ -11,6 +11,7 @@ public class QChatConstant {
   public static final String CHOICE_LIST = "choice_list";
   public static final String SELECTED_INDEX = "selected_index";
   public static final String SERVER_ID = "server_id";
+  public static final String SERVER_OWNER_ID = "server_owner_id";
   public static final String SERVER_INFO = "serverInfo";
   public static final String SERVER_MEMBER = "serverMember";
   public static final String CHANNEL_ID = "channel_id";
@@ -21,6 +22,7 @@ public class QChatConstant {
   public static final String SERVER_ROLE_ID = "serverRoleId";
   public static final String CHANNEL_ROLE = "channel_role_info";
   public static final String CHANNEL_MEMBER = "channel_member_info";
+  public static final String IS_VISITOR_MODE = "server_visitor_mode";
 
   public static final String ROUTER_ADD_ROLE = "channel/add_role";
   public static final String ROUTER_ADD_MEMBER = "channel/add_member";
@@ -37,6 +39,8 @@ public class QChatConstant {
   public static final String REQUEST_MEMBER_FILTER_KEY = "request_member_filter_key";
 
   public static final String REQUEST_MEMBER_FILTER_LIST = "request_member_filter_list";
+
+  public static final String REQUEST_MEMBER_MAX_SIZE = "request_member_max_size";
 
   public static final int REQUEST_MEMBER_FILTER_ROLE = 1;
 
@@ -89,4 +93,16 @@ public class QChatConstant {
   public static final int ERROR_CODE_MESSAGE_FETCH = 10201;
 
   public static final int ERROR_CODE_SEND_MESSAGE = 10202;
+
+  public static String LIB_TAG = "QChatKit";
+  public static int NO_PERMISSION_CODE = 403;
+
+  public static int NO_INTERNET_CODE = 408;
+  public static int PARAM_ERROR_CODE = 406;
+
+  // 圈组自定义权限表情回复
+  public static final int QCHAT_SELF_PERMISSION_EMOJI_REPLAY = 10001;
+
+  // 圈组权限范围，0 channel/server 都有
+  public static final int QCHAT_PERMISSION_TYPE_ALL = 0;
 }

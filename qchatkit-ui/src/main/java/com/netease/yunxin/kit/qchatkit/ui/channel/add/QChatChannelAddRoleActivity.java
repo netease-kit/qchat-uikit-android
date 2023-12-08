@@ -27,8 +27,9 @@ import com.netease.yunxin.kit.qchatkit.ui.model.QChatArrowBean;
 import com.netease.yunxin.kit.qchatkit.ui.model.QChatBaseBean;
 import com.netease.yunxin.kit.qchatkit.ui.model.QChatConstant;
 import com.netease.yunxin.kit.qchatkit.ui.model.QChatViewType;
+import com.netease.yunxin.kit.qchatkit.ui.utils.QChatUtils;
 
-/** server role list that used to add role to channel */
+/** 话题身份组添加页面 */
 public class QChatChannelAddRoleActivity extends CommonListActivity {
 
   private static final String TAG = "QChatChannelAddRoleActivity";
@@ -39,10 +40,14 @@ public class QChatChannelAddRoleActivity extends CommonListActivity {
   @Override
   public void initData() {
     super.initData();
+    changeStatusBarColor(R.color.color_white);
+    viewBinding.getRoot().setBackgroundResource(R.color.color_white);
     serverId = getIntent().getLongExtra(QChatConstant.SERVER_ID, 0);
     channelId = getIntent().getLongExtra(QChatConstant.CHANNEL_ID, 0);
+    configServerIdAndChannelId(serverId, channelId);
     ALog.d(TAG, "initData", "info:" + serverId + "," + channelId);
     viewModel = new ViewModelProvider(this).get(AddRoleViewModel.class);
+    // 身份组查询Livedata
     viewModel
         .getRoleLiveData()
         .observe(
@@ -63,6 +68,7 @@ public class QChatChannelAddRoleActivity extends CommonListActivity {
               }
             });
 
+    // 添加身份组Livedata
     viewModel
         .getAddLiveData()
         .observe(
@@ -94,35 +100,38 @@ public class QChatChannelAddRoleActivity extends CommonListActivity {
     viewModel.fetchRoleList(serverId, channelId);
   }
 
-  /** show page empty view */
+  /** 显示空视图 */
   private void showEmptyView(boolean isShow) {
     String content = "";
     if (isShow) {
-      String memberText = getResources().getString(R.string.qchat_roles);
-      String tipsText = getResources().getString(R.string.qchat_empty_text);
-      content = String.format(tipsText, memberText);
+      content = getString(R.string.qchat_role_empty_text);
     }
-    showEmptyView(content, isShow);
+    showEmptyView(content, R.drawable.ic_qchat_list_empty, isShow);
   }
 
+  /** 加载更多 */
   @Override
   public void loadMore(QChatBaseBean bean) {
     viewModel.loadMore(serverId, channelId);
   }
 
+  /** 标题栏右侧按钮点击事件 */
   @Override
   public void onTitleActionClick(View view) {}
 
+  /** 获取标题栏标题 */
   @Override
   public String getTitleText() {
     return getResources().getString(R.string.qchat_channel_add_role_title);
   }
 
+  /** 是否还有加载更多 */
   @Override
   public boolean isLoadMore() {
     return viewModel.hasMore();
   }
 
+  /** 创建身份组列表中的ViewHolder */
   @Override
   public CommonViewHolder<QChatBaseBean> onCreateViewHolder(
       @NonNull ViewGroup parent, int viewType) {
@@ -130,12 +139,14 @@ public class QChatChannelAddRoleActivity extends CommonListActivity {
       QChatAddRoleViewHolderBinding viewBinding =
           QChatAddRoleViewHolderBinding.inflate(getLayoutInflater(), parent, false);
       RoleViewHolder roleViewHolder = new RoleViewHolder(viewBinding);
+      // 身份组列表中的点击事件
       roleViewHolder.setItemOnClickListener(
           (data, position) -> {
             if (data instanceof QChatArrowBean) {
               Object param = ((QChatArrowBean) data).param;
               if (param instanceof QChatServerRoleInfo) {
-                viewModel.addChannelRole(channelId, (QChatServerRoleInfo) param);
+                QChatUtils.isConnectedToastAndRun(
+                    this, () -> viewModel.addChannelRole(channelId, (QChatServerRoleInfo) param));
               }
             }
           });

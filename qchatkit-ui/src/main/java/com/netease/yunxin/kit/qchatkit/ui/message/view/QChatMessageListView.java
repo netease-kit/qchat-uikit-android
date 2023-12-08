@@ -13,15 +13,19 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import com.netease.nimlib.sdk.msg.constant.MsgTypeEnum;
 import com.netease.yunxin.kit.corekit.im.IMKitClient;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatMessageInfo;
 import com.netease.yunxin.kit.qchatkit.ui.message.interfaces.IMessageList;
 import com.netease.yunxin.kit.qchatkit.ui.message.interfaces.IMessageLoadHandler;
 import com.netease.yunxin.kit.qchatkit.ui.message.interfaces.IMessageOptionCallBack;
+import com.netease.yunxin.kit.qchatkit.ui.message.interfaces.IQChatMsgClickListener;
+import com.netease.yunxin.kit.qchatkit.ui.message.popmenu.IQChatPopMenuClickListener;
+import com.netease.yunxin.kit.qchatkit.ui.message.popmenu.QChatPopActionFactory;
 import com.netease.yunxin.kit.qchatkit.ui.message.viewholder.QChatMessageViewHolderFactory;
 import java.util.List;
 
-/** listView for ChatMessage */
+/** 圈组消息列表自定义View */
 public class QChatMessageListView extends RecyclerView implements IMessageList {
 
   private static final int SCROLL_DELAY_TIME = 200;
@@ -43,6 +47,8 @@ public class QChatMessageListView extends RecyclerView implements IMessageList {
   private GestureDetector gestureDetector = null;
 
   private OnListViewEventListener onListViewEventListener;
+
+  private IQChatMsgClickListener msgClickListener;
 
   private boolean isScroll = false;
 
@@ -116,7 +122,7 @@ public class QChatMessageListView extends RecyclerView implements IMessageList {
             && hasMoreForwardMessages) {
           hasMoreForwardMessages = loadHandler.loadMoreForward(messageAdapter.getFirstMessage());
         } else if (isLastItemVisibleCompleted() && hasMoreNewerMessages) {
-          hasMoreNewerMessages = loadHandler.loadMoreBackground(messageAdapter.getlastMessage());
+          hasMoreNewerMessages = loadHandler.loadMoreBackground(messageAdapter.getLastMessage());
         }
       }
     }
@@ -137,12 +143,23 @@ public class QChatMessageListView extends RecyclerView implements IMessageList {
     this.hasMoreForwardMessages = hasMoreForwardMessages;
   }
 
+  public void setMsgPopMenuActionListener(IQChatPopMenuClickListener listener) {
+    QChatPopActionFactory.getInstance().setActionListener(listener);
+  }
+
   public void setOnListViewEventListener(OnListViewEventListener onListViewEventListener) {
     this.onListViewEventListener = onListViewEventListener;
   }
 
   public void setHasMoreNewerMessages(boolean hasMoreNewerMessages) {
     this.hasMoreNewerMessages = hasMoreNewerMessages;
+  }
+
+  public void setQChatMsgClickListener(IQChatMsgClickListener msgClickListener) {
+    this.msgClickListener = msgClickListener;
+    if (messageAdapter != null) {
+      messageAdapter.setQChatMsgClickListener(msgClickListener);
+    }
   }
 
   public void scrollToEnd() {
@@ -152,6 +169,13 @@ public class QChatMessageListView extends RecyclerView implements IMessageList {
         post(() -> smoothScrollToPosition(itemCount - 1));
       }
     }
+  }
+
+  public List<QChatMessageInfo> getQChatMessageByType(MsgTypeEnum typeEnum) {
+    if (messageAdapter != null) {
+      return messageAdapter.getQChatMessageListByType(typeEnum);
+    }
+    return null;
   }
 
   @Override
@@ -214,6 +238,24 @@ public class QChatMessageListView extends RecyclerView implements IMessageList {
     }
   }
 
+  public void updateMessage(QChatMessageInfo message, String playLoad) {
+    if (messageAdapter != null) {
+      messageAdapter.updateMessage(message, playLoad);
+    }
+  }
+
+  public void updateMessage(List<Long> msgIdList, String playLoad) {
+    if (messageAdapter != null) {
+      messageAdapter.updateMessage(msgIdList, playLoad);
+    }
+  }
+
+  public void updateMessagePlayLoad(String playLoad) {
+    if (messageAdapter != null) {
+      messageAdapter.updateMessagePlayLoad(playLoad);
+    }
+  }
+
   @Override
   public void addMessagesForward(List<QChatMessageInfo> message) {
     if (messageAdapter != null) {
@@ -229,7 +271,11 @@ public class QChatMessageListView extends RecyclerView implements IMessageList {
   }
 
   @Override
-  public void revokeMessage(String messageId) {}
+  public void revokeMessage(QChatMessageInfo messageInfo) {
+    if (messageAdapter != null) {
+      messageAdapter.revokeMessage(messageInfo);
+    }
+  }
 
   @Override
   public void setLoadHandler(IMessageLoadHandler handler) {

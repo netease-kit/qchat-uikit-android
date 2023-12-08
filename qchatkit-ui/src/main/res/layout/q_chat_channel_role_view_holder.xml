@@ -28,9 +28,16 @@
     <ImageView android:id="@+id/q_chat_vh_role_edit_iv"
         android:layout_width="@dimen/dimen_32_dp"
         android:layout_height="@dimen/dimen_32_dp"
-        android:src="@drawable/ic_arrow_right"
         android:scaleType="center"
         android:layout_gravity="right|center_vertical"
         android:layout_marginEnd="@dimen/dimen_20_dp"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_1_dp"
+        android:layout_gravity="bottom"
+        android:layout_marginStart="@dimen/dimen_20_dp"
+        android:layout_marginEnd="@dimen/dimen_20_dp"
+        android:background="@color/color_f5f8fc" />
 
 </FrameLayout>

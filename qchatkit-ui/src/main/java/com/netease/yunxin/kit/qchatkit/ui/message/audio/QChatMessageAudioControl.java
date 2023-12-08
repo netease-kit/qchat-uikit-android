@@ -6,6 +6,7 @@ package com.netease.yunxin.kit.qchatkit.ui.message.audio;
 
 import android.media.MediaPlayer;
 import androidx.annotation.Nullable;
+import com.netease.nimlib.sdk.media.player.OnPlayListener;
 import com.netease.nimlib.sdk.msg.attachment.AudioAttachment;
 import com.netease.nimlib.sdk.msg.constant.AttachStatusEnum;
 import com.netease.nimlib.sdk.msg.constant.MsgDirectionEnum;
@@ -21,6 +22,7 @@ import com.netease.yunxin.kit.qchatkit.ui.message.view.QChatMessageAdapter;
 import java.io.File;
 import java.util.List;
 
+/** 聊天界面语音播放管理器， 采用单例模式，点击播放自动停止上个音频播放 */
 public class QChatMessageAudioControl extends BaseAudioControl<QChatMessageInfo> {
   private static QChatMessageAudioControl mChatMessageAudioControl = null;
 
@@ -34,6 +36,11 @@ public class QChatMessageAudioControl extends BaseAudioControl<QChatMessageInfo>
     super(true);
   }
 
+  /**
+   * 获取单例对象
+   *
+   * @return
+   */
   public static QChatMessageAudioControl getInstance() {
     if (mChatMessageAudioControl == null) {
       synchronized (QChatMessageAudioControl.class) {
@@ -46,6 +53,11 @@ public class QChatMessageAudioControl extends BaseAudioControl<QChatMessageInfo>
     return mChatMessageAudioControl;
   }
 
+  /**
+   * 设置播放控制器listener
+   *
+   * @param playable
+   */
   @Override
   protected void setOnPlayListener(
       Playable playingPlayable, AudioControlListener audioControlListener) {
@@ -103,6 +115,16 @@ public class QChatMessageAudioControl extends BaseAudioControl<QChatMessageInfo>
     currentAudioPlayer.setOnPlayListener(basePlayerListener);
   }
 
+  public void setAudioControlListenerWhenPlaying(AudioControlListener audioControlListener) {
+    if (!isPlayingAudio()) {
+      return;
+    }
+    OnPlayListener playListener = currentAudioPlayer.getOnPlayListener();
+    if (playListener instanceof BaseAudioControl<?>.BasePlayerListener) {
+      ((BasePlayerListener) playListener).setAudioControlListener(audioControlListener);
+    }
+  }
+
   @Override
   public QChatMessageInfo getPlayingAudio() {
     if (isPlayingAudio() && currentPlayable instanceof QChatMessageAudioPlayable) {
@@ -112,6 +134,13 @@ public class QChatMessageAudioControl extends BaseAudioControl<QChatMessageInfo>
     }
   }
 
+  /**
+   * 开始播放语音，支持设置延迟
+   *
+   * @param message
+   * @param audioControlListener
+   * @param audioStreamType
+   */
   @Override
   public void startPlayAudioDelay(
       final long delayMillis,
@@ -127,6 +156,7 @@ public class QChatMessageAudioControl extends BaseAudioControl<QChatMessageInfo>
     if (!file.exists()) {
       QChatMessageRepo.downloadAttachment(
           message,
+          false,
           new FetchCallback<Void>() {
             @Override
             public void onSuccess(@Nullable Void param) {
@@ -144,7 +174,13 @@ public class QChatMessageAudioControl extends BaseAudioControl<QChatMessageInfo>
     startPlayAudio(message, audioControlListener, audioStreamType, true, delayMillis);
   }
 
-  //need not resetOrigAudioStreamType while play audio one by one
+  /**
+   * 开始播放语音
+   *
+   * @param message
+   * @param audioControlListener
+   * @param audioStreamType
+   */
   private void startPlayAudio(
       QChatMessageInfo message,
       AudioControlListener audioControlListener,

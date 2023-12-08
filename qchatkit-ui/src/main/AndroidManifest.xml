@@ -20,6 +20,10 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
+    <!-- android 33 image-->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
+
     <!-- media -->
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
@@ -152,7 +156,12 @@
             android:exported="false" />
 
         <activity
-            android:name=".message.QChatChannelMessageActivity"
+            android:name=".message.ChannelMessageActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+
+        <activity
+            android:name=".message.ChannelMemberActivity"
             android:screenOrientation="portrait"
             android:exported="false" />
 
@@ -162,6 +171,39 @@
             android:screenOrientation="portrait"
             android:exported="false" />
 
+        <activity
+            android:name=".image.QChatWatchImageActivity"
+            android:windowSoftInputMode="adjustPan"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+
+        <activity
+            android:name=".announce.ServerMemberListActivity"
+            android:windowSoftInputMode="adjustPan"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTop" />
+
+        <activity
+            android:name=".announce.ManagerListActivity"
+            android:windowSoftInputMode="adjustPan"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTop" />
+
+        <activity
+            android:name=".announce.SettingActivity"
+            android:windowSoftInputMode="adjustPan"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+
+        <activity android:name=".announce.ManagerEditActivity"
+            android:windowSoftInputMode="adjustPan"
+            android:screenOrientation="portrait"
+            android:exported="false"/>
+
+        <activity android:name=".announce.UpdateInfoActivity"
+            android:windowSoftInputMode="adjustPan"
+            android:screenOrientation="portrait"
+            android:exported="false"/>
     </application>
 
 </manifest>

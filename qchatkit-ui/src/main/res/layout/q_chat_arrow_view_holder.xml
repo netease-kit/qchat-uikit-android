@@ -30,4 +30,12 @@
         android:layout_gravity="right|center_vertical"
         android:layout_marginEnd="@dimen/dimen_28_dp"/>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_1_dp"
+        android:layout_gravity="bottom"
+        android:layout_marginStart="@dimen/dimen_20_dp"
+        android:layout_marginEnd="@dimen/dimen_20_dp"
+        android:background="@color/color_f5f8fc" />
+
 </FrameLayout>

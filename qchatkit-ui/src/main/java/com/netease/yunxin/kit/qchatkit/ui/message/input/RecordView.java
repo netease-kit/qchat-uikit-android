@@ -28,7 +28,7 @@ import com.netease.yunxin.kit.common.utils.SizeUtils;
 import com.netease.yunxin.kit.qchatkit.ui.R;
 import com.netease.yunxin.kit.qchatkit.ui.databinding.QChatMessageRecordViewBinding;
 
-/** record panel in input view */
+/** 录音自定义View */
 public class RecordView extends FrameLayout {
   public static final String TAG = "RecordView";
   private QChatMessageRecordViewBinding mBinding;

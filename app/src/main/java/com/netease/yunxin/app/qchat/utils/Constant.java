@@ -6,7 +6,7 @@ package com.netease.yunxin.app.qchat.utils;
 
 public class Constant {
 
-  public static final String PROJECT_TAG = "imkit-sample";
+  public static final String PROJECT_TAG = "qchatkit-sample";
   public static final String PAGE_MAIN = "https://netease.yunxin.im.demo.home";
   public static final String CONFIG_APPKEY_KEY = "com.netease.nim.appKey";
   public static final String CONFIG_APPKEY_KEY_OVERSEA = "com.netease.nim.oversea.appKey";
@@ -26,4 +26,6 @@ public class Constant {
   public static final String SERVER_CONFIG_FILE = "imkit_config_info";
   public static final int CHINA_CONFIG = 0;
   public static final int OVERSEA_CONFIG = 1;
+
+  public static final int NETWORK_ERROR_CODE = 415;
 }

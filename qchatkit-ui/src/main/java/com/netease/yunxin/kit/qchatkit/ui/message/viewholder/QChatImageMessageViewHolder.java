@@ -9,28 +9,29 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.widget.FrameLayout;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.GranularRoundedCorners;
-import com.bumptech.glide.request.RequestOptions;
 import com.netease.nimlib.sdk.msg.attachment.ImageAttachment;
 import com.netease.yunxin.kit.common.ui.widgets.ShapeDrawable;
 import com.netease.yunxin.kit.common.utils.ImageUtils;
 import com.netease.yunxin.kit.common.utils.ScreenUtils;
 import com.netease.yunxin.kit.common.utils.SizeUtils;
+import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
+import com.netease.yunxin.kit.qchatkit.repo.QChatMessageRepo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatMessageInfo;
 import com.netease.yunxin.kit.qchatkit.ui.R;
-import com.netease.yunxin.kit.qchatkit.ui.common.WatchImageActivity;
+import com.netease.yunxin.kit.qchatkit.ui.databinding.QChatBaseMessageViewHolderBinding;
 import com.netease.yunxin.kit.qchatkit.ui.databinding.QChatImageMessageViewHolderBinding;
-import com.netease.yunxin.kit.qchatkit.ui.databinding.QchatBaseMessageViewHolderBinding;
 
+/** 图片消息ViewHolder */
 public class QChatImageMessageViewHolder extends QChatBaseMessageViewHolder {
 
   private QChatImageMessageViewHolderBinding imageBinding;
   protected static int maxEdge = 0;
   protected static int minEdge = 0;
 
-  public QChatImageMessageViewHolder(@NonNull QchatBaseMessageViewHolderBinding parent) {
+  public QChatImageMessageViewHolder(@NonNull QChatBaseMessageViewHolderBinding parent) {
     super(parent);
   }
 
@@ -42,8 +43,8 @@ public class QChatImageMessageViewHolder extends QChatBaseMessageViewHolder {
   }
 
   @Override
-  public void bindData(QChatMessageInfo data, QChatMessageInfo lastMessage) {
-    super.bindData(data, lastMessage);
+  public void bindData(QChatMessageInfo data, int position, QChatMessageInfo lastMessage) {
+    super.bindData(data, position, lastMessage);
     String imageAttachStr = data.getAttachStr();
     if (TextUtils.isEmpty(imageAttachStr)) {
       return;
@@ -72,10 +73,17 @@ public class QChatImageMessageViewHolder extends QChatBaseMessageViewHolder {
       h = bounds[0] != 0 ? w * bounds[1] / bounds[0] : 0;
     }
     int thumbMaxEdge = getImageMaxEdge();
+    int thumbMaxHeight = (int) (0.3 * ScreenUtils.getDisplayHeight());
     if (w > thumbMaxEdge) {
       w = thumbMaxEdge;
       h = w * bounds[1] / bounds[0];
     }
+    if (h > thumbMaxHeight) {
+      h = thumbMaxHeight;
+    }
+
+    final int width = w;
+    final int height = h;
 
     FrameLayout.LayoutParams thumbParams =
         (FrameLayout.LayoutParams) imageBinding.getRoot().getLayoutParams();
@@ -103,29 +111,59 @@ public class QChatImageMessageViewHolder extends QChatBaseMessageViewHolder {
     }
     imageBinding.getRoot().setBackground(shapeBuilder.build());
 
+    if (!TextUtils.isEmpty(imageAttachment.getPath())
+        || !TextUtils.isEmpty(imageAttachment.getThumbPath())) {
+      loadImageFromPath(imageAttachment, width, height, corners);
+    } else {
+      QChatMessageRepo.downloadAttachment(
+          currentMessage,
+          true,
+          new FetchCallback<Void>() {
+            @Override
+            public void onSuccess(@Nullable Void param) {
+              loadImageFromPath(imageAttachment, width, height, corners);
+            }
+
+            @Override
+            public void onFailed(int code) {
+              Glide.with(itemView.getContext())
+                  .load(R.drawable.bg_image_loading_qchat)
+                  .into(imageBinding.messageImage);
+            }
+
+            @Override
+            public void onException(@Nullable Throwable exception) {
+              Glide.with(itemView.getContext())
+                  .load(R.drawable.bg_image_loading_qchat)
+                  .into(imageBinding.messageImage);
+            }
+          });
+    }
+  }
+
+  private void loadImageFromPath(
+      ImageAttachment imageAttachment, int width, int height, float[] corners) {
+    String loadPath =
+        TextUtils.isEmpty(imageAttachment.getPath())
+            ? imageAttachment.getThumbPath()
+            : imageAttachment.getPath();
     Glide.with(itemView.getContext())
-        .load(path)
-        .apply(
-            new RequestOptions()
-                .transform(
-                    new GranularRoundedCorners(corners[0], corners[1], corners[2], corners[3])))
-        .override(w, h)
+        .load(loadPath)
+        .override(width, height)
         .placeholder(R.drawable.bg_image_loading_qchat)
         .into(imageBinding.messageImage);
-    imageBinding.messageImage.setOnClickListener(
-        view -> WatchImageActivity.start(itemView.getContext(), data));
   }
 
   private int getImageMaxEdge() {
     if (maxEdge == 0) {
-      maxEdge = (int) (222.0 / 320.0 * ScreenUtils.getDisplayWidth());
+      maxEdge = (int) (0.40 * ScreenUtils.getDisplayWidth());
     }
     return maxEdge;
   }
 
   private int getImageThumbMinEdge() {
     if (minEdge == 0) {
-      minEdge = (int) (111.0 / 375.0 * ScreenUtils.getDisplayWidth());
+      minEdge = (int) (0.3 * ScreenUtils.getDisplayWidth());
     }
     return minEdge;
   }

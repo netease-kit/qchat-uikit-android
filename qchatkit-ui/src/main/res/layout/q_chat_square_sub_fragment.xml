@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2022 NetEase, Inc. All rights reserved.
+  ~ Use of this source code is governed by a MIT license that can be
+  ~ found in the LICENSE file.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_eff1f4"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ImageView
+        android:id="@+id/ivEmpty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dimen_100_dp"
+        android:src="@drawable/ic_qchat_square_server_list_empty_tip"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvEmpty"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ivEmpty"
+        android:layout_width="wrap_content"
+        android:textColor="@color/color_999999"
+        android:textSize="@dimen/dimen_14_dp"
+        android:text="@string/qchat_square_server_empty_tip"
+        android:layout_marginTop="@dimen/dimen_8_dp"
+        android:layout_height="wrap_content"
+        tools:ignore="SpUsage" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/groupEmpty"
+        android:layout_width="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="ivEmpty,tvEmpty"
+        android:layout_height="wrap_content"/>
+
+    <ImageView
+        android:id="@+id/ivTypeContentEmpty"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="wrap_content"
+        android:scaleType="centerInside"
+        android:visibility="visible"
+        android:src="@drawable/ic_qchat_square_type_content_emtpy_tip"
+        android:layout_height="wrap_content"/>
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/srlContent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvSquareSubServerList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:overScrollMode="never"
+            android:paddingHorizontal="@dimen/dimen_12_dp" />
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

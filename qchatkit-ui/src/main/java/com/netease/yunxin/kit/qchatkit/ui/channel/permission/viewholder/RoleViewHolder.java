@@ -5,8 +5,11 @@
 package com.netease.yunxin.kit.qchatkit.ui.channel.permission.viewholder;
 
 import android.view.View;
+import android.view.ViewGroup;
 import androidx.annotation.NonNull;
+import com.netease.yunxin.kit.common.utils.SizeUtils;
 import com.netease.yunxin.kit.qchatkit.ui.R;
+import com.netease.yunxin.kit.qchatkit.ui.channel.permission.QChatChannelPermissionExpandableHelper;
 import com.netease.yunxin.kit.qchatkit.ui.common.CommonClickListener;
 import com.netease.yunxin.kit.qchatkit.ui.common.CommonViewHolder;
 import com.netease.yunxin.kit.qchatkit.ui.databinding.QChatChannelRoleViewHolderBinding;
@@ -48,6 +51,17 @@ public class RoleViewHolder extends CommonViewHolder<QChatBaseBean> {
 
   @Override
   protected void onBindData(QChatBaseBean data, int position) {
+    if (position >= QChatChannelPermissionExpandableHelper.NUM_MAX_EXPANDABLE_ITEM
+        && !QChatChannelPermissionExpandableHelper.isExpandable()) {
+      ViewGroup.LayoutParams layoutParams = viewBinding.getRoot().getLayoutParams();
+      layoutParams.height = 0;
+      viewBinding.getRoot().setLayoutParams(layoutParams);
+      return;
+    }
+    ViewGroup.LayoutParams layoutParams = viewBinding.getRoot().getLayoutParams();
+    layoutParams.height = SizeUtils.dp2px(38);
+    viewBinding.getRoot().setLayoutParams(layoutParams);
+
     if (data instanceof QChatChannelRoleBean) {
       this.data = data;
       this.position = position;
@@ -63,7 +77,7 @@ public class RoleViewHolder extends CommonViewHolder<QChatBaseBean> {
           viewBinding.qChatVhRoleEditIv.setImageResource(R.drawable.ic_delete);
         }
       } else {
-        viewBinding.qChatVhRoleEditIv.setImageResource(R.drawable.ic_arrow_right);
+        viewBinding.qChatVhRoleEditIv.setImageDrawable(null);
       }
     }
   }

@@ -10,13 +10,12 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import com.bumptech.glide.Glide;
 import com.netease.nimlib.sdk.msg.attachment.ImageAttachment;
-import com.netease.yunxin.kit.common.ui.activities.BaseActivity;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatMessageInfo;
 import com.netease.yunxin.kit.qchatkit.ui.R;
 import com.netease.yunxin.kit.qchatkit.ui.databinding.QChatWatchPictureActivityBinding;
 import java.io.File;
 
-public class WatchImageActivity extends BaseActivity {
+public class WatchImageActivity extends QChatChannelBaseActivity {
 
   private static final String TAG = WatchImageActivity.class.getSimpleName();
 
@@ -49,6 +48,7 @@ public class WatchImageActivity extends BaseActivity {
       finish();
       return;
     }
+    configServerIdAndChannelId(sMessage.getQChatServerId(), sMessage.getQChatChannelId());
     String path = ((ImageAttachment) sMessage.getAttachment()).getPath();
     String url = ((ImageAttachment) sMessage.getAttachment()).getUrl();
     if (!TextUtils.isEmpty(path)) {

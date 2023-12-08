@@ -5,45 +5,115 @@
 package com.netease.yunxin.kit.qchatkit.ui.server;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Pair;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import com.netease.nimlib.sdk.qchat.result.QChatApplyServerJoinResult;
 import com.netease.yunxin.kit.alog.ALog;
 import com.netease.yunxin.kit.common.ui.activities.BaseActivity;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
+import com.netease.yunxin.kit.corekit.event.EventCenter;
+import com.netease.yunxin.kit.corekit.im.IMKitClient;
+import com.netease.yunxin.kit.corekit.im.provider.FetchCallbackImpl;
+import com.netease.yunxin.kit.corekit.model.ResultInfo;
 import com.netease.yunxin.kit.qchatkit.repo.QChatServerRepo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatSearchResultInfo;
+import com.netease.yunxin.kit.qchatkit.repo.model.QChatServerMemberInfo;
 import com.netease.yunxin.kit.qchatkit.ui.R;
 import com.netease.yunxin.kit.qchatkit.ui.databinding.QChatJoinOtherServerActivityBinding;
-import com.netease.yunxin.kit.qchatkit.ui.message.QChatChannelMessageActivity;
 import com.netease.yunxin.kit.qchatkit.ui.server.adapter.QChatSearchResultAdapter;
+import com.netease.yunxin.kit.qchatkit.ui.server.model.QChatEnterServerEvent;
+import com.netease.yunxin.kit.qchatkit.ui.server.viewmodel.QChatServerCreateViewModel;
 import com.netease.yunxin.kit.qchatkit.ui.utils.QChatUtils;
 import java.util.Collections;
 import java.util.List;
 
-/** In the page, user can search a existing server and join it. */
+/** 社区/公告频道查询页面 */
 public class QChatJoinOtherServerActivity extends BaseActivity {
   private static final String TAG = "QChatJoinOtherServerActivity";
+  private static final String KEY_PARAM_IS_ANNOUNCEMENT = "key_is_announcement";
+  private final QChatServerCreateViewModel viewModel = new QChatServerCreateViewModel();
   private QChatJoinOtherServerActivityBinding binding;
   private QChatSearchResultAdapter adapter;
+  private boolean isAnnouncement = false;
+
+  /** 监听加入请求通知 */
+  private final Observer<Pair<QChatSearchResultInfo, ResultInfo<QChatApplyServerJoinResult>>>
+      observerForJoin =
+          result -> {
+            if (result.second.getSuccess()) {
+              result.first.state = QChatSearchResultInfo.STATE_JOINED;
+              adapter.updateItemState();
+              Toast.makeText(
+                      QChatJoinOtherServerActivity.this,
+                      R.string.qchat_server_had_appled_tip,
+                      Toast.LENGTH_SHORT)
+                  .show();
+            } else {
+              Toast.makeText(
+                      getApplicationContext(),
+                      getString(R.string.qchat_server_request_fail),
+                      Toast.LENGTH_SHORT)
+                  .show();
+              ALog.e(TAG, "join failed. " + result.second.getMsg());
+            }
+          };
+
+  /** 监听查询社区结果通知 */
+  private final Observer<ResultInfo<List<QChatSearchResultInfo>>> observerForSearch =
+      result -> {
+        if (result.getSuccess()) {
+          List<QChatSearchResultInfo> serverList = result.getValue();
+          if (serverList != null && !serverList.isEmpty()) {
+            binding.groupNoServerTip.setVisibility(View.GONE);
+            adapter.addDataList(serverList, true);
+          } else {
+            binding.groupNoServerTip.setVisibility(View.VISIBLE);
+            adapter.addDataList(Collections.emptyList(), true);
+          }
+        } else {
+          Toast.makeText(
+                  getApplicationContext(),
+                  getString(R.string.qchat_server_request_fail),
+                  Toast.LENGTH_SHORT)
+              .show();
+          ALog.e(TAG, "search failed. " + result.getMsg());
+        }
+      };
 
   @Override
   protected void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     binding = QChatJoinOtherServerActivityBinding.inflate(getLayoutInflater());
     setContentView(binding.getRoot());
-
+    isAnnouncement = getIntent().getBooleanExtra(KEY_PARAM_IS_ANNOUNCEMENT, false);
+    viewModel.getSearchServerResult().observeForever(observerForSearch);
+    viewModel.getJoinServerResult().observeForever(observerForJoin);
     initView();
   }
 
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+    viewModel.getSearchServerResult().removeObserver(observerForSearch);
+    viewModel.getJoinServerResult().removeObserver(observerForJoin);
+  }
+
   private void initView() {
+    binding.tvTitle.setText(
+        isAnnouncement ? R.string.qchat_crate_by_other_announce : R.string.qchat_crate_by_other);
+    binding.etServerID.setHint(
+        isAnnouncement ? R.string.qchat_announcement_search_tip : R.string.qchat_search_tip);
     binding.ivBack.setOnClickListener(v -> finish());
     binding.etServerID.addTextChangedListener(
         new TextWatcher() {
@@ -62,7 +132,7 @@ public class QChatJoinOtherServerActivity extends BaseActivity {
             }
           }
         });
-    // da search action.
+    // do search action.
     binding.etServerID.setOnEditorActionListener(
         (v, actionId, event) -> {
           if (actionId == EditorInfo.IME_ACTION_SEARCH) {
@@ -75,39 +145,7 @@ public class QChatJoinOtherServerActivity extends BaseActivity {
               adapter.addDataList(Collections.emptyList(), true);
             } else {
               QChatUtils.isConnectedToastAndRun(
-                  this,
-                  () ->
-                      QChatServerRepo.searchServerById(
-                          serverId,
-                          new FetchCallback<List<QChatSearchResultInfo>>() {
-                            @Override
-                            public void onSuccess(@Nullable List<QChatSearchResultInfo> param) {
-                              if (param != null && !param.isEmpty()) {
-                                binding.groupNoServerTip.setVisibility(View.GONE);
-                                adapter.addDataList(param, true);
-                              } else {
-                                binding.groupNoServerTip.setVisibility(View.VISIBLE);
-                                adapter.addDataList(Collections.emptyList(), true);
-                              }
-                            }
-
-                            public void onFailed(int code) {
-                              Toast.makeText(
-                                      getApplicationContext(),
-                                      getString(R.string.qchat_server_request_fail) + code,
-                                      Toast.LENGTH_SHORT)
-                                  .show();
-                            }
-
-                            @Override
-                            public void onException(@Nullable Throwable exception) {
-                              Toast.makeText(
-                                      getApplicationContext(),
-                                      getString(R.string.qchat_server_request_fail) + exception,
-                                      Toast.LENGTH_SHORT)
-                                  .show();
-                            }
-                          }));
+                  this, () -> viewModel.searchServer(isAnnouncement, serverId));
             }
             return true;
           }
@@ -116,22 +154,39 @@ public class QChatJoinOtherServerActivity extends BaseActivity {
 
     binding.ivClear.setOnClickListener(v -> binding.etServerID.setText(null));
 
-    adapter = new QChatSearchResultAdapter(this);
-    // if user click the item of the searching result that user had joined,
-    // user can launching the message page of the first channel in the server.
+    adapter = new QChatSearchResultAdapter(this, isAnnouncement);
+    // 设置点击监听
     adapter.setItemClickListener(
         (data, holder) -> {
-          if (data.channelInfo != null) {
-            QChatChannelMessageActivity.launch(
-                QChatJoinOtherServerActivity.this,
-                data.channelInfo.getServerId(),
-                data.channelInfo.getChannelId(),
-                data.channelInfo.getName(),
-                data.channelInfo.getTopic());
-            setResult(RESULT_OK);
-            finish();
-          }
+          QChatUtils.isConnectedToastAndRun(
+              this,
+              () -> {
+                // 如果为公告频道则判断是否为已经加入该频道，如果已经加入则可以跳转
+                if (isAnnouncement) {
+                  QChatServerRepo.getServerMembers(
+                      Collections.singletonList(
+                          new Pair<>(data.serverInfo.getServerId(), IMKitClient.account())),
+                      new FetchCallbackImpl<List<QChatServerMemberInfo>>() {
+                        @Override
+                        public void onSuccess(@Nullable List<QChatServerMemberInfo> param) {
+                          if (param != null && !param.isEmpty()) {
+                            EventCenter.notifyEvent(new QChatEnterServerEvent(data.serverInfo));
+                            setResult(RESULT_OK);
+                            finish();
+                          }
+                        }
+                      });
+                } else {
+                  // 如果为普通社区，则进入社区列表
+                  EventCenter.notifyEvent(new QChatEnterServerEvent(data.serverInfo));
+                  setResult(RESULT_OK);
+                  finish();
+                }
+              });
         });
+    adapter.setTipClickListener(
+        (data, holder) ->
+            QChatUtils.isConnectedToastAndRun(this, () -> viewModel.joinServer(data)));
     binding.ryServerList.setAdapter(adapter);
     binding.ryServerList.setLayoutManager(
         new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
@@ -155,5 +210,19 @@ public class QChatJoinOtherServerActivity extends BaseActivity {
   public void finish() {
     super.finish();
     overridePendingTransition(R.anim.anim_empty_with_time, R.anim.anim_from_start_to_end);
+  }
+
+  /**
+   * 页面启动方法
+   *
+   * @param launcher 启动 launcher， 用户当前页面将数据通知启动方
+   * @param context 上下文
+   * @param isAnnouncement 是否为公告频道
+   */
+  public static void launch(
+      ActivityResultLauncher<Intent> launcher, Context context, boolean isAnnouncement) {
+    Intent intent = new Intent(context, QChatJoinOtherServerActivity.class);
+    intent.putExtra(KEY_PARAM_IS_ANNOUNCEMENT, isAnnouncement);
+    launcher.launch(intent);
   }
 }

@@ -16,7 +16,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import com.netease.yunxin.kit.common.ui.activities.CommonActivity;
 import com.netease.yunxin.kit.common.ui.utils.ToastX;
 import com.netease.yunxin.kit.common.utils.NetworkUtils;
 import com.netease.yunxin.kit.qchatkit.repo.QChatRoleRepo;
@@ -25,15 +24,18 @@ import com.netease.yunxin.kit.qchatkit.repo.model.QChatRoleResourceEnum;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatServerRoleInfo;
 import com.netease.yunxin.kit.qchatkit.ui.R;
 import com.netease.yunxin.kit.qchatkit.ui.common.QChatCallback;
+import com.netease.yunxin.kit.qchatkit.ui.common.QChatServerCommonBaseActivity;
 import com.netease.yunxin.kit.qchatkit.ui.databinding.QChatRolesSettingActivityLayoutBinding;
 import com.netease.yunxin.kit.qchatkit.ui.model.QChatConstant;
 import java.util.HashMap;
 import java.util.Map;
 
-public class QChatRoleSettingActivity extends CommonActivity {
+/** 身份组设置页面 */
+public class QChatRoleSettingActivity extends QChatServerCommonBaseActivity {
 
   private QChatRolesSettingActivityLayoutBinding binding;
 
+  /** 身份组信息 */
   private QChatServerRoleInfo role;
 
   private ActivityResultLauncher<Intent> memberLauncher;
@@ -53,6 +55,7 @@ public class QChatRoleSettingActivity extends CommonActivity {
     binding.title.getTitleTextView().setEllipsize(TextUtils.TruncateAt.MIDDLE);
     binding.rlyMemberModify.setOnClickListener(
         v -> {
+          // 跳转身份组成员列表页面
           Intent intent = new Intent(QChatRoleSettingActivity.this, QChatRoleMemberActivity.class);
           intent.putExtra(SERVER_ROLE_INFO, role);
           memberLauncher.launch(intent);
@@ -60,6 +63,7 @@ public class QChatRoleSettingActivity extends CommonActivity {
   }
 
   private void registerResult() {
+    // 处理在成员列表页面添加或删除成员后，身份组人数变化
     memberLauncher =
         registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -75,6 +79,12 @@ public class QChatRoleSettingActivity extends CommonActivity {
             });
   }
 
+  /**
+   * 更新身份组权限
+   *
+   * @param switchCompat 身份组对应的权限开关控件
+   * @param key 对应的权限
+   */
   private void updateAuths(CompoundButton switchCompat, QChatRoleResourceEnum key) {
     binding.flyProcess.setVisibility(View.VISIBLE);
     Map<QChatRoleResourceEnum, QChatRoleOptionEnum> auths = new HashMap<>();
@@ -98,6 +108,9 @@ public class QChatRoleSettingActivity extends CommonActivity {
   @Override
   public void initData() {
     role = (QChatServerRoleInfo) getIntent().getSerializableExtra(SERVER_ROLE_INFO);
+    if (role != null) {
+      configServerId(role.getServerId());
+    }
     String title = getResources().getString(R.string.qchat_role_permission_title);
     binding.title.setTitle(String.format(title, role.getName()));
     binding.chatRoleName.setText(role.getName());
@@ -116,6 +129,7 @@ public class QChatRoleSettingActivity extends CommonActivity {
                   ToastX.showShortToast(R.string.qchat_network_error_tip);
                   return;
                 }
+                // 更新身份组
                 String name = binding.chatRoleName.getText().toString().trim();
                 QChatRoleRepo.updateRole(
                     role.getServerId(),
@@ -135,6 +149,8 @@ public class QChatRoleSettingActivity extends CommonActivity {
 
     binding.tvNumber.setText(String.valueOf(role.getMemberCount()));
 
+    //------------------ 根据具体权限设置控件状态 ---------------------
+
     binding.scManagerServer.setChecked(
         role.getAuths().get(QChatRoleResourceEnum.MANAGE_SERVER) == QChatRoleOptionEnum.ALLOW);
 
@@ -146,6 +162,12 @@ public class QChatRoleSettingActivity extends CommonActivity {
 
     binding.scSendMessage.setChecked(
         role.getAuths().get(QChatRoleResourceEnum.SEND_MSG) == QChatRoleOptionEnum.ALLOW);
+
+    binding.scDeleteMessage.setChecked(
+        role.getAuths().get(QChatRoleResourceEnum.DELETE_MSG) == QChatRoleOptionEnum.ALLOW);
+
+    binding.scRevokeMessage.setChecked(
+        role.getAuths().get(QChatRoleResourceEnum.RECALL_MSG) == QChatRoleOptionEnum.ALLOW);
 
     binding.scModifySelfMember.setChecked(
         role.getAuths().get(QChatRoleResourceEnum.ACCOUNT_INFO_SELF) == QChatRoleOptionEnum.ALLOW);
@@ -166,6 +188,7 @@ public class QChatRoleSettingActivity extends CommonActivity {
     setListener();
   }
 
+  /** 监听身份组权限按钮点击，并执行权限更新 */
   private void setListener() {
     binding.rlyManagerServer.setOnClickListener(
         v -> updateAuths(binding.scManagerServer, QChatRoleResourceEnum.MANAGE_SERVER));
@@ -178,6 +201,12 @@ public class QChatRoleSettingActivity extends CommonActivity {
 
     binding.rlySendMessage.setOnClickListener(
         v -> updateAuths(binding.scSendMessage, QChatRoleResourceEnum.SEND_MSG));
+
+    binding.rlyDeleteMessage.setOnClickListener(
+        v -> updateAuths(binding.scDeleteMessage, QChatRoleResourceEnum.DELETE_MSG));
+
+    binding.rlyRevokeMessage.setOnClickListener(
+        v -> updateAuths(binding.scRevokeMessage, QChatRoleResourceEnum.RECALL_MSG));
 
     binding.rlyModifySelfMember.setOnClickListener(
         v -> updateAuths(binding.scModifySelfMember, QChatRoleResourceEnum.ACCOUNT_INFO_SELF));
@@ -198,6 +227,12 @@ public class QChatRoleSettingActivity extends CommonActivity {
   @Override
   protected void initViewModel() {}
 
+  /**
+   * 页面启动方法
+   *
+   * @param activity 页面启动activity
+   * @param data 社区身份组信息
+   */
   public static void launch(Activity activity, QChatServerRoleInfo data) {
     Intent intent = new Intent(activity, QChatRoleSettingActivity.class);
     intent.putExtra(QChatConstant.SERVER_ROLE_INFO, data);

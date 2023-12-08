@@ -28,9 +28,10 @@ import java.util.regex.Pattern;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
+/** Emoji表情管理类，负责从Asset加载Emoji，提供获取Emoji的Drawable和Pattern的方法 */
 public class EmojiManager {
 
-  private static final String EMOJI_DIR = "emoji/";
+  private static final String EMOJI_DIR = "qchat/emoji/";
 
   // max cache size
   private static final int CACHE_MAX_SIZE = 1024;
@@ -96,6 +97,19 @@ public class EmojiManager {
     return pattern;
   }
 
+  public static Drawable getDrawable(Context context, int index) {
+    Entry entry = defaultEntries.get(index);
+    if (entry == null) {
+      return null;
+    }
+
+    Bitmap cache = drawableCache.get(entry.assetPath);
+    if (cache == null) {
+      cache = loadAssetBitmap(context, entry.assetPath);
+    }
+    return new BitmapDrawable(context.getResources(), cache);
+  }
+
   public static Drawable getDrawable(Context context, String text) {
     Entry entry = text2entry.get(text);
     if (entry == null) {
@@ -154,7 +168,7 @@ public class EmojiManager {
 
     void load(Context context) {
       try {
-        XmlResourceParser xmlParser = context.getResources().getXml(R.xml.emoji);
+        XmlResourceParser xmlParser = context.getResources().getXml(R.xml.qchat_emoji);
         //
         try {
           int event = xmlParser.getEventType(); //先获取当前解析器光标在哪

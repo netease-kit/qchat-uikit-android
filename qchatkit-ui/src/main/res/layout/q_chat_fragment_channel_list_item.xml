@@ -8,18 +8,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="32dp">
+    android:background="@drawable/bg_selector_channel_list_item"
+    android:minHeight="@dimen/dimen_32_dp"
+    android:layout_height="wrap_content">
 
     <TextView
         android:id="@+id/tvFlag"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="2dp"
+        android:layout_marginTop="@dimen/dimen_7_dp"
         android:text="#"
         android:textColor="@color/color_a6adb6"
         android:textSize="14dp"
         tools:ignore="HardcodedText,SpUsage"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -28,14 +30,32 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
+        android:layout_marginTop="@dimen/dimen_7_dp"
         android:gravity="start"
         android:singleLine="true"
         android:textColor="@color/color_333333"
         android:textSize="14dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/tvUnReadCount"
         app:layout_constraintStart_toEndOf="@id/tvFlag"
         app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="SpUsage" />
+
+    <TextView
+        android:id="@+id/tvChannelMessage"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="@dimen/dimen_6_dp"
+        android:gravity="start"
+        android:singleLine="true"
+        android:textColor="@color/color_999999"
+        android:textSize="@dimen/dimen_12_dp"
+        android:layout_marginBottom="@dimen/dimen_7_dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/tvUnReadCount"
+        app:layout_constraintStart_toEndOf="@id/tvFlag"
+        app:layout_constraintTop_toBottomOf="@id/tvChannelTitle"
+        android:visibility="gone"
         tools:ignore="SpUsage" />
 
     <TextView
@@ -50,9 +70,9 @@
         android:gravity="center"
         android:textSize="12dp"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tvChannelTitle"
+        app:layout_constraintBottom_toBottomOf="@id/tvChannelTitle"
         tools:ignore="SpUsage" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

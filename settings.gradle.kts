@@ -35,3 +35,4 @@ dependencyResolutionManagement {
 rootProject.name = "qchat-uikit"
 include(":app")
 include(":qchatkit-ui")
+include(":qchatkit")

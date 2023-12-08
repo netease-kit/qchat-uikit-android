@@ -11,6 +11,11 @@ import java.util.List;
 
 public class ActionFactory {
 
+  /**
+   * 获取聊天页面，底部输入框下方操作按钮列表
+   *
+   * @return action list
+   */
   public static List<ActionItem> assembleDefaultInputActions() {
     ArrayList<ActionItem> actions = new ArrayList<>();
     // voice
@@ -27,6 +32,11 @@ public class ActionFactory {
     return actions;
   }
 
+  /**
+   * 获取聊天页面，底部输入框下方操作按钮更多，点击之后底部页面的操作列表
+   *
+   * @return action list
+   */
   public static List<ActionItem> assembleInputMoreActions() {
     ArrayList<ActionItem> actions = new ArrayList<>();
     return actions;
