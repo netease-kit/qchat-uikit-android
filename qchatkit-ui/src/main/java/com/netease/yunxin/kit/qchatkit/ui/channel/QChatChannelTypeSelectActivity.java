@@ -12,14 +12,14 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import androidx.annotation.Nullable;
 import com.netease.yunxin.kit.alog.ALog;
-import com.netease.yunxin.kit.common.ui.activities.BaseActivity;
 import com.netease.yunxin.kit.qchatkit.ui.R;
+import com.netease.yunxin.kit.qchatkit.ui.common.QChatServerBaseActivity;
 import com.netease.yunxin.kit.qchatkit.ui.databinding.QChatChannelTypeSelectActivityBinding;
 import com.netease.yunxin.kit.qchatkit.ui.model.QChatConstant;
 import java.util.ArrayList;
 
-/** channel type select page choice list should be transfer by intent */
-public class QChatChannelTypeSelectActivity extends BaseActivity {
+/** 话题类型选择页面 */
+public class QChatChannelTypeSelectActivity extends QChatServerBaseActivity {
 
   private static final String TAG = "QChatChannelTypeSelectActivity";
   private QChatChannelTypeSelectActivityBinding viewBinding;
@@ -31,12 +31,15 @@ public class QChatChannelTypeSelectActivity extends BaseActivity {
     changeStatusBarColor(R.color.color_eff1f4);
     viewBinding = QChatChannelTypeSelectActivityBinding.inflate(LayoutInflater.from(this));
     setContentView(viewBinding.getRoot());
-    initView();
+    initInnerView();
   }
 
-  private void initView() {
+  private void initInnerView() {
     String title = getIntent().getStringExtra(QChatConstant.TITLE);
     int selected = getIntent().getIntExtra(QChatConstant.SELECTED_INDEX, 0);
+    int serverId = getIntent().getIntExtra(QChatConstant.SERVER_ID, 0);
+    configServerId(serverId);
+    // 话题类型列表，由外部传入
     ArrayList<String> groupList = getIntent().getStringArrayListExtra(QChatConstant.CHOICE_LIST);
     viewBinding.channelTypeSelectTitleBar.setTitle(title);
     if (groupList != null && groupList.size() > 0) {

@@ -4,12 +4,14 @@
 
 package com.netease.yunxin.kit.qchatkit.ui.message;
 
+import android.text.TextUtils;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;
 import com.netease.yunxin.kit.alog.ALog;
 import com.netease.yunxin.kit.common.ui.viewmodel.BaseViewModel;
 import com.netease.yunxin.kit.common.ui.viewmodel.FetchResult;
 import com.netease.yunxin.kit.common.ui.viewmodel.LoadStatus;
+import com.netease.yunxin.kit.corekit.im.IMKitClient;
 import com.netease.yunxin.kit.corekit.im.model.EventObserver;
 import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
 import com.netease.yunxin.kit.qchatkit.repo.QChatChannelRepo;
@@ -27,6 +29,7 @@ import com.netease.yunxin.kit.qchatkit.repo.model.ServerMemberInviteAccept;
 import com.netease.yunxin.kit.qchatkit.repo.model.ServerMemberKick;
 import com.netease.yunxin.kit.qchatkit.repo.model.ServerMemberLeave;
 import com.netease.yunxin.kit.qchatkit.repo.model.ServerMemberUpdate;
+import com.netease.yunxin.kit.qchatkit.repo.model.ServerRemove;
 import com.netease.yunxin.kit.qchatkit.ui.R;
 import com.netease.yunxin.kit.qchatkit.ui.message.model.ChannelMemberStatusBean;
 import com.netease.yunxin.kit.qchatkit.ui.model.QChatBaseBean;
@@ -39,25 +42,26 @@ import java.util.List;
 public class ChannelMemberViewModel extends BaseViewModel {
 
   private static final String TAG = "ChannelMemberViewModel";
-  //channel member live data
-  private final MutableLiveData<FetchResult<List<QChatBaseBean>>> resultLiveData =
+  //话题成员查询 live data
+  private final MutableLiveData<FetchResult<List<QChatBaseBean>>> membersLiveData =
       new MutableLiveData<>();
   private final FetchResult<List<QChatBaseBean>> fetchResult = new FetchResult<>(LoadStatus.Finish);
 
-  //channel info live data
+  //话题信息变更live data
   private final MutableLiveData<FetchResult<QChatChannelInfo>> channelInfoLiveData =
       new MutableLiveData<>();
   private final FetchResult<QChatChannelInfo> fetchChannelInfo =
       new FetchResult<>(LoadStatus.Finish);
 
-  //member role info live data
+  //成员身份组 live data
   private final MutableLiveData<FetchResult<List<QChatServerRoleInfo>>> memberRoleLiveData =
       new MutableLiveData<>();
   private final FetchResult<List<QChatServerRoleInfo>> memberRoleResult =
       new FetchResult<>(LoadStatus.Finish);
 
   //channel remove live data
-  private final MutableLiveData<FetchResult<List<Long>>> channelLiveData = new MutableLiveData<>();
+  private final MutableLiveData<FetchResult<List<Long>>> channelNotifyLiveData =
+      new MutableLiveData<>();
   private final FetchResult<List<Long>> channelListResult = new FetchResult<>(LoadStatus.Finish);
 
   private QChatServerMemberInfo lastRoleInfo;
@@ -65,8 +69,8 @@ public class ChannelMemberViewModel extends BaseViewModel {
   private long observerServerId;
   private boolean roleHasMore = false;
 
-  public MutableLiveData<FetchResult<List<QChatBaseBean>>> getResultLiveData() {
-    return resultLiveData;
+  public MutableLiveData<FetchResult<List<QChatBaseBean>>> getMembersLiveData() {
+    return membersLiveData;
   }
 
   public MutableLiveData<FetchResult<List<QChatServerRoleInfo>>> getMemberRoleLiveData() {
@@ -77,16 +81,16 @@ public class ChannelMemberViewModel extends BaseViewModel {
     return channelInfoLiveData;
   }
 
-  public MutableLiveData<FetchResult<List<Long>>> getChannelLiveData() {
-    return channelLiveData;
+  public MutableLiveData<FetchResult<List<Long>>> getChannelNotifyLiveData() {
+    return channelNotifyLiveData;
   }
 
-  /** fetch member list in channel */
+  /** 获取成员列表 */
   public void fetchMemberList(long serverId, long channelId) {
     fetchMemberData(serverId, channelId, 0);
   }
 
-  /** fetch member's role info */
+  /** 获取身份组列表 */
   public void fetchMemberRoleList(long serverId, String accId) {
     ALog.d(TAG, "fetchMemberRoleList", "info:" + serverId + "," + accId);
     QChatChannelRepo.fetchServerRolesByAccId(
@@ -118,16 +122,16 @@ public class ChannelMemberViewModel extends BaseViewModel {
         });
   }
 
-  /** fetch channel info */
+  /** 查询话题信息 */
   public void fetchChannelInfo(long channelId) {
     QChatChannelRepo.fetchChannelInfo(
         channelId,
-        new FetchCallback<List<QChatChannelInfo>>() {
+        new FetchCallback<QChatChannelInfo>() {
           @Override
-          public void onSuccess(@Nullable List<QChatChannelInfo> param) {
-            if (param != null && param.size() > 0) {
-              ALog.d(TAG, "fetchChannelInfo", "onSuccess:" + param.size());
-              fetchChannelInfo.setData(param.get(0));
+          public void onSuccess(@Nullable QChatChannelInfo param) {
+            if (param != null) {
+              ALog.d(TAG, "fetchChannelInfo", "onSuccess:");
+              fetchChannelInfo.setData(param);
               fetchChannelInfo.setLoadStatus(LoadStatus.Success);
               channelInfoLiveData.postValue(fetchChannelInfo);
             }
@@ -146,8 +150,8 @@ public class ChannelMemberViewModel extends BaseViewModel {
         });
   }
 
-  /** register channel change observer include channel remove ,change ,member change and so on */
-  public void registerDeleteChannelObserver(long serverId, long channelId) {
+  /** 初始化，注册相关监听 */
+  public void init(long serverId, long channelId) {
     observerChannelId = channelId;
     observerServerId = serverId;
     ALog.d(TAG, "registerDeleteChannelObserver", "info:" + serverId + "," + channelId);
@@ -157,6 +161,7 @@ public class ChannelMemberViewModel extends BaseViewModel {
             ChannelRemove.INSTANCE,
             ChannelUpdate.INSTANCE,
             ChannelUpdateWhiteBlackRoleMember.INSTANCE,
+            ServerRemove.INSTANCE,
             ServerMemberInviteAccept.INSTANCE,
             ServerMemberApplyAccept.INSTANCE,
             ServerMemberKick.INSTANCE,
@@ -164,7 +169,7 @@ public class ChannelMemberViewModel extends BaseViewModel {
             ServerMemberUpdate.INSTANCE));
   }
 
-  /** fetch member data */
+  /** 分页查询成员列表 */
   private void fetchMemberData(long serverId, long channelId, long offset) {
     QChatChannelRepo.fetchChannelMembers(
         serverId,
@@ -193,14 +198,14 @@ public class ChannelMemberViewModel extends BaseViewModel {
               fetchResult.setFetchType(FetchResult.FetchType.Add);
               fetchResult.setTypeIndex(-1);
             }
-            resultLiveData.postValue(fetchResult);
+            membersLiveData.postValue(fetchResult);
           }
 
           @Override
           public void onFailed(int code) {
             ALog.d(TAG, "fetchMemberData", "onFailed:" + code);
             fetchResult.setError(code, R.string.qchat_channel_fetch_member_error);
-            resultLiveData.postValue(fetchResult);
+            membersLiveData.postValue(fetchResult);
           }
 
           @Override
@@ -210,7 +215,7 @@ public class ChannelMemberViewModel extends BaseViewModel {
             fetchResult.setError(
                 QChatConstant.ERROR_CODE_CHANNEL_MEMBER_FETCH,
                 R.string.qchat_channel_fetch_member_error);
-            resultLiveData.postValue(fetchResult);
+            membersLiveData.postValue(fetchResult);
           }
         });
   }
@@ -224,6 +229,7 @@ public class ChannelMemberViewModel extends BaseViewModel {
     fetchMemberData(serverId, channelId, offset);
   }
 
+  /** 监听系统通知 社区、话题被删除需要退出页面 当前用户被移除需要退出页面等 */
   private final EventObserver<List<QChatSystemNotificationInfo>> notificationObserver =
       new EventObserver<List<QChatSystemNotificationInfo>>() {
         @Override
@@ -231,6 +237,8 @@ public class ChannelMemberViewModel extends BaseViewModel {
           if (eventList == null || eventList.isEmpty()) {
             return;
           }
+          // 获取当前用户 accId
+          String currentAccount = IMKitClient.account();
           for (QChatSystemNotificationInfo item : eventList) {
             if (item == null) {
               continue;
@@ -238,13 +246,37 @@ public class ChannelMemberViewModel extends BaseViewModel {
             QChatSystemNotificationTypeInfo type = item.getType();
             long channelId = item.getChannelId() != null ? item.getChannelId() : 0;
             long serverId = item.getServerId() != null ? item.getServerId() : 0;
-            ALog.d(
-                TAG,
-                "notificationObserver",
-                "info:" + serverId + "," + channelId + "," + type.toString());
-            if (type == ChannelRemove.INSTANCE && channelId == observerChannelId) {
+            ALog.d(TAG, "notificationObserver", "info:" + serverId + "," + channelId + "," + type);
+            // 通知是否为当前聊天所处服务
+            boolean isCurrentServer = observerServerId == serverId;
+            // 服务是否被移除
+            boolean isServerRemoved = type == ServerRemove.INSTANCE;
+            // 当前聊天频道是否被移除
+            boolean isChannelRemoved =
+                type == ChannelRemove.INSTANCE && channelId == observerChannelId;
+            // 当前用户是否被踢出当前服务器
+            boolean isKickedOutCurrentServer =
+                type == ServerMemberKick.INSTANCE
+                    && !TextUtils.equals(currentAccount, item.getFromAccount())
+                    && (item.getToAccIds() != null && item.getToAccIds().contains(currentAccount));
+            // 当前用户是否离开当前服务器
+            boolean isLeftCurrentServer =
+                type == ServerMemberLeave.INSTANCE
+                    && TextUtils.equals(currentAccount, item.getFromAccount());
+            // 当前用户是否被当前频道拉入黑名单
+            boolean isBlocked =
+                type == ChannelUpdateWhiteBlackRoleMember.INSTANCE
+                    && channelId == observerChannelId
+                    && !TextUtils.equals(currentAccount, item.getFromAccount())
+                    && (item.getToAccIds() != null && item.getToAccIds().contains(currentAccount));
+            if (isCurrentServer
+                && (isServerRemoved
+                    || isChannelRemoved
+                    || isKickedOutCurrentServer
+                    || isLeftCurrentServer
+                    || isBlocked)) {
               channelListResult.setFetchType(FetchResult.FetchType.Remove);
-              channelLiveData.setValue(channelListResult);
+              channelNotifyLiveData.setValue(channelListResult);
             } else if (type == ChannelUpdate.INSTANCE && channelId == observerChannelId) {
               fetchChannelInfo(observerChannelId);
             } else if (serverId == observerServerId

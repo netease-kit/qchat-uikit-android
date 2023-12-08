@@ -43,7 +43,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/dimen_50_dp"
                 android:layout_marginTop="@dimen/dimen_8_dp"
-                android:background="@drawable/white_round_bg"
+                android:background="@drawable/bg_qchat_white_round"
                 android:gravity="center_vertical"
                 android:maxLength="20"
                 android:paddingStart="@dimen/dimen_16_dp"
@@ -65,7 +65,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dimen_8_dp"
-                android:background="@drawable/white_round_bg"
+                android:background="@drawable/bg_qchat_white_round"
                 android:padding="@dimen/dimen_16_dp">
 
                 <TextView
@@ -108,14 +108,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dimen_8_dp"
-                android:background="@drawable/white_round_bg"
+                android:background="@drawable/bg_qchat_white_round"
                 android:orientation="vertical">
 
                 <RelativeLayout
                     android:id="@+id/rly_manager_server"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/dimen_50_dp"
-                    android:padding="@dimen/dimen_16_dp">
+                    android:paddingHorizontal="@dimen/dimen_16_dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -127,8 +127,8 @@
 
                     <androidx.appcompat.widget.SwitchCompat
                         android:id="@+id/sc_manager_server"
-                        android:layout_width="@dimen/dimen_60_dp"
-                        android:layout_height="@dimen/dimen_20_dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:clickable="false"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
@@ -145,7 +145,7 @@
                     android:id="@+id/rly_manage_channel_pro"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/dimen_50_dp"
-                    android:padding="@dimen/dimen_16_dp">
+                    android:paddingHorizontal="@dimen/dimen_16_dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -157,8 +157,8 @@
 
                     <androidx.appcompat.widget.SwitchCompat
                         android:id="@+id/sc_manage_channel_pro"
-                        android:layout_width="@dimen/dimen_60_dp"
-                        android:layout_height="@dimen/dimen_20_dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:clickable="false"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
@@ -175,7 +175,7 @@
                     android:id="@+id/rly_manager_role"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/dimen_50_dp"
-                    android:padding="@dimen/dimen_16_dp">
+                    android:paddingHorizontal="@dimen/dimen_16_dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -187,8 +187,8 @@
 
                     <androidx.appcompat.widget.SwitchCompat
                         android:id="@+id/sc_manager_role"
-                        android:layout_width="@dimen/dimen_60_dp"
-                        android:layout_height="@dimen/dimen_20_dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:thumb="@drawable/switch_thumb_selector"
@@ -211,14 +211,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dimen_8_dp"
-                android:background="@drawable/white_round_bg"
+                android:background="@drawable/bg_qchat_white_round"
                 android:orientation="vertical">
 
                 <RelativeLayout
                     android:id="@+id/rly_send_message"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/dimen_50_dp"
-                    android:padding="@dimen/dimen_16_dp">
+                    android:paddingHorizontal="@dimen/dimen_16_dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -230,8 +230,68 @@
 
                     <androidx.appcompat.widget.SwitchCompat
                         android:id="@+id/sc_send_message"
-                        android:layout_width="@dimen/dimen_60_dp"
-                        android:layout_height="@dimen/dimen_20_dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:clickable="false"
+                        android:thumb="@drawable/switch_thumb_selector"
+                        app:track="@drawable/switch_track_selector" />
+                </RelativeLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/dimen_1_dp"
+                    android:background="@color/color_f5f8fc" />
+
+                <RelativeLayout
+                    android:id="@+id/rly_delete_message"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/dimen_50_dp"
+                    android:paddingHorizontal="@dimen/dimen_16_dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="@string/qchat_delete_other_msg"
+                        android:textColor="@color/color_666666"
+                        android:textSize="@dimen/text_size_12" />
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/sc_delete_message"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:clickable="false"
+                        android:thumb="@drawable/switch_thumb_selector"
+                        app:track="@drawable/switch_track_selector" />
+                </RelativeLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/dimen_1_dp"
+                    android:background="@color/color_f5f8fc" />
+
+                <RelativeLayout
+                    android:id="@+id/rly_revoke_message"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/dimen_50_dp"
+                    android:paddingHorizontal="@dimen/dimen_16_dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="@string/qchat_revoke_other_msg"
+                        android:textColor="@color/color_666666"
+                        android:textSize="@dimen/text_size_12" />
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/sc_revoke_message"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:clickable="false"
@@ -254,7 +314,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dimen_8_dp"
-                android:background="@drawable/white_round_bg"
+                android:background="@drawable/bg_qchat_white_round"
                 android:orientation="vertical"
                 android:layout_marginBottom="@dimen/dimen_8_dp">
 
@@ -262,7 +322,7 @@
                     android:id="@+id/rly_modify_self_member"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/dimen_50_dp"
-                    android:padding="@dimen/dimen_16_dp">
+                    android:paddingHorizontal="@dimen/dimen_16_dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -274,8 +334,8 @@
 
                     <androidx.appcompat.widget.SwitchCompat
                         android:id="@+id/sc_modify_self_member"
-                        android:layout_width="@dimen/dimen_60_dp"
-                        android:layout_height="@dimen/dimen_20_dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:clickable="false"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
@@ -292,7 +352,7 @@
                     android:id="@+id/rly_modify_other_member"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/dimen_50_dp"
-                    android:padding="@dimen/dimen_16_dp">
+                    android:paddingHorizontal="@dimen/dimen_16_dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -304,8 +364,8 @@
 
                     <androidx.appcompat.widget.SwitchCompat
                         android:id="@+id/sc_modify_other_member"
-                        android:layout_width="@dimen/dimen_60_dp"
-                        android:layout_height="@dimen/dimen_20_dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:clickable="false"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
@@ -322,7 +382,7 @@
                     android:id="@+id/rly_invite_member"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/dimen_50_dp"
-                    android:padding="@dimen/dimen_16_dp">
+                    android:paddingHorizontal="@dimen/dimen_16_dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -334,8 +394,8 @@
 
                     <androidx.appcompat.widget.SwitchCompat
                         android:id="@+id/sc_invite_member"
-                        android:layout_width="@dimen/dimen_60_dp"
-                        android:layout_height="@dimen/dimen_20_dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:clickable="false"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
@@ -352,7 +412,7 @@
                     android:id="@+id/rly_kick_out"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/dimen_50_dp"
-                    android:padding="@dimen/dimen_16_dp">
+                    android:paddingHorizontal="@dimen/dimen_16_dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -364,8 +424,8 @@
 
                     <androidx.appcompat.widget.SwitchCompat
                         android:id="@+id/sc_kick_out"
-                        android:layout_width="@dimen/dimen_60_dp"
-                        android:layout_height="@dimen/dimen_20_dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:clickable="false"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
@@ -373,11 +433,16 @@
                         app:track="@drawable/switch_track_selector" />
                 </RelativeLayout>
 
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/dimen_1_dp"
+                    android:background="@color/color_f5f8fc" />
+
                 <RelativeLayout
                     android:id="@+id/rly_manager_member"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/dimen_50_dp"
-                    android:padding="@dimen/dimen_16_dp">
+                    android:paddingHorizontal="@dimen/dimen_16_dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -389,8 +454,8 @@
 
                     <androidx.appcompat.widget.SwitchCompat
                         android:id="@+id/sc_manager_member"
-                        android:layout_width="@dimen/dimen_60_dp"
-                        android:layout_height="@dimen/dimen_20_dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:clickable="false"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"

@@ -30,7 +30,7 @@ public class ChannelCreateViewModel extends BaseViewModel {
     return resultLiveData;
   }
 
-  /** create new channel */
+  /** 创建话题 */
   public void createChannel(
       Long serverId, String name, String topic, QChatChannelModeEnum typeEnum) {
     ALog.d(TAG, "createChannel", "param:" + serverId + "," + name + "," + topic);

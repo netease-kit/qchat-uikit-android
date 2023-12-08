@@ -22,6 +22,7 @@ import com.netease.yunxin.kit.common.ui.dialog.ChoiceListener;
 import com.netease.yunxin.kit.common.ui.dialog.CommonChoiceDialog;
 import com.netease.yunxin.kit.common.ui.viewmodel.FetchResult;
 import com.netease.yunxin.kit.common.ui.viewmodel.LoadStatus;
+import com.netease.yunxin.kit.corekit.im.IMKitClient;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatChannelModeEnum;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatServerMemberInfo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatServerRoleMemberInfo;
@@ -42,10 +43,7 @@ import com.netease.yunxin.kit.qchatkit.ui.server.QChatMemberSelectorActivity;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * black and white name list page show the member list in channel,when the channel type is public it
- * is black list if the channel type is private,it is white list
- */
+/** 黑白名单页面，当频道类型为公开时，是黑名单，当频道类型为私有时，是白名单 */
 public class QChatBlackWhiteActivity extends CommonListActivity {
 
   private static final String TAG = "QChatBlackWhiteActivity";
@@ -54,6 +52,7 @@ public class QChatBlackWhiteActivity extends CommonListActivity {
   private boolean editStatus = false;
   private long channelId;
   private long serverId;
+  private String serverOwnerId;
   private QChatChannelModeEnum channelType = QChatChannelModeEnum.Public;
 
   @Override
@@ -72,13 +71,15 @@ public class QChatBlackWhiteActivity extends CommonListActivity {
     super.initData();
     channelId = getIntent().getLongExtra(QChatConstant.CHANNEL_ID, 0);
     serverId = getIntent().getLongExtra(QChatConstant.SERVER_ID, 0);
+    serverOwnerId = getIntent().getStringExtra(QChatConstant.SERVER_OWNER_ID);
+    configServerIdAndChannelId(serverId, channelId);
     int type = getIntent().getIntExtra(QChatConstant.CHANNEL_TYPE, 0);
     if (type == QChatChannelModeEnum.Private.ordinal()) {
       channelType = QChatChannelModeEnum.Private;
     }
     ALog.d(TAG, "initData", "info:" + channelId + "," + serverId);
     viewModel = new ViewModelProvider(this).get(BlackWhiteViewModel.class);
-    //observe the member list
+    //监听成员查询结果livedata
     viewModel
         .getResultLiveData()
         .observe(
@@ -107,7 +108,7 @@ public class QChatBlackWhiteActivity extends CommonListActivity {
                 ALog.d(TAG, "ResultLiveData", "Error");
               }
             });
-    //add member live data
+    //监听添加成员的livedata
     viewModel
         .getAddLiveData()
         .observe(
@@ -126,6 +127,7 @@ public class QChatBlackWhiteActivity extends CommonListActivity {
               }
             });
 
+    //监听删除成员的livedata
     viewModel
         .getRemoveLiveData()
         .observe(
@@ -150,6 +152,7 @@ public class QChatBlackWhiteActivity extends CommonListActivity {
     loadData();
   }
 
+  /** 加载数据 */
   private void loadData() {
     setData(viewModel.loadHeader());
     viewModel.fetchMemberList(serverId, channelId, channelType);
@@ -163,6 +166,11 @@ public class QChatBlackWhiteActivity extends CommonListActivity {
     //    loadData();
   }
 
+  /**
+   * 设置标题栏右侧按钮点击事件
+   *
+   * @param view
+   */
   @Override
   public void onTitleActionClick(View view) {
     if (editStatus) {
@@ -175,6 +183,7 @@ public class QChatBlackWhiteActivity extends CommonListActivity {
     recyclerViewAdapter.setEditStatus(editStatus);
   }
 
+  /** 页面标题文案 */
   @Override
   public String getTitleText() {
     return channelType == QChatChannelModeEnum.Public
@@ -182,11 +191,13 @@ public class QChatBlackWhiteActivity extends CommonListActivity {
         : getResources().getString(R.string.qchat_channel_white_name_list);
   }
 
+  /** 是否有加载更多 */
   @Override
   public boolean isLoadMore() {
     return viewModel.hasMore();
   }
 
+  /** 创建成员列表ViewHolder */
   @Override
   public CommonViewHolder<QChatBaseBean> onCreateViewHolder(
       @NonNull ViewGroup parent, int viewType) {
@@ -226,11 +237,15 @@ public class QChatBlackWhiteActivity extends CommonListActivity {
       AddMemberViewHolder addMemberViewHolder = new AddMemberViewHolder(viewBinding);
       addMemberViewHolder.setItemOnClickListener(
           (data, position) -> {
+            ArrayList<String> filterList = new ArrayList<>();
+            filterList.add(IMKitClient.account());
+            filterList.add(serverOwnerId);
             Intent intent =
                 new Intent(QChatBlackWhiteActivity.this, QChatMemberSelectorActivity.class);
             intent.putExtra(QChatConstant.SERVER_ID, serverId);
             intent.putExtra(QChatConstant.CHANNEL_ID, channelId);
             intent.putExtra(QChatConstant.CHANNEL_TYPE, channelType.ordinal());
+            intent.putExtra(QChatConstant.REQUEST_MEMBER_FILTER_LIST, filterList);
             intent.putExtra(QChatConstant.REQUEST_MEMBER_FILTER_KEY, REQUEST_MEMBER_FILTER_CHANNEL);
             selectorListLauncher.launch(intent);
           });
@@ -239,11 +254,15 @@ public class QChatBlackWhiteActivity extends CommonListActivity {
     return null;
   }
 
+  /** 注册选择器返回结果 */
   private void registerResult() {
     selectorListLauncher =
         registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
+              if (isFinishing()) {
+                return;
+              }
               if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                 ArrayList<QChatServerRoleMemberInfo> members =
                     result.getData().getParcelableArrayListExtra(REQUEST_MEMBER_SELECTOR_KEY);
@@ -259,6 +278,7 @@ public class QChatBlackWhiteActivity extends CommonListActivity {
             });
   }
 
+  /** 删除成员弹窗 */
   private void showDeleteDialog(QChatServerMemberInfo data, int position) {
     if (data == null) {
       return;
@@ -292,15 +312,19 @@ public class QChatBlackWhiteActivity extends CommonListActivity {
         .show(getSupportFragmentManager());
   }
 
+  /** 加载更多 */
   @Override
   public void loadMore(QChatBaseBean bean) {
     viewModel.loadMore(serverId, channelId, channelType);
   }
 
-  public static void launch(Activity activity, long serverId, long channelId, int channelType) {
+  /** 启动黑名单&白名单页面 */
+  public static void launch(
+      Activity activity, long serverId, long channelId, String ownerId, int channelType) {
     Intent intent = new Intent(activity, QChatBlackWhiteActivity.class);
     intent.putExtra(QChatConstant.SERVER_ID, serverId);
     intent.putExtra(QChatConstant.CHANNEL_ID, channelId);
+    intent.putExtra(QChatConstant.SERVER_OWNER_ID, ownerId);
     intent.putExtra(QChatConstant.CHANNEL_TYPE, channelType);
     activity.startActivity(intent);
   }

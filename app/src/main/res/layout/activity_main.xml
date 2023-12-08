@@ -65,6 +65,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:onClick="tabClick"
+            android:clickable="false"
             android:layout_weight="1">
 
             <TextView
@@ -79,8 +80,43 @@
                 android:drawableTop="@drawable/ic_qchat_unchecked"
                 android:text="@string/tab_qchat_tab_text" />
 
+            <TextView android:id="@+id/qchat_dot"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/qchat"
+                android:textSize="@dimen/dimen_9_dp"
+                android:paddingStart="@dimen/dimen_4_dp"
+                android:paddingEnd="@dimen/dimen_4_dp"
+                android:layout_marginStart="-10dp"
+                android:layout_marginTop="-5dp"
+                android:layout_alignTop="@id/qchat"
+                android:textColor="@color/color_white"
+                android:background="@drawable/bg_shape_red_dot"
+                android:visibility="gone"
+                tools:ignore="SpUsage" />
+
         </RelativeLayout>
 
+        <RelativeLayout
+            android:id="@+id/qchat_square_btn_group"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:onClick="tabClick"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/qchat_square"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:drawablePadding="3dp"
+                android:gravity="center"
+                android:textSize="12sp"
+                android:textColor="@color/tab_unchecked_color"
+                android:drawableTop="@drawable/ic_qchat_square_unchecked"
+                android:text="@string/tab_qchat_square_tab_text" />
+
+        </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/live_btn_group"

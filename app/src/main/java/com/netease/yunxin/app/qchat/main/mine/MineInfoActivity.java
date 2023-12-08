@@ -17,12 +17,13 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import com.netease.nimlib.sdk.uinfo.constant.GenderEnum;
 import com.netease.yunxin.app.qchat.R;
 import com.netease.yunxin.app.qchat.databinding.ActivityMineInfoBinding;
 import com.netease.yunxin.app.qchat.utils.Constant;
+import com.netease.yunxin.kit.common.ui.activities.BaseActivity;
+import com.netease.yunxin.kit.common.ui.photo.BasePhotoChoiceDialog;
 import com.netease.yunxin.kit.common.ui.photo.PhotoChoiceDialog;
 import com.netease.yunxin.kit.common.ui.utils.AvatarColor;
 import com.netease.yunxin.kit.common.ui.utils.CommonCallback;
@@ -40,7 +41,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MineInfoActivity extends AppCompatActivity {
+public class MineInfoActivity extends BaseActivity {
   private ActivityMineInfoBinding binding;
   private ActivityResultLauncher<Intent> launcher;
   private UserInfo userInfo;
@@ -65,7 +66,7 @@ public class MineInfoActivity extends AppCompatActivity {
                       result.getData().getStringExtra(Constant.EDIT_TYPE), Constant.EDIT_SEXUAL)) {
                 int select = result.getData().getIntExtra(Constant.SELECTED_INDEX, -1);
                 if (select >= 0) {
-                  updateUserInfo(UserField.Gender, select);
+                  updateUserInfo(UserField.Gender, select + 1);
                 }
 
               } else if (result.getResultCode() == RESULT_OK) {
@@ -100,14 +101,13 @@ public class MineInfoActivity extends AppCompatActivity {
     binding.flSexual.setOnClickListener(
         v -> {
           ArrayList<String> content = new ArrayList<>();
-          content.add(getResources().getString(R.string.sexual_unknown));
           content.add(getResources().getString(R.string.sexual_male));
           content.add(getResources().getString(R.string.sexual_female));
-          int selectIndex = 0;
+          int selectIndex = -1;
           if (userInfo.getGenderEnum() == GenderEnum.MALE) {
-            selectIndex = 1;
+            selectIndex = 0;
           } else if (userInfo.getGenderEnum() == GenderEnum.FEMALE) {
-            selectIndex = 2;
+            selectIndex = 1;
           }
           TypeSelectActivity.launch(
               MineInfoActivity.this,
@@ -154,93 +154,90 @@ public class MineInfoActivity extends AppCompatActivity {
   }
 
   private void choicePhoto() {
-    new PhotoChoiceDialog(MineInfoActivity.this)
-        .show(
-            new CommonCallback<File>() {
-              @Override
-              public void onSuccess(@Nullable File param) {
-                if (NetworkUtils.isConnected()) {
-                  CommonRepo.uploadImage(
-                      param,
-                      new FetchCallback<String>() {
-                        @Override
-                        public void onSuccess(@Nullable String urlParam) {
-                          Map<UserField, Object> map = new HashMap<>(1);
-                          map.put(UserField.Avatar, urlParam);
-                          CommonRepo.updateUserInfo(
-                              map,
-                              new FetchCallback<Void>() {
-                                @Override
-                                public void onSuccess(@Nullable Void param) {
-                                  resultCode = RESULT_OK;
-                                  loadData(IMKitClient.account());
-                                }
+    BasePhotoChoiceDialog choiceDialog;
+    choiceDialog = new PhotoChoiceDialog(this);
+    choiceDialog.show(
+        new CommonCallback<File>() {
+          @Override
+          public void onSuccess(@Nullable File param) {
+            if (NetworkUtils.isConnected()) {
+              CommonRepo.uploadImage(
+                  param,
+                  new FetchCallback<String>() {
+                    @Override
+                    public void onSuccess(@Nullable String urlParam) {
+                      Map<UserField, Object> map = new HashMap<>(1);
+                      map.put(UserField.Avatar, urlParam);
+                      CommonRepo.updateUserInfo(
+                          map,
+                          new FetchCallback<Void>() {
+                            @Override
+                            public void onSuccess(@Nullable Void param) {
+                              resultCode = RESULT_OK;
+                              loadData(IMKitClient.account());
+                            }
 
-                                @Override
-                                public void onFailed(int code) {
-                                  Toast.makeText(
-                                          getApplicationContext(),
-                                          getString(R.string.request_fail),
-                                          Toast.LENGTH_SHORT)
-                                      .show();
-                                }
+                            @Override
+                            public void onFailed(int code) {
+                              Toast.makeText(
+                                      getApplicationContext(),
+                                      getString(R.string.request_fail),
+                                      Toast.LENGTH_SHORT)
+                                  .show();
+                            }
 
-                                @Override
-                                public void onException(@Nullable Throwable exception) {
-                                  Toast.makeText(
-                                          getApplicationContext(),
-                                          getString(R.string.request_fail),
-                                          Toast.LENGTH_SHORT)
-                                      .show();
-                                }
-                              });
-                        }
+                            @Override
+                            public void onException(@Nullable Throwable exception) {
+                              Toast.makeText(
+                                      getApplicationContext(),
+                                      getString(R.string.request_fail),
+                                      Toast.LENGTH_SHORT)
+                                  .show();
+                            }
+                          });
+                    }
 
-                        @Override
-                        public void onFailed(int code) {
-                          Toast.makeText(
-                                  getApplicationContext(),
-                                  getString(R.string.request_fail),
-                                  Toast.LENGTH_SHORT)
-                              .show();
-                        }
+                    @Override
+                    public void onFailed(int code) {
+                      Toast.makeText(
+                              getApplicationContext(),
+                              getString(R.string.request_fail),
+                              Toast.LENGTH_SHORT)
+                          .show();
+                    }
 
-                        @Override
-                        public void onException(@Nullable Throwable exception) {
-                          Toast.makeText(
-                                  getApplicationContext(),
-                                  getString(R.string.request_fail),
-                                  Toast.LENGTH_SHORT)
-                              .show();
-                        }
-                      });
-                } else {
-                  Toast.makeText(
-                          getApplicationContext(),
-                          getString(R.string.network_error),
-                          Toast.LENGTH_SHORT)
-                      .show();
-                }
-              }
+                    @Override
+                    public void onException(@Nullable Throwable exception) {
+                      Toast.makeText(
+                              getApplicationContext(),
+                              getString(R.string.request_fail),
+                              Toast.LENGTH_SHORT)
+                          .show();
+                    }
+                  });
+            } else {
+              Toast.makeText(
+                      getApplicationContext(),
+                      getString(R.string.network_error),
+                      Toast.LENGTH_SHORT)
+                  .show();
+            }
+          }
 
-              @Override
-              public void onFailed(int code) {
-                Toast.makeText(
-                        getApplicationContext(),
-                        getString(R.string.request_fail),
-                        Toast.LENGTH_SHORT)
-                    .show();
-              }
+          @Override
+          public void onFailed(int code) {
+            Toast.makeText(
+                    getApplicationContext(), getString(R.string.request_fail), Toast.LENGTH_SHORT)
+                .show();
+          }
 
-              @Override
-              public void onException(@Nullable Throwable exception) {
-                Toast.makeText(
-                        getApplicationContext(),
-                        getString(R.string.request_fail),
-                        Toast.LENGTH_SHORT)
-                    .show();
-              }
-            });
+          @Override
+          public void onException(@Nullable Throwable exception) {
+            Toast.makeText(
+                    getApplicationContext(), getString(R.string.request_fail), Toast.LENGTH_SHORT)
+                .show();
+          }
+        });
   }
 
   private void refreshUserInfo(UserInfo userInfo) {
@@ -250,7 +247,7 @@ public class MineInfoActivity extends AppCompatActivity {
     this.userInfo = userInfo;
     binding.cavAvatar.setData(
         userInfo.getAvatar(),
-        TextUtils.isEmpty(userInfo.getName()) ? userInfo.getAccount() : userInfo.getName(),
+        userInfo.getName() == null ? "" : userInfo.getName(),
         AvatarColor.avatarColor(IMKitClient.account()));
     binding.tvName.setText(userInfo.getName());
     int sexualValue = R.string.sexual_unknown;
@@ -312,9 +309,17 @@ public class MineInfoActivity extends AppCompatActivity {
 
           @Override
           public void onFailed(int code) {
-            Toast.makeText(
-                    getApplicationContext(), getString(R.string.request_fail), Toast.LENGTH_SHORT)
-                .show();
+            if (code == Constant.NETWORK_ERROR_CODE) {
+              Toast.makeText(
+                      getApplicationContext(),
+                      getString(R.string.network_error),
+                      Toast.LENGTH_SHORT)
+                  .show();
+            } else {
+              Toast.makeText(
+                      getApplicationContext(), getString(R.string.request_fail), Toast.LENGTH_SHORT)
+                  .show();
+            }
           }
 
           @Override

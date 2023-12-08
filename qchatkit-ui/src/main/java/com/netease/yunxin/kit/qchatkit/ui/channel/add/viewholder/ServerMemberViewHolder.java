@@ -12,6 +12,7 @@ import com.netease.yunxin.kit.qchatkit.ui.databinding.QChatChannelMemberViewHold
 import com.netease.yunxin.kit.qchatkit.ui.model.QChatBaseBean;
 import com.netease.yunxin.kit.qchatkit.ui.model.QChatServerMemberBean;
 
+/** 成员列表ViewHolder */
 public class ServerMemberViewHolder extends CommonViewHolder<QChatBaseBean> {
 
   private QChatChannelMemberViewHolderBinding binding;

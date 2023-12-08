@@ -4,9 +4,15 @@
 
 package com.netease.yunxin.kit.qchatkit.ui.channel.permission.viewholder;
 
-import android.text.TextUtils;
+import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.view.View;
+import android.view.ViewGroup;
 import androidx.annotation.NonNull;
+import androidx.appcompat.content.res.AppCompatResources;
+import com.netease.yunxin.kit.common.utils.SizeUtils;
+import com.netease.yunxin.kit.qchatkit.ui.R;
+import com.netease.yunxin.kit.qchatkit.ui.channel.permission.QChatChannelPermissionExpandableHelper;
 import com.netease.yunxin.kit.qchatkit.ui.common.CommonViewHolder;
 import com.netease.yunxin.kit.qchatkit.ui.databinding.QChatMoreViewholderLayoutBinding;
 import com.netease.yunxin.kit.qchatkit.ui.model.QChatBaseBean;
@@ -35,23 +41,30 @@ public class MoreViewHolder extends CommonViewHolder<QChatBaseBean> {
 
   @Override
   protected void onBindData(QChatBaseBean data, int position) {
+    ViewGroup.LayoutParams layoutParams = viewBinding.getRoot().getLayoutParams();
+    if (position > QChatChannelPermissionExpandableHelper.NUM_MAX_EXPANDABLE_ITEM) {
+      layoutParams.height = SizeUtils.dp2px(50);
+    } else {
+      layoutParams.height = 0;
+    }
+    viewBinding.getRoot().setLayoutParams(layoutParams);
     if (data instanceof QChatMoreBean) {
       this.data = data;
       this.position = position;
       QChatMoreBean bean = (QChatMoreBean) data;
-      if (!TextUtils.isEmpty(bean.title)) {
-        String title = bean.title;
-        if (bean.extend != null) {
-          title = String.format(bean.title, bean.extend);
-        }
-        viewBinding.qChatVhMoreTv.setText(title);
+      Context context = viewBinding.getRoot().getContext();
+      Drawable icon;
+      String title;
+      if (QChatChannelPermissionExpandableHelper.isExpandable()) {
+        title = context.getString(R.string.qchat_pack_up_with_all, bean.extend);
+        icon = AppCompatResources.getDrawable(context, R.drawable.ic_up);
       } else {
-        String title = viewBinding.getRoot().getContext().getString(bean.titleRes);
-        if (bean.extend != null) {
-          title = String.format(title, bean.extend);
-        }
-        viewBinding.qChatVhMoreTv.setText(title);
+        title = context.getString(R.string.qchat_more_title, String.valueOf(bean.extend));
+        icon = AppCompatResources.getDrawable(context, R.drawable.ic_down);
       }
+      viewBinding.qChatVhMoreTv.setText(title);
+      icon.setBounds(0, 0, icon.getMinimumWidth(), icon.getMinimumHeight());
+      viewBinding.qChatVhMoreTv.setCompoundDrawables(null, null, icon, null);
     }
   }
 }

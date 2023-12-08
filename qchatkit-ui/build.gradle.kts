@@ -10,11 +10,11 @@ plugins {
 }
 
 android {
-    compileSdk = 31
+    compileSdk = 33
 
     defaultConfig {
         minSdk = 21
-        targetSdk = 30
+        targetSdk = 33
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
         buildConfigField("String", "versionName", "\"9.4.1\"")
@@ -39,12 +39,14 @@ android {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    api("com.netease.yunxin.kit.qchat:qchatkit:9.4.1")
-    api("com.netease.yunxin.kit.common:common-ui:1.1.15")
+    api(project(":qchatkit"))
+    api("com.netease.yunxin.kit.common:common-ui:1.3.2")
     api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.21")
     implementation("androidx.appcompat:appcompat:1.4.2") 
     implementation("com.google.android.material:material:1.5.0") 
     implementation("androidx.recyclerview:recyclerview:1.2.1") 
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     implementation("com.github.bumptech.glide:glide:4.13.1")
+    implementation("com.github.bumptech.glide:compiler:4.13.1")
 }
 

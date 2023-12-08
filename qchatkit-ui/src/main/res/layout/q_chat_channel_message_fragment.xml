@@ -19,6 +19,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
+    <TextView
+        android:id="@+id/q_chat_message_bottom_tips"
+        android:layout_width="match_parent"
+        android:layout_height="102dp"
+        android:background="@color/color_eff1f4"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:textColor="@color/color_656a72"
+        android:text="@string/qchat_announcement_read_only_tips"
+        android:textSize="@dimen/text_size_16"
+        android:gravity="center_horizontal"
+        android:paddingTop="@dimen/dimen_12_dp"
+        android:visibility="gone"
+        android:clickable="false"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
     <TextView android:id="@+id/networkTip"
         android:layout_width="match_parent"
@@ -34,7 +49,7 @@
         android:visibility="gone"
         tools:ignore="SpUsage" />
 
-    <FrameLayout
+    <FrameLayout android:id="@+id/q_chat_message_list_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/q_chat_message_bottom_layout"
@@ -71,5 +86,13 @@
             app:drawableStartCompat="@drawable/ic_ok_green"
             tools:ignore="SpUsage" />
     </androidx.cardview.widget.CardView>
+
+    <com.netease.yunxin.kit.qchatkit.ui.common.widget.QChatVisitorTipView
+        android:id="@+id/viewQChatVisitor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_marginBottom="89dp"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

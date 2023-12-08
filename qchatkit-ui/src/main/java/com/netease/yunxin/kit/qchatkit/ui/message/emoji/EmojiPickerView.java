@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-/** emoji picker view */
+/** 聊天页面底部Emoji表情选择View */
 public class EmojiPickerView extends LinearLayout implements IEmojiCategoryChanged {
 
   private Context context;

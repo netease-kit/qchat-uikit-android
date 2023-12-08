@@ -16,7 +16,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.netease.yunxin.kit.alog.ALog;
-import com.netease.yunxin.kit.common.ui.activities.CommonActivity;
 import com.netease.yunxin.kit.common.ui.dialog.ChoiceListener;
 import com.netease.yunxin.kit.common.ui.dialog.CommonChoiceDialog;
 import com.netease.yunxin.kit.common.ui.photo.PhotoChoiceDialog;
@@ -31,13 +30,16 @@ import com.netease.yunxin.kit.qchatkit.repo.QChatServerRepo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatServerInfo;
 import com.netease.yunxin.kit.qchatkit.ui.R;
 import com.netease.yunxin.kit.qchatkit.ui.common.QChatCallback;
+import com.netease.yunxin.kit.qchatkit.ui.common.QChatServerCommonBaseActivity;
 import com.netease.yunxin.kit.qchatkit.ui.databinding.QChatServerSettingActivityLayoutBinding;
 import com.netease.yunxin.kit.qchatkit.ui.model.QChatConstant;
+import com.netease.yunxin.kit.qchatkit.ui.utils.QChatUtils;
 import java.io.File;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class QChatServerSettingActivity extends CommonActivity {
+/** 社区设置页面 */
+public class QChatServerSettingActivity extends QChatServerCommonBaseActivity {
 
   public static final String TAG = "QChatServerSettingActivity";
 
@@ -62,7 +64,17 @@ public class QChatServerSettingActivity extends CommonActivity {
         .setActionTextColor(getResources().getColor(R.color.color_337eff))
         .setActionListener(
             v -> {
+              if (!NetworkUtils.isConnected()) {
+                Toast.makeText(this, R.string.qchat_network_error_tip, Toast.LENGTH_SHORT).show();
+                return;
+              }
               String name = binding.edtServerName.getText().toString().trim();
+              if (TextUtils.isEmpty(name)) {
+                Toast.makeText(
+                        this, R.string.qchat_update_server_empty_name_tip, Toast.LENGTH_SHORT)
+                    .show();
+                return;
+              }
               String topic = binding.edtServerTopic.getText().toString().trim();
               JSONObject jsonObject = new JSONObject();
               try {
@@ -70,29 +82,46 @@ public class QChatServerSettingActivity extends CommonActivity {
               } catch (JSONException e) {
                 e.printStackTrace();
               }
+              // 更新社区信息
               QChatServerRepo.updateServer(
                   serverInfo.getServerId(),
                   name,
                   avatarUrl,
                   jsonObject.toString(),
-                  new QChatCallback<Void>(getApplicationContext()));
-              finish();
+                  new QChatCallback<Void>(getApplicationContext()) {
+                    @Override
+                    public void onSuccess(@Nullable Void param) {
+                      super.onSuccess(param);
+                      finish();
+                    }
+                  });
             });
 
     binding.rlyMember.setOnClickListener(
-        v -> QChatServerMemberListActivity.launch(this, serverInfo.getServerId()));
+        v ->
+            QChatUtils.isConnectedToastAndRun(
+                this,
+                () -> {
+                  QChatServerMemberListActivity.launch(this, serverInfo.getServerId());
+                }));
 
     binding.rlyTeam.setOnClickListener(
         v -> {
-          Intent intent = new Intent(QChatServerSettingActivity.this, QChatRoleListActivity.class);
-          intent.putExtra(SERVER_INFO, serverInfo);
-          startActivity(intent);
+          QChatUtils.isConnectedToastAndRun(
+              this,
+              () -> {
+                Intent intent =
+                    new Intent(QChatServerSettingActivity.this, QChatRoleListActivity.class);
+                intent.putExtra(SERVER_INFO, serverInfo);
+                startActivity(intent);
+              });
         });
 
     binding.avatar.setOnClickListener(this::gotoPicture);
     binding.ivCamera.setOnClickListener(this::gotoPicture);
   }
 
+  /** 选择社区头像 */
   private void gotoPicture(View v) {
     manager.hideSoftInputFromWindow(v.getWindowToken(), 0);
     new PhotoChoiceDialog(this)
@@ -101,11 +130,13 @@ public class QChatServerSettingActivity extends CommonActivity {
               @Override
               public void onSuccess(@Nullable File param) {
                 if (NetworkUtils.isConnected()) {
+                  // 头像上传
                   CommonRepo.uploadImage(
                       param,
                       new FetchCallback<String>() {
                         @Override
                         public void onSuccess(@Nullable String param) {
+                          //获取长传成功的头像url
                           avatarUrl = param;
                           binding.avatar.setData(
                               param,
@@ -170,6 +201,7 @@ public class QChatServerSettingActivity extends CommonActivity {
     if (serverInfo == null) {
       return;
     }
+    configServerId(serverInfo.getServerId());
     boolean isOwner = TextUtils.equals(serverInfo.getOwner(), IMKitClient.account());
     if (isOwner) {
       binding.tvDelete.setText(R.string.qchat_delete_server);
@@ -195,6 +227,11 @@ public class QChatServerSettingActivity extends CommonActivity {
     }
   }
 
+  /**
+   * 展示删除/退出社区的确认弹窗
+   *
+   * @param isOwner true 展示删除弹窗；false 展示退出社区弹窗
+   */
   private void showConfirmDialog(boolean isOwner) {
     CommonChoiceDialog commonConfirmDialog = new CommonChoiceDialog();
     commonConfirmDialog
@@ -202,6 +239,10 @@ public class QChatServerSettingActivity extends CommonActivity {
             isOwner
                 ? getString(R.string.qchat_delete_server)
                 : getString(R.string.qchat_leave_server))
+        .setContentStr(
+            isOwner
+                ? getString(R.string.qchat_delete_server_content)
+                : getString(R.string.qchat_leave_server_content))
         .setPositiveStr(getString(isOwner ? R.string.qchat_delete : R.string.qchat_leave))
         .setNegativeStr(getString(R.string.qchat_cancel))
         .setConfirmListener(
@@ -213,19 +254,23 @@ public class QChatServerSettingActivity extends CommonActivity {
 
               @Override
               public void onPositive() {
-                QChatCallback<Void> callback =
-                    new QChatCallback<Void>(getApplicationContext()) {
-                      @Override
-                      public void onSuccess(@Nullable Void param) {
-                        super.onSuccess(param);
-                        finish();
+                QChatUtils.isConnectedToastAndRun(
+                    QChatServerSettingActivity.this,
+                    () -> {
+                      QChatCallback<Void> callback =
+                          new QChatCallback<Void>(getApplicationContext()) {
+                            @Override
+                            public void onSuccess(@Nullable Void param) {
+                              super.onSuccess(param);
+                              finish();
+                            }
+                          };
+                      if (isOwner) {
+                        QChatServerRepo.deleteServer(serverInfo.getServerId(), callback);
+                      } else {
+                        QChatServerRepo.leaveServer(serverInfo.getServerId(), callback);
                       }
-                    };
-                if (isOwner) {
-                  QChatServerRepo.deleteServer(serverInfo.getServerId(), callback);
-                } else {
-                  QChatServerRepo.leaveServer(serverInfo.getServerId(), callback);
-                }
+                    });
               }
             })
         .show(getSupportFragmentManager());
@@ -241,6 +286,12 @@ public class QChatServerSettingActivity extends CommonActivity {
   @Override
   protected void initViewModel() {}
 
+  /**
+   * 页面启动方法
+   *
+   * @param activity 页面启动 activity
+   * @param data 社区信息
+   */
   public static void launch(Activity activity, QChatServerInfo data) {
     Intent intent = new Intent(activity, QChatServerSettingActivity.class);
     intent.putExtra(QChatConstant.SERVER_INFO, data);

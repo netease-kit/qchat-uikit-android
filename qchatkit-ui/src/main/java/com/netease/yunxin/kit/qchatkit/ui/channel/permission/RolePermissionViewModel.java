@@ -19,7 +19,7 @@ import com.netease.yunxin.kit.qchatkit.ui.R;
 import com.netease.yunxin.kit.qchatkit.ui.model.QChatConstant;
 import java.util.Map;
 
-/** role permission view mode get or update role permission */
+/** 身份组权限配置ViewModel */
 public class RolePermissionViewModel extends BaseViewModel {
 
   private static final String TAG = "RolePermissionViewModel";
@@ -32,7 +32,7 @@ public class RolePermissionViewModel extends BaseViewModel {
     return rolePermissionLiveData;
   }
 
-  /** update role permission in channel */
+  /** 更新频道身份组权限信息 */
   public void updateChannelRole(
       long serverId,
       long channelId,

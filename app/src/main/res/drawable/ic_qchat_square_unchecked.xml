@@ -1,0 +1,19 @@
+<!--
+  ~ Copyright (c) 2022 NetEase, Inc. All rights reserved.
+  ~ Use of this source code is governed by a MIT license that can be
+  ~ found in the LICENSE file.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="20dp"
+    android:height="20dp"
+    android:viewportWidth="28"
+    android:viewportHeight="28">
+  <path
+      android:pathData="M7.833,4.022C9.807,2.704 12.127,2 14.5,2C17.683,2 20.735,3.264 22.985,5.515C25.236,7.765 26.5,10.817 26.5,14C26.5,16.373 25.796,18.693 24.478,20.667C23.159,22.64 21.285,24.178 19.092,25.087C16.899,25.995 14.487,26.232 12.159,25.769C9.831,25.306 7.693,24.163 6.015,22.485C4.336,20.807 3.194,18.669 2.731,16.341C2.268,14.013 2.505,11.601 3.413,9.408C4.322,7.215 5.86,5.341 7.833,4.022ZM19.337,8.593C19.745,8.43 20.15,8.835 19.987,9.243L17.094,16.475C17.043,16.602 16.942,16.703 16.815,16.754L9.583,19.647C9.175,19.81 8.77,19.405 8.933,18.997L11.826,11.764C11.877,11.637 11.978,11.537 12.105,11.486L19.337,8.593Z"
+      android:fillColor="#C5C9D2"
+      android:fillType="evenOdd"/>
+  <path
+      android:pathData="M16,14C16,14.828 15.328,15.5 14.5,15.5C13.672,15.5 13,14.828 13,14C13,13.172 13.672,12.5 14.5,12.5C15.328,12.5 16,13.172 16,14Z"
+      android:fillColor="#C5C9D2"/>
+</vector>

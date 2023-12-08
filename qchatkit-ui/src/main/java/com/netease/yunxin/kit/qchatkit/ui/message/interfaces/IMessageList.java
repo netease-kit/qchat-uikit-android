@@ -40,7 +40,7 @@ public interface IMessageList {
   void deleteMessage(QChatMessageInfo messageInfo);
 
   /** revoke message by id */
-  void revokeMessage(String messageId);
+  void revokeMessage(QChatMessageInfo messageInfo);
 
   void setLoadHandler(IMessageLoadHandler handler);
 

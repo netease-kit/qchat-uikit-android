@@ -6,6 +6,7 @@ package com.netease.yunxin.kit.qchatkit.ui.channel.add;
 
 import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;
+import com.netease.nimlib.sdk.ResponseCode;
 import com.netease.yunxin.kit.alog.ALog;
 import com.netease.yunxin.kit.common.ui.viewmodel.BaseViewModel;
 import com.netease.yunxin.kit.common.ui.viewmodel.FetchResult;
@@ -21,22 +22,25 @@ import com.netease.yunxin.kit.qchatkit.ui.utils.ErrorUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-/** add role to channel permission */
 public class AddRoleViewModel extends BaseViewModel {
 
   private static final String TAG = "AddRoleViewModel";
-  //sever role list live data
+
+  // 身份组查询LiveData
   private final MutableLiveData<FetchResult<List<QChatArrowBean>>> roleLiveData =
       new MutableLiveData<>();
+  // 身份组查询结果
   private final FetchResult<List<QChatArrowBean>> fetchResult =
       new FetchResult<>(LoadStatus.Finish);
 
-  //add role live data
+  // 添加身份组LiveData
   private final MutableLiveData<FetchResult<QChatChannelRoleInfo>> addLiveData =
       new MutableLiveData<>();
   private final FetchResult<QChatChannelRoleInfo> addResult = new FetchResult<>(LoadStatus.Finish);
 
+  // 身份组查询最后一个身份组记录，用于分页查询
   private QChatServerRoleInfo lastRoleInfo;
+  // 身份组列表是否还有更多数据
   private boolean roleHasMore = false;
 
   public MutableLiveData<FetchResult<List<QChatArrowBean>>> getRoleLiveData() {
@@ -47,12 +51,24 @@ public class AddRoleViewModel extends BaseViewModel {
     return addLiveData;
   }
 
-  /** fetch role list in channel permission */
+  /**
+   * 查询身份组列表接口
+   *
+   * @param serverId 社区ID
+   * @param channelId 频道ID
+   */
   public void fetchRoleList(long serverId, long channelId) {
     ALog.d(TAG, "fetchRoleList", "info:" + serverId + "," + channelId);
     fetchRoleData(serverId, channelId, 0);
   }
 
+  /**
+   * 分页查询身份组列表接口
+   *
+   * @param serverId 社区ID
+   * @param channelId 频道ID
+   * @param offset 分页查询偏移量
+   */
   private void fetchRoleData(long serverId, long channelId, long offset) {
     QChatRoleRepo.fetchServerRolesWithoutChannel(
         serverId,
@@ -107,6 +123,12 @@ public class AddRoleViewModel extends BaseViewModel {
         });
   }
 
+  /**
+   * 添加身份组接口
+   *
+   * @param channelId 频道ID
+   * @param roleInfo 身份组信息
+   */
   public void addChannelRole(long channelId, QChatServerRoleInfo roleInfo) {
     QChatRoleRepo.addChannelRole(
         roleInfo.getServerId(),
@@ -124,7 +146,15 @@ public class AddRoleViewModel extends BaseViewModel {
           @Override
           public void onFailed(int code) {
             ALog.d(TAG, "addChannelRole", "onFailed:" + code + "," + roleInfo.getRoleId());
-            addResult.setError(code, ErrorUtils.getErrorText(code, R.string.qchat_add_role_error));
+            int tipRes;
+            if (code == ResponseCode.RES_ENONEXIST) {
+              tipRes = R.string.qchat_add_role_error_not_found;
+            } else if (code == ResponseCode.RES_EEXIST) {
+              tipRes = R.string.qchat_add_role_error_exist;
+            } else {
+              tipRes = R.string.qchat_add_role_error;
+            }
+            addResult.setError(code, ErrorUtils.getErrorText(code, tipRes));
             addLiveData.postValue(addResult);
           }
 
@@ -140,6 +170,12 @@ public class AddRoleViewModel extends BaseViewModel {
         });
   }
 
+  /**
+   * 分页查询更多身份组列表接口
+   *
+   * @param serverId 社区ID
+   * @param channelId 频道ID
+   */
   public void loadMore(long serverId, long channelId) {
     long offset = 0;
     if (lastRoleInfo != null) {
@@ -148,6 +184,11 @@ public class AddRoleViewModel extends BaseViewModel {
     fetchRoleData(serverId, channelId, offset);
   }
 
+  /**
+   * 是否还有更多数据
+   *
+   * @return true:还有更多数据
+   */
   public boolean hasMore() {
     return roleHasMore;
   }

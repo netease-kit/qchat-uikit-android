@@ -73,11 +73,30 @@ public class QChatCommonAdapter<T, R extends ViewBinding>
     notifyItemRangeInserted(pos, data.size());
   }
 
+  public void addData(T data) {
+    if (data == null) {
+      return;
+    }
+    dataSource.add(data);
+    notifyItemInserted(getItemCount() - 1);
+  }
+
+  public void addData(int position, T data) {
+    if (data == null) {
+      return;
+    }
+    dataSource.add(position, data);
+    notifyItemRangeChanged(position, dataSource.size());
+  }
+
   public void removeData(T data) {
     if (data == null) {
       return;
     }
     int index = dataSource.indexOf(data);
+    if (index < 0) {
+      return;
+    }
     dataSource.remove(index);
     notifyItemRemoved(index);
   }
@@ -115,7 +134,7 @@ public class QChatCommonAdapter<T, R extends ViewBinding>
     onBindViewHolder(holder, position, item);
   }
 
-  public void onBindViewHolder(@NonNull ItemViewHolder<R> holder, int position, T data) {
+  public void onBindViewHolder(@NonNull ItemViewHolder<R> holder, int position, @NonNull T data) {
     onBindViewHolder(holder.binding, position, data, holder.getBindingAdapterPosition());
   }
 

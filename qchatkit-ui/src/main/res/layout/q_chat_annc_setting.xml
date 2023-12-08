@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2022 NetEase, Inc. All rights reserved.
+  ~ Use of this source code is governed by a MIT license that can be
+  ~ found in the LICENSE file.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_eff1f4">
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:gravity="center"
+        android:text="@string/qchat_announce_channel_setting_title"
+        android:textColor="@color/color_333333"
+        android:textSize="16dp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="SpUsage" />
+
+    <ImageView
+        android:id="@+id/ivBack"
+        android:layout_width="26dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="20dp"
+        android:src="@drawable/ic_arrow_left"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="5dp"
+        android:overScrollMode="never"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvTitle">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="20dp">
+
+            <View
+                android:id="@+id/viewInfoBg"
+                android:layout_width="0dp"
+                android:layout_height="92dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:background="@drawable/bg_qchat_white_round"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tvName"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_marginStart="11dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="16dp"
+                android:gravity="center_vertical|start"
+                android:singleLine="true"
+                android:textColor="@color/color_333333"
+                android:textSize="16dp"
+                app:layout_constraintEnd_toEndOf="@id/viewInfoBg"
+                app:layout_constraintStart_toEndOf="@id/ivAvatar"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="SpUsage" />
+
+            <com.netease.yunxin.kit.common.ui.widgets.ContactAvatarView
+                android:id="@+id/ivAvatar"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_marginStart="16dp"
+                app:layout_constraintStart_toStartOf="@id/viewInfoBg"
+                app:layout_constraintTop_toTopOf="@id/tvName" />
+            
+            <ImageView android:id="@+id/ivEditAvatar"
+                android:layout_width="@dimen/dimen_24_dp"
+                android:layout_height="24dp"
+                app:layout_constraintEnd_toEndOf="@id/ivAvatar"
+                app:layout_constraintBottom_toBottomOf="@id/ivAvatar"
+                android:visibility="gone"
+                android:src="@drawable/ic_qchat_camera"/>
+
+
+            <TextView android:id="@+id/tvShareTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/qchat_announcement_share"
+                android:textColor="@color/color_666666"
+                android:textSize="@dimen/text_size_12"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="20dp"
+                app:layout_constraintTop_toBottomOf="@id/viewInfoBg"
+                app:layout_constraintStart_toStartOf="parent"
+                android:maxLines="1"
+                android:ellipsize="end"
+                tools:ignore="MissingConstraints" />
+            <View
+                android:id="@+id/viewShareBg"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="20dp"
+                android:background="@drawable/bg_qchat_white_round"
+                app:layout_constraintBottom_toBottomOf="@id/tvShare"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvShareTitle" />
+
+            <TextView
+                android:id="@+id/tvShare"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
+                android:gravity="center_vertical|start"
+                android:textColor="@color/color_333333"
+                android:textSize="@dimen/text_size_12"
+                app:layout_constraintEnd_toEndOf="@id/viewShareBg"
+                app:layout_constraintStart_toStartOf="@id/viewShareBg"
+                android:layout_marginEnd="42dp"
+                app:layout_constraintTop_toTopOf="@id/viewShareBg"
+                android:maxLines="1"
+                android:ellipsize="end"
+                tools:ignore="SpUsage" />
+
+            <ImageView android:id="@+id/ivCopy"
+                android:layout_width="@dimen/dimen_20_dp"
+                android:layout_height="@dimen/dimen_20_dp"
+                android:src="@drawable/ic_qchat_anounce_copy"
+                android:layout_marginTop="14dp"
+                app:layout_constraintEnd_toEndOf="@id/viewShareBg"
+                android:layout_marginEnd="16dp"
+                app:layout_constraintTop_toTopOf="@id/viewShareBg"
+                />
+
+
+            <TextView android:id="@+id/tvChannelInfoTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/qchat_announcement_channel_info"
+                android:textColor="@color/color_666666"
+                android:textSize="@dimen/text_size_12"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="20dp"
+                app:layout_constraintTop_toBottomOf="@id/viewShareBg"
+                app:layout_constraintStart_toStartOf="parent"
+                android:maxLines="1"
+                android:ellipsize="end"
+                tools:ignore="MissingConstraints" />
+            <View
+                android:id="@+id/viewChannelInfoBg"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="20dp"
+                android:background="@drawable/bg_qchat_white_round"
+                app:layout_constraintBottom_toBottomOf="@id/tvChannelSubscribe"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvChannelInfoTitle" />
+
+            <TextView
+                android:id="@+id/tvChannelName"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:gravity="center_vertical|start"
+                android:text="@string/qchat_announcement_update_name_title"
+                android:textColor="@color/color_333333"
+                android:textSize="16dp"
+                app:drawableEndCompat="@drawable/ic_right_arrow"
+                app:layout_constraintEnd_toEndOf="@id/viewChannelInfoBg"
+                app:layout_constraintStart_toStartOf="@id/viewChannelInfoBg"
+                app:layout_constraintTop_toTopOf="@id/viewChannelInfoBg"
+                tools:ignore="SpUsage" />
+
+            <View
+                android:id="@+id/channelLine"
+                android:layout_width="0dp"
+                android:layout_height="0.5dp"
+                android:layout_marginStart="16dp"
+                android:background="@color/color_f5f8fc"
+                app:layout_constraintEnd_toEndOf="@id/viewChannelInfoBg"
+                app:layout_constraintStart_toStartOf="@id/viewChannelInfoBg"
+                app:layout_constraintTop_toBottomOf="@id/tvChannelName" />
+
+            <TextView
+                android:id="@+id/tvChannelSubscribe"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:gravity="center_vertical|start"
+                android:text="@string/qchat_announcement_update_topic_title"
+                android:textColor="@color/color_333333"
+                android:textSize="16dp"
+                app:drawableEndCompat="@drawable/ic_right_arrow"
+                app:layout_constraintEnd_toEndOf="@id/viewChannelInfoBg"
+                app:layout_constraintStart_toStartOf="@id/viewChannelInfoBg"
+                app:layout_constraintTop_toBottomOf="@id/tvChannelName"
+                tools:ignore="SpUsage" />
+
+            <View
+                android:id="@+id/channelSubscribeLine"
+                android:layout_width="0dp"
+                android:layout_height="0.5dp"
+                android:layout_marginStart="16dp"
+                android:background="@color/color_f5f8fc"
+                app:layout_constraintEnd_toEndOf="@id/tvChannelName"
+                app:layout_constraintStart_toStartOf="@id/tvChannelName"
+                app:layout_constraintTop_toBottomOf="@id/tvChannelSubscribe" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/channelInfoGroup"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:visibility="visible"
+                app:constraint_referenced_ids="tvChannelInfoTitle,viewChannelInfoBg,tvChannelName,channelLine,tvChannelSubscribe,channelSubscribeLine" />
+
+            <TextView android:id="@+id/tvManagerTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/qchat_announcement_member_info"
+                android:textColor="@color/color_666666"
+                android:textSize="@dimen/text_size_12"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="20dp"
+                app:layout_constraintTop_toBottomOf="@id/viewChannelInfoBg"
+                app:layout_constraintStart_toStartOf="parent"
+                android:maxLines="1"
+                android:ellipsize="end"
+                tools:ignore="MissingConstraints" />
+            <View
+                android:id="@+id/viewMemberBg"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="20dp"
+                android:background="@drawable/bg_qchat_white_round"
+                app:layout_constraintBottom_toBottomOf="@id/tvSubscribe"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvManagerTitle" />
+
+            <TextView
+                android:id="@+id/tvManager"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:gravity="center_vertical|start"
+                android:text="@string/qchat_announcement_manager"
+                android:textColor="@color/color_333333"
+                android:textSize="16dp"
+                app:drawableEndCompat="@drawable/ic_right_arrow"
+                app:layout_constraintEnd_toEndOf="@id/viewMemberBg"
+                app:layout_constraintStart_toStartOf="@id/viewMemberBg"
+                app:layout_constraintTop_toTopOf="@id/viewMemberBg"
+                tools:ignore="SpUsage" />
+            <TextView
+                android:id="@+id/tvManagerCount"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:gravity="center_vertical|end"
+                android:textColor="@color/color_666666"
+                android:textSize="12dp"
+                app:drawableEndCompat="@drawable/ic_right_arrow"
+                app:layout_constraintEnd_toEndOf="@id/viewMemberBg"
+                app:layout_constraintTop_toTopOf="@id/viewMemberBg"
+                tools:ignore="SpUsage" />
+
+            <View
+                android:id="@+id/managerLine"
+                android:layout_width="0dp"
+                android:layout_height="0.5dp"
+                android:layout_marginStart="16dp"
+                android:background="@color/color_f5f8fc"
+                app:layout_constraintEnd_toEndOf="@id/viewMemberBg"
+                app:layout_constraintStart_toStartOf="@id/viewMemberBg"
+                app:layout_constraintTop_toBottomOf="@id/tvManager" />
+
+            <TextView
+                android:id="@+id/tvSubscribe"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:gravity="center_vertical|start"
+                android:text="@string/qchat_announcement_subscribe"
+                android:textColor="@color/color_333333"
+                android:textSize="16dp"
+                app:layout_constraintEnd_toEndOf="@id/viewMemberBg"
+                app:layout_constraintStart_toStartOf="@id/viewMemberBg"
+                app:layout_constraintTop_toBottomOf="@id/tvManager"
+                tools:ignore="SpUsage" />
+            <TextView
+                android:id="@+id/tvSubscribeCount"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:gravity="center_vertical|end"
+                android:textColor="@color/color_666666"
+                android:textSize="12dp"
+                app:drawableEndCompat="@drawable/ic_right_arrow"
+                app:layout_constraintEnd_toEndOf="@id/viewMemberBg"
+                app:layout_constraintTop_toBottomOf="@id/tvManager"
+                tools:ignore="SpUsage" />
+
+            <View
+                android:id="@+id/subscribeLine"
+                android:layout_width="0dp"
+                android:layout_height="0.5dp"
+                android:layout_marginStart="16dp"
+                android:background="@color/color_f5f8fc"
+                app:layout_constraintEnd_toEndOf="@id/viewMemberBg"
+                app:layout_constraintStart_toStartOf="@id/viewMemberBg"
+                app:layout_constraintTop_toBottomOf="@id/tvSubscribe" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/memberManagerGroup"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:visibility="gone"
+                app:constraint_referenced_ids="tvManagerTitle,viewMemberBg,tvManager,tvManagerCount,managerLine,tvSubscribe,tvSubscribeCount,subscribeLine" />
+
+
+            <TextView android:id="@+id/tvMsgTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/qchat_announcement_message_manager"
+                android:textColor="@color/color_666666"
+                android:textSize="@dimen/text_size_12"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="20dp"
+                app:layout_constraintTop_toBottomOf="@id/viewMemberBg"
+                app:layout_constraintStart_toStartOf="parent"
+                android:maxLines="1"
+                android:ellipsize="end"
+                tools:ignore="MissingConstraints" />
+
+            <View
+                android:id="@+id/viewMsgSettingBg"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="20dp"
+                android:background="@drawable/bg_qchat_white_round"
+                app:layout_constraintBottom_toBottomOf="@id/tvAllowEmoji"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvMsgTitle" />
+
+            <TextView
+                android:id="@+id/tvAllowEmoji"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:gravity="center_vertical|start"
+                android:text="@string/qchat_announcement_message_allow_emoji"
+                android:textColor="@color/color_333333"
+                android:textSize="16dp"
+                app:layout_constraintEnd_toEndOf="@id/viewMsgSettingBg"
+                app:layout_constraintStart_toStartOf="@id/viewMsgSettingBg"
+                app:layout_constraintTop_toTopOf="@id/viewMsgSettingBg"
+                tools:ignore="SpUsage" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/swAllowEmoji"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                android:thumb="@drawable/switch_thumb_selector"
+                app:layout_constraintBottom_toBottomOf="@id/tvAllowEmoji"
+                app:layout_constraintEnd_toEndOf="@id/viewMsgSettingBg"
+                app:layout_constraintTop_toTopOf="@id/tvAllowEmoji"
+                app:track="@drawable/switch_track_selector" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/msgManagerGroup"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:visibility="gone"
+                app:constraint_referenced_ids="swAllowEmoji,tvAllowEmoji,viewMsgSettingBg,tvMsgTitle" />
+            <TextView
+                android:id="@+id/tvQuit"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="20dp"
+                android:background="@drawable/bg_qchat_white_round"
+                android:gravity="center"
+                android:text="@string/qchat_announcement_channel_quit"
+                android:textColor="@color/color_e6605c"
+                android:textSize="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/viewMsgSettingBg"
+                tools:ignore="SpUsage" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

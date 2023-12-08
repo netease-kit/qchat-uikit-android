@@ -9,7 +9,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/color_e9eff5"
+    android:background="@color/color_eff1f4"
     android:paddingTop="10dp">
 
     <ImageView
@@ -17,7 +17,15 @@
         android:layout_width="42dp"
         android:layout_height="42dp"
         android:src="@drawable/ic_add_blue"
-        app:layout_constraintEnd_toStartOf="@id/ryChannelFragment"
+        app:layout_constraintEnd_toStartOf="@id/guideLine"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/guideLine"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="66dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -26,6 +34,7 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_marginStart="66dp"
+        android:visibility="visible"
         android:background="@drawable/bg_shape_qchat_fragment"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -37,9 +46,18 @@
         android:layout_marginTop="3dp"
         android:overScrollMode="never"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/ryChannelFragment"
+        app:layout_constraintEnd_toStartOf="@id/guideLine"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/ivAddServer" />
+
+    <View
+        android:id="@+id/noServerBg"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="66dp"
+        app:layout_constraintStart_toStartOf="parent"
+        android:background="@drawable/bg_shape_qchat_fragment" />
 
     <ImageView
         android:id="@+id/ivNoServerTip"
@@ -47,9 +65,9 @@
         android:layout_height="91dp"
         android:background="@drawable/ic_qchat_tip_no_servers"
         app:layout_constraintBottom_toTopOf="@id/tvNoServerTip"
-        app:layout_constraintEnd_toEndOf="@id/ryChannelFragment"
-        app:layout_constraintStart_toStartOf="@id/ryChannelFragment"
-        app:layout_constraintTop_toTopOf="@id/ryChannelFragment"
+        app:layout_constraintEnd_toEndOf="@id/noServerBg"
+        app:layout_constraintStart_toStartOf="@id/noServerBg"
+        app:layout_constraintTop_toTopOf="@id/noServerBg"
         app:layout_constraintVertical_chainStyle="packed" />
 
     <TextView
@@ -61,9 +79,9 @@
         android:text="@string/qchat_fragment_no_server_tip"
         android:textColor="@color/color_b3b7bc"
         android:textSize="14dp"
-        app:layout_constraintBottom_toBottomOf="@id/ryChannelFragment"
-        app:layout_constraintEnd_toEndOf="@id/ryChannelFragment"
-        app:layout_constraintStart_toStartOf="@id/ryChannelFragment"
+        app:layout_constraintBottom_toBottomOf="@id/noServerBg"
+        app:layout_constraintEnd_toEndOf="@id/noServerBg"
+        app:layout_constraintStart_toStartOf="@id/noServerBg"
         app:layout_constraintTop_toBottomOf="@id/ivNoServerTip"
         tools:ignore="SpUsage" />
 
@@ -71,5 +89,13 @@
         android:id="@+id/groupNoServerTip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:constraint_referenced_ids="ivNoServerTip,tvNoServerTip" />
+        android:visibility="visible"
+        app:constraint_referenced_ids="ivNoServerTip,tvNoServerTip,noServerBg" />
+
+    <com.netease.yunxin.kit.qchatkit.ui.common.widget.QChatVisitorTipView
+        android:id="@+id/viewQChatVisitor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

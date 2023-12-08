@@ -32,4 +32,9 @@
     <dimen name="text_size_18">18sp</dimen>
     <dimen name="text_size_12">12sp</dimen>
     <dimen name="text_size_11">11sp</dimen>
+
+    <!-- image -->
+    <dimen name="qchat_photo_crop_width">280dip</dimen>
+    <dimen name="qchat_photo_crop_stroke_width">1dip</dimen>
+    <dimen name="qchat_photo_preview_size">200dip</dimen>
 </resources>

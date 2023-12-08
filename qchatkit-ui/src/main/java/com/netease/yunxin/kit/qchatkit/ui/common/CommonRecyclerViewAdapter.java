@@ -53,7 +53,7 @@ public class CommonRecyclerViewAdapter
   public void removeData(int index) {
     if (index > 0 && index < dataList.size()) {
       dataList.remove(index);
-      notifyItemRemoved(index);
+      notifyDataSetChanged();
     }
   }
 

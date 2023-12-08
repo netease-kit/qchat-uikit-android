@@ -4,68 +4,87 @@
 
 package com.netease.yunxin.kit.qchatkit.ui.server.adapter;
 
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
+import android.content.Context;
+import android.view.View;
 import androidx.annotation.NonNull;
-import com.netease.yunxin.kit.common.ui.activities.adapter.CommonMoreAdapter;
-import com.netease.yunxin.kit.common.ui.activities.viewholder.BaseMoreViewHolder;
+import com.netease.yunxin.kit.common.ui.utils.AvatarColor;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatServerRoleMemberInfo;
+import com.netease.yunxin.kit.qchatkit.ui.common.QChatCommonAdapter;
 import com.netease.yunxin.kit.qchatkit.ui.databinding.QChatRoleMemberViewHolderBinding;
-import com.netease.yunxin.kit.qchatkit.ui.server.viewholder.QChatServerMemberViewHolder;
 
 public class QChatServerMemberListAdapter
-    extends CommonMoreAdapter<QChatServerRoleMemberInfo, QChatRoleMemberViewHolderBinding> {
+    extends QChatCommonAdapter<QChatServerRoleMemberInfo, QChatRoleMemberViewHolderBinding> {
 
-  private QChatServerMemberViewHolder.DeleteListener deleteListener;
+  private final DeleteListener deleteListener;
 
-  private QChatServerMemberViewHolder.SelectListener selectListener;
+  private final SelectListener selectListener;
 
   private boolean isDelete;
 
   private boolean isSelect;
 
-  public QChatServerMemberListAdapter(QChatServerMemberViewHolder.DeleteListener deleteListener) {
+  public QChatServerMemberListAdapter(Context context, DeleteListener deleteListener) {
+    super(context, QChatRoleMemberViewHolderBinding.class);
     this.deleteListener = deleteListener;
+    this.selectListener = null;
     isDelete = true;
   }
 
-  public QChatServerMemberListAdapter(QChatServerMemberViewHolder.SelectListener selectListener) {
+  public QChatServerMemberListAdapter(Context context, SelectListener selectListener) {
+    super(context, QChatRoleMemberViewHolderBinding.class);
     this.selectListener = selectListener;
+    this.deleteListener = null;
     isSelect = true;
   }
 
-  public void setSelect(QChatServerRoleMemberInfo item, boolean isSelected) {
-    item.setSelected(isSelected);
-    int pos = getDataList().indexOf(item);
-    if (pos >= 0) {
-      notifyItemChanged(pos);
-    }
-  }
-
-  public void setDeleteListener(QChatServerMemberViewHolder.DeleteListener deleteListener) {
-    this.deleteListener = deleteListener;
-  }
-
-  public void setSelectListener(QChatServerMemberViewHolder.SelectListener selectListener) {
-    this.selectListener = selectListener;
-  }
-
-  @NonNull
   @Override
-  public BaseMoreViewHolder<QChatServerRoleMemberInfo, QChatRoleMemberViewHolderBinding>
-      getViewHolder(@NonNull ViewGroup parent, int viewType) {
-    QChatRoleMemberViewHolderBinding binding =
-        QChatRoleMemberViewHolderBinding.inflate(
-            LayoutInflater.from(parent.getContext()), parent, false);
-    QChatServerMemberViewHolder viewHolder = new QChatServerMemberViewHolder(binding);
-    if (deleteListener != null) {
-      viewHolder.setDeleteListener(deleteListener);
+  public void onBindViewHolder(
+      @NonNull ItemViewHolder<QChatRoleMemberViewHolderBinding> holder,
+      int position,
+      @NonNull QChatServerRoleMemberInfo data) {
+    QChatRoleMemberViewHolderBinding binding = holder.binding;
+    if (isSelect) {
+      binding.rbCheck.setOnCheckedChangeListener(
+          (buttonView, isChecked) -> {
+            data.setSelected(isChecked);
+            if (selectListener != null) {
+              selectListener.onSelected(data, isChecked);
+            }
+          });
+      binding.rbCheck.setChecked(data.getSelected());
+      binding.rbCheck.setVisibility(View.VISIBLE);
+      binding
+          .getRoot()
+          .setOnClickListener(
+              v -> {
+                if (clickListener != null) {
+                  clickListener.onClick(data, holder);
+                }
+              });
+    } else {
+      binding.rbCheck.setVisibility(View.GONE);
     }
-    if (selectListener != null) {
-      viewHolder.setSelectListener(selectListener);
+    if (isDelete) {
+      binding.ivDelete.setVisibility(View.VISIBLE);
+      binding.ivDelete.setOnClickListener(
+          v -> {
+            if (deleteListener != null) {
+              deleteListener.deleteClick(data);
+            }
+          });
+    } else {
+      binding.ivDelete.setVisibility(View.GONE);
     }
-    viewHolder.setSelect(isSelect);
-    viewHolder.setDelete(isDelete);
-    return viewHolder;
+    binding.avatar.setData(
+        data.getAvatarUrl(), data.getNickName(), AvatarColor.avatarColor(data.getAccId()));
+    binding.tvName.setText(data.getNickName());
+  }
+
+  public interface DeleteListener {
+    void deleteClick(QChatServerRoleMemberInfo item);
+  }
+
+  public interface SelectListener {
+    void onSelected(QChatServerRoleMemberInfo item, boolean selected);
   }
 }

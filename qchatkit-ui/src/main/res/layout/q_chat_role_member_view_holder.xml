@@ -49,6 +49,7 @@
         android:id="@+id/iv_delete"
         android:layout_width="@dimen/dimen_16_dp"
         android:layout_height="@dimen/dimen_16_dp"
+        android:visibility="gone"
         android:layout_centerVertical="true"
         android:layout_alignParentEnd="true"
         android:src="@drawable/ic_delete" />

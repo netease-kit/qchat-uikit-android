@@ -38,7 +38,7 @@
             android:layout_width="@dimen/dimen_118_dp"
             android:layout_height="@dimen/dimen_96_dp"
             android:layout_gravity="center_horizontal"
-            android:src="@drawable/ic_qchat_list_empty"/>
+            android:src="@drawable/ic_qchat_tip_no_members"/>
         <TextView android:id="@+id/empty_tv"
             android:layout_width="@dimen/dimen_118_dp"
             android:layout_height="wrap_content"

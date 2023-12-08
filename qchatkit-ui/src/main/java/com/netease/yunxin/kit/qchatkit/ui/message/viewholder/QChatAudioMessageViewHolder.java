@@ -12,7 +12,9 @@ import static android.widget.RelativeLayout.START_OF;
 import android.graphics.drawable.AnimationDrawable;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
-import android.widget.LinearLayout;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import androidx.annotation.NonNull;
 import com.netease.nimlib.sdk.msg.attachment.AudioAttachment;
@@ -21,16 +23,15 @@ import com.netease.yunxin.kit.corekit.im.audioplayer.Playable;
 import com.netease.yunxin.kit.corekit.im.repo.SettingRepo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatMessageInfo;
 import com.netease.yunxin.kit.qchatkit.ui.R;
+import com.netease.yunxin.kit.qchatkit.ui.databinding.QChatBaseMessageViewHolderBinding;
 import com.netease.yunxin.kit.qchatkit.ui.databinding.QChatMessageAudioViewHolderBinding;
-import com.netease.yunxin.kit.qchatkit.ui.databinding.QchatBaseMessageViewHolderBinding;
 import com.netease.yunxin.kit.qchatkit.ui.message.audio.QChatMessageAudioControl;
+import java.util.Objects;
 
-/** view holder for audio message */
+/** v语音消息ViewHolder */
 public class QChatAudioMessageViewHolder extends QChatBaseMessageViewHolder {
 
   private QChatMessageAudioViewHolderBinding audioBinding;
-
-  private QChatMessageInfo currentMessage;
 
   private QChatMessageAudioControl audioControl;
 
@@ -113,7 +114,7 @@ public class QChatAudioMessageViewHolder extends QChatBaseMessageViewHolder {
   }
 
   public QChatAudioMessageViewHolder(
-      @NonNull QchatBaseMessageViewHolderBinding parent, int viewType) {
+      @NonNull QChatBaseMessageViewHolderBinding parent, int viewType) {
     super(parent);
   }
 
@@ -125,38 +126,45 @@ public class QChatAudioMessageViewHolder extends QChatBaseMessageViewHolder {
   }
 
   @Override
-  public void bindData(QChatMessageInfo message, QChatMessageInfo lastMessage) {
-    super.bindData(message, lastMessage);
+  public void bindData(QChatMessageInfo message, int position, QChatMessageInfo lastMessage) {
+    super.bindData(message, position, lastMessage);
     audioControl = QChatMessageAudioControl.getInstance();
-    audioBinding.tvTime.setTag(message.getMessage().getUuid());
-    currentMessage = message;
-    playControl(message);
-    setAudioLayout(message);
+    audioBinding.tvTime.setTag(currentMessage.getMessage().getUuid());
+    playControl(currentMessage);
+    setAudioLayout(currentMessage, baseViewBinding.emojiGroup.getVisibility() == View.VISIBLE);
     audioBinding.container.setOnClickListener(
         v -> {
           initPlayAnim();
-          audioControl.setEarPhoneModeEnable(SettingRepo.INSTANCE.getHandsetMode());
-          audioControl.startPlayAudioDelay(CLICK_TO_PLAY_AUDIO_DELAY, message, onPlayListener);
+          audioControl.setEarPhoneModeEnable(SettingRepo.getHandsetMode());
+          audioControl.startPlayAudioDelay(
+              CLICK_TO_PLAY_AUDIO_DELAY, currentMessage, onPlayListener);
         });
+    audioBinding.container.setOnLongClickListener(
+        v -> msgClickListener.onMessageLongClick(v, position, currentMessage));
+    checkAudioPlayAndRefreshAnim();
   }
 
-  private void setAudioLayout(QChatMessageInfo message) {
+  private void checkAudioPlayAndRefreshAnim() {
+    if (currentMessage == null) {
+      return;
+    }
+    if (audioControl == null) {
+      audioControl = QChatMessageAudioControl.getInstance();
+    }
+    if (!Objects.equals(audioControl.getPlayingAudio(), currentMessage)) {
+      return;
+    }
+    audioControl.setAudioControlListenerWhenPlaying(onPlayListener);
+    initPlayAnim();
+    play();
+  }
+
+  private void setAudioLayout(QChatMessageInfo message, boolean showEmoji) {
     AudioAttachment audioAttachment = (AudioAttachment) message.getMessage().getAttachment();
     if (audioAttachment == null) {
       return;
     }
-    long len = audioAttachment.getDuration() / 1000;
-    LinearLayout.LayoutParams layoutParams =
-        (LinearLayout.LayoutParams) getContainer().getLayoutParams();
-    if (len <= 2) {
-      layoutParams.width = SizeUtils.dp2px(MIN_LENGTH_FOR_AUDIO);
-    } else {
-      layoutParams.width =
-          Math.min(
-              SizeUtils.dp2px(MAX_LENGTH_FOR_AUDIO),
-              SizeUtils.dp2px(MIN_LENGTH_FOR_AUDIO + (len - 2) * 8));
-    }
-    getContainer().setLayoutParams(layoutParams);
+    updateLayout(message, showEmoji);
     RelativeLayout.LayoutParams aniLp =
         (RelativeLayout.LayoutParams) audioBinding.animation.getLayoutParams();
     RelativeLayout.LayoutParams timeLp =
@@ -176,6 +184,48 @@ public class QChatAudioMessageViewHolder extends QChatBaseMessageViewHolder {
     }
     audioBinding.animation.setLayoutParams(aniLp);
     audioBinding.tvTime.setLayoutParams(timeLp);
+  }
+
+  private void updateLayout(QChatMessageInfo message, boolean showEmoji) {
+    AudioAttachment audioAttachment = (AudioAttachment) message.getMessage().getAttachment();
+    if (audioAttachment == null) {
+      return;
+    }
+    long len = audioAttachment.getDuration() / 1000;
+    ViewGroup.LayoutParams layoutParams = audioBinding.getRoot().getLayoutParams();
+    int marginExpand = showEmoji ? 8 * 2 : 0;
+    if (len <= 2) {
+      layoutParams.width = SizeUtils.dp2px(MIN_LENGTH_FOR_AUDIO + marginExpand);
+    } else {
+      layoutParams.width =
+          Math.min(
+              SizeUtils.dp2px(MAX_LENGTH_FOR_AUDIO),
+              SizeUtils.dp2px(MIN_LENGTH_FOR_AUDIO + (len - 2) * 8 + marginExpand));
+    }
+    audioBinding.getRoot().setLayoutParams(layoutParams);
+    FrameLayout.LayoutParams containerLp =
+        (FrameLayout.LayoutParams) audioBinding.container.getLayoutParams();
+    if (baseViewBinding.emojiGroup.getVisibility() == View.VISIBLE) {
+      int margin = SizeUtils.dp2px(8);
+      containerLp.setMargins(margin, margin, margin, margin);
+      audioBinding.container.setLayoutParams(containerLp);
+      if (isReceivedMessage(message)) {
+        audioBinding.container.setBackgroundResource(R.drawable.bg_qchat_audio_white_other);
+      } else {
+        audioBinding.container.setBackgroundResource(R.drawable.bg_qchat_audio_white_self);
+      }
+    } else {
+      containerLp.setMargins(0, 0, 0, 0);
+      audioBinding.container.setLayoutParams(containerLp);
+      audioBinding.container.setBackgroundColor(
+          getParent().getContext().getResources().getColor(R.color.color_transparent));
+    }
+  }
+
+  @Override
+  public void setQuickComment(QChatMessageInfo data) {
+    super.setQuickComment(data);
+    updateLayout(data, baseViewBinding.emojiGroup.getVisibility() == View.VISIBLE);
   }
 
   private void playControl(QChatMessageInfo message) {

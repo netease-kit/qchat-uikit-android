@@ -12,24 +12,26 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
+import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import com.netease.yunxin.kit.common.ui.activities.CommonActivity;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatServerRoleMemberInfo;
 import com.netease.yunxin.kit.qchatkit.ui.R;
 import com.netease.yunxin.kit.qchatkit.ui.common.QChatCallback;
+import com.netease.yunxin.kit.qchatkit.ui.common.QChatServerCommonBaseActivity;
 import com.netease.yunxin.kit.qchatkit.ui.databinding.QChatRoleGroupCreatorActivityLayoutBinding;
 import com.netease.yunxin.kit.qchatkit.ui.model.QChatConstant;
 import com.netease.yunxin.kit.qchatkit.ui.server.adapter.QChatServerMemberListAdapter;
 import com.netease.yunxin.kit.qchatkit.ui.server.viewmodel.QChatRoleCreateViewModel;
+import com.netease.yunxin.kit.qchatkit.ui.utils.QChatUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-/** create a role in server */
-public class QChatRoleCreateActivity extends CommonActivity {
+/** 社区身份组创建页面 */
+public class QChatRoleCreateActivity extends QChatServerCommonBaseActivity {
 
   private QChatRoleGroupCreatorActivityLayoutBinding binding;
 
@@ -50,6 +52,7 @@ public class QChatRoleCreateActivity extends CommonActivity {
 
   @Override
   public void initView() {
+    changeStatusBarColor(R.color.color_eef1f4);
     registerResult();
     binding
         .title
@@ -59,13 +62,28 @@ public class QChatRoleCreateActivity extends CommonActivity {
         .setActionEnable(false)
         .setActionTextColor(getResources().getColor(R.color.color_337eff))
         .setActionListener(
-            v -> viewModel.createRole(serverId, binding.chatRoleName.getText().toString().trim()));
+            v ->
+                QChatUtils.isConnectedToastAndRun(
+                    this,
+                    () -> {
+                      String name = binding.chatRoleName.getText().toString().trim();
+                      if (TextUtils.isEmpty(name)) {
+                        Toast.makeText(
+                                this, R.string.qchat_create_role_empty_name_tip, Toast.LENGTH_SHORT)
+                            .show();
+                        return;
+                      }
+                      binding.title.setActionEnable(false);
+                      viewModel.createRole(serverId, name);
+                    }));
 
     binding.rlyMemberAdd.setOnClickListener(
         v -> {
+          // 跳转进入成员选择页面
           Intent intent =
               new Intent(QChatRoleCreateActivity.this, QChatMemberSelectorActivity.class);
           intent.putExtra(QChatConstant.SERVER_ID, serverId);
+          // 过滤已经在列表中的成员
           intent.putExtra(
               QChatConstant.REQUEST_MEMBER_FILTER_LIST,
               new ArrayList<>(viewModel.getSelectedUsers()));
@@ -75,8 +93,10 @@ public class QChatRoleCreateActivity extends CommonActivity {
     binding.rvMember.setLayoutManager(new LinearLayoutManager(this));
     memberListAdapter =
         new QChatServerMemberListAdapter(
+            this,
             item -> {
-              memberListAdapter.deleteItem(item);
+              // 移除目标成员
+              memberListAdapter.removeData(item);
               viewModel.deleteSelectMember(item.getAccId());
             });
     binding.rvMember.setAdapter(memberListAdapter);
@@ -100,6 +120,7 @@ public class QChatRoleCreateActivity extends CommonActivity {
         registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
+              // 监听成员选择页面结果，将结果添加到列表中
               if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                 ArrayList<QChatServerRoleMemberInfo> members =
                     result.getData().getParcelableArrayListExtra(REQUEST_MEMBER_SELECTOR_KEY);
@@ -109,7 +130,7 @@ public class QChatRoleCreateActivity extends CommonActivity {
                     accIds.add(member.getAccId());
                   }
                   viewModel.addSelectMember(accIds);
-                  memberListAdapter.append(members);
+                  memberListAdapter.addData(members);
                 }
               }
             });
@@ -118,7 +139,16 @@ public class QChatRoleCreateActivity extends CommonActivity {
   @Override
   public void initData() {
     serverId = getIntent().getLongExtra(QChatConstant.SERVER_ID, 0);
-    viewModel.getCreateResult().observe(this, aBoolean -> finish());
+    configServerId(serverId);
+    viewModel
+        .getCreateResult()
+        .observe(
+            this,
+            aBoolean -> {
+              if (aBoolean) {
+                finish();
+              }
+            });
 
     viewModel
         .getErrorLiveData()
@@ -131,6 +161,12 @@ public class QChatRoleCreateActivity extends CommonActivity {
     viewModel = new ViewModelProvider(this).get(QChatRoleCreateViewModel.class);
   }
 
+  /**
+   * 页面启动方法
+   *
+   * @param activity 启动页面Activity
+   * @param serverId 创建身份组的社区id
+   */
   public static void launch(Activity activity, long serverId) {
     Intent intent = new Intent(activity, QChatRoleCreateActivity.class);
     intent.putExtra(QChatConstant.SERVER_ID, serverId);

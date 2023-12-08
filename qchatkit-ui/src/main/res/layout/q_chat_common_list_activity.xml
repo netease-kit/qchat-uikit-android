@@ -29,6 +29,7 @@
         android:orientation="vertical">
 
         <ImageView
+            android:id="@+id/ivEmptyTip"
             android:layout_width="@dimen/dimen_118_dp"
             android:layout_height="@dimen/dimen_96_dp"
             android:layout_gravity="center_horizontal"

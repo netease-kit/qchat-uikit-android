@@ -5,15 +5,17 @@
 package com.netease.yunxin.kit.qchatkit.ui.server.adapter;
 
 import android.content.Context;
+import android.util.Pair;
 import android.view.View;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
 import com.netease.yunxin.kit.common.ui.utils.AvatarColor;
 import com.netease.yunxin.kit.qchatkit.observer.ObserverUnreadInfoResultHelper;
-import com.netease.yunxin.kit.qchatkit.observer.QChatUnreadInfoSubscriberHelper;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatServerInfo;
 import com.netease.yunxin.kit.qchatkit.ui.common.QChatCommonAdapter;
 import com.netease.yunxin.kit.qchatkit.ui.databinding.QChatFragmentServerListItemBinding;
 import com.netease.yunxin.kit.qchatkit.ui.server.model.QChatFragmentServerInfo;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,22 +26,25 @@ public class QChatFragmentServerAdapter
     extends QChatCommonAdapter<QChatFragmentServerInfo, QChatFragmentServerListItemBinding> {
   private static final String PAYLOADS_FOCUS = "focus";
   private static final String PAYLOADS_UNREAD = "unread";
-  private int lastFocusPosition = 0;
+  private final List<Long> bindedServerList = new ArrayList<>();
+  private long focusedServerId = 0L;
   private OnClickListener<QChatFragmentServerInfo, QChatFragmentServerListItemBinding>
       clickListener;
-
-  private OnUnreadInfoRefresh<QChatFragmentServerInfo> refreshListener;
+  private OnServerRemovedToNewFocusListener onServerRemovedToNewFocusListener;
 
   public QChatFragmentServerAdapter(Context context) {
     super(context, QChatFragmentServerListItemBinding.class);
   }
 
-  public void setRefreshListener(OnUnreadInfoRefresh<QChatFragmentServerInfo> refreshListener) {
-    this.refreshListener = refreshListener;
+  public long getFocusedServerId() {
+    return focusedServerId;
   }
 
   /** update server unread count info. */
   public void updateUnreadInfoList(List<Long> serverIdList) {
+    if (serverIdList == null) {
+      return;
+    }
     for (Long serverId : serverIdList) {
       if (serverId == null) {
         continue;
@@ -59,24 +64,74 @@ public class QChatFragmentServerAdapter
 
   @Override
   public void addDataList(List<QChatFragmentServerInfo> data, boolean clearOld) {
+    int lastIndex = getItemCount();
     super.addDataList(data, clearOld);
     if (clearOld) {
-      lastFocusPosition = 0;
+      bindedServerList.clear();
+    }
+    if (focusedServerId == 0) {
+      Pair<QChatFragmentServerInfo, Integer> serverInfoIndexPair =
+          findNextNormalQChatServer(lastIndex);
+      if (serverInfoIndexPair != null) {
+        focusedServerId = serverInfoIndexPair.first.serverInfo.getServerId();
+        if (onServerRemovedToNewFocusListener != null) {
+          onServerRemovedToNewFocusListener.onNewFocusServer(serverInfoIndexPair.first);
+        }
+      }
     }
   }
 
   public void removeServerById(long serverId) {
     int index = dataSource.indexOf(QChatFragmentServerInfo.generateWithServerId(serverId));
     if (index >= 0) {
+      bindedServerList.remove(serverId);
       dataSource.remove(index);
       notifyItemRemoved(index);
-      if (lastFocusPosition >= getItemCount()) {
-        lastFocusPosition--;
-      }
-      if (lastFocusPosition >= 0) {
-        notifyItemChanged(lastFocusPosition);
+      if (serverId == focusedServerId && !dataSource.isEmpty()) {
+        focusedServerId = 0L;
+        Pair<QChatFragmentServerInfo, Integer> serverInfoIndexPair =
+            findNextNormalQChatServer(index);
+        if (serverInfoIndexPair == null) {
+          return;
+        }
+        focusedServerId = serverInfoIndexPair.first.serverInfo.getServerId();
+        notifyItemChanged(serverInfoIndexPair.second);
+        if (onServerRemovedToNewFocusListener != null) {
+          onServerRemovedToNewFocusListener.onNewFocusServer(serverInfoIndexPair.first);
+        }
       }
     }
+  }
+
+  private Pair<QChatFragmentServerInfo, Integer> findNextNormalQChatServer(int startIndex) {
+    if (getItemCount() == 0) {
+      return null;
+    }
+    Pair<QChatFragmentServerInfo, Integer> result = null;
+    for (int index = startIndex; index < getItemCount(); index++) {
+      QChatFragmentServerInfo item = getItemData(index);
+      if (item == null) {
+        continue;
+      }
+      if (item.serverInfo.getAnnouncementInfo() == null) {
+        result = new Pair<>(item, index);
+        break;
+      }
+    }
+    if (result != null) {
+      return result;
+    }
+    for (int index = startIndex - 1; index >= 0; index--) {
+      QChatFragmentServerInfo item = getItemData(index);
+      if (item == null) {
+        continue;
+      }
+      if (item.serverInfo.getAnnouncementInfo() == null) {
+        result = new Pair<>(item, index);
+        break;
+      }
+    }
+    return result;
   }
 
   public void updateData(QChatServerInfo info) {
@@ -92,45 +147,55 @@ public class QChatFragmentServerAdapter
     }
   }
 
+  public void setOnServerRemovedToNewFocusListener(
+      OnServerRemovedToNewFocusListener onServerRemovedToNewFocusListener) {
+    this.onServerRemovedToNewFocusListener = onServerRemovedToNewFocusListener;
+  }
+
   @Override
   public void onBindViewHolder(
       @NonNull ItemViewHolder<QChatFragmentServerListItemBinding> holder,
       int position,
       QChatFragmentServerInfo data) {
     super.onBindViewHolder(holder, position, data);
+    bindedServerList.add(data.serverInfo.getServerId());
 
     QChatFragmentServerListItemBinding binding = holder.binding;
     binding.cavIcon.setData(
         data.serverInfo.getIconUrl(),
         data.serverInfo.getName(),
         AvatarColor.avatarColor(data.serverInfo.getServerId()));
-    binding.ivMsgTip.setVisibility(
-        ObserverUnreadInfoResultHelper.hasUnreadMsg(data.serverInfo.getServerId())
-            ? View.VISIBLE
-            : View.GONE);
 
-    updateFocus(holder, position, data);
+    data.unreadInfoItemMap =
+        ObserverUnreadInfoResultHelper.getUnreadInfoMap(data.serverInfo.getServerId());
+
+    updateForUnReadCount(data, binding.tvUnReadCount);
+
+    updateFocus(holder, data);
+    if (data.serverInfo.getAnnouncementInfo() != null
+        && data.serverInfo.getAnnouncementInfo().isValid()) {
+      binding.ivAnnounceFlag.setVisibility(View.VISIBLE);
+    } else {
+      binding.ivAnnounceFlag.setVisibility(View.GONE);
+    }
 
     holder.itemView.setOnClickListener(
         v -> {
-          QChatFragmentServerInfo lastInfo = getItemData(lastFocusPosition);
-          if (lastInfo != null) {
-            notifyItemChanged(lastFocusPosition, PAYLOADS_FOCUS);
+          if (data.serverInfo.getAnnouncementInfo() != null
+              && data.serverInfo.getAnnouncementInfo().isValid()) {
+            if (clickListener != null) {
+              clickListener.onClick(data, holder);
+            }
+            return;
           }
-          lastFocusPosition = holder.getBindingAdapterPosition();
-          notifyItemChanged(lastFocusPosition, PAYLOADS_FOCUS);
+          int focusIndex =
+              dataSource.indexOf(QChatFragmentServerInfo.generateWithServerId(focusedServerId));
+          if (focusIndex >= 0) {
+            notifyItemChanged(focusIndex, PAYLOADS_FOCUS);
+          }
+          focusedServerId = data.serverInfo.getServerId();
+          notifyItemChanged(holder.getBindingAdapterPosition(), PAYLOADS_FOCUS);
         });
-
-    if (data.unreadInfoItemMap == null) {
-      QChatUnreadInfoSubscriberHelper.fetchServerUnreadInfoCount(
-          data.serverInfo,
-          result -> {
-            data.unreadInfoItemMap =
-                ObserverUnreadInfoResultHelper.getMapFromResult(
-                    data.serverInfo.getServerId(), result);
-            notifyItemChanged(holder.getBindingAdapterPosition(), PAYLOADS_UNREAD);
-          });
-    }
   }
 
   @Override
@@ -139,34 +204,92 @@ public class QChatFragmentServerAdapter
       int position,
       @NonNull List<Object> payloads) {
     QChatFragmentServerInfo data = getItemData(position);
+    if (data == null) {
+      return;
+    }
     if (payloads.contains(PAYLOADS_FOCUS)) {
-      if (data != null) {
-        updateFocus(holder, position, data);
-      }
+      updateFocus(holder, data);
     } else if (payloads.contains(PAYLOADS_UNREAD)) {
       QChatFragmentServerListItemBinding binding = holder.binding;
-      binding.ivMsgTip.setVisibility(
-          ObserverUnreadInfoResultHelper.hasUnreadMsg(data.serverInfo.getServerId())
-              ? View.VISIBLE
-              : View.GONE);
-      if (lastFocusPosition == position) {
-        refreshListener.onCurrentRefresh(data);
-      }
+      updateForUnReadCount(data, binding.tvUnReadCount);
     } else {
       super.onBindViewHolder(holder, position, payloads);
     }
   }
 
+  public void updateFocus(long serverId) {
+    if (serverId == focusedServerId) {
+      return;
+    }
+    if (serverId == 0 && !dataSource.isEmpty()) {
+      Pair<QChatFragmentServerInfo, Integer> serverInfoIndexPair = findNextNormalQChatServer(0);
+      if (serverInfoIndexPair != null) {
+        focusedServerId = serverInfoIndexPair.first.serverInfo.getServerId();
+        notifyItemChanged(serverInfoIndexPair.second);
+        return;
+      }
+    }
+    int focusIndex =
+        dataSource.indexOf(QChatFragmentServerInfo.generateWithServerId(focusedServerId));
+    focusedServerId = serverId;
+    if (bindedServerList.contains(serverId)) {
+      int newFocusIndex =
+          dataSource.indexOf(QChatFragmentServerInfo.generateWithServerId(serverId));
+      if (newFocusIndex >= 0 && getItemCount() > newFocusIndex) {
+        notifyItemChanged(newFocusIndex);
+      }
+    }
+    if (focusIndex >= 0 && getItemCount() > focusIndex) {
+      notifyItemChanged(focusIndex);
+    }
+  }
+
+  public int getNormalQChatServerCount() {
+    int count = 0;
+    for (QChatFragmentServerInfo item : dataSource) {
+      if (item == null) {
+        continue;
+      }
+      if (item.serverInfo.getAnnouncementInfo() == null
+          || !item.serverInfo.getAnnouncementInfo().isValid()) {
+        count++;
+      }
+    }
+    return count;
+  }
+
   private void updateFocus(
-      ItemViewHolder<QChatFragmentServerListItemBinding> holder,
-      int position,
-      QChatFragmentServerInfo data) {
+      ItemViewHolder<QChatFragmentServerListItemBinding> holder, QChatFragmentServerInfo data) {
     QChatFragmentServerListItemBinding binding = holder.binding;
-    if (lastFocusPosition == position) {
+    QChatServerInfo.AnnouncementInfo announcementInfo = data.serverInfo.getAnnouncementInfo();
+    if (focusedServerId <= 0L && announcementInfo == null) {
+      focusedServerId = data.serverInfo.getServerId();
+    }
+    if (data.serverInfo.getServerId() == focusedServerId && announcementInfo == null) {
       binding.ivFocus.setVisibility(View.VISIBLE);
       clickListener.onClick(data, holder);
     } else {
       binding.ivFocus.setVisibility(View.GONE);
+    }
+  }
+
+  private void updateForUnReadCount(QChatFragmentServerInfo info, TextView view) {
+    if (info == null || info.serverInfo == null || view == null) {
+      return;
+    }
+    int unReadCount =
+        ObserverUnreadInfoResultHelper.getUnreadCountForServer(info.serverInfo.getServerId());
+    if (unReadCount > 0) {
+      String countStr;
+      if (unReadCount > 99) {
+        countStr = "99+";
+      } else {
+        countStr = String.valueOf(unReadCount);
+      }
+      view.setText(countStr);
+      view.setVisibility(View.VISIBLE);
+    } else {
+      view.setVisibility(View.GONE);
     }
   }
 
@@ -178,7 +301,7 @@ public class QChatFragmentServerAdapter
     return dataSource.get(index);
   }
 
-  public interface OnUnreadInfoRefresh<T> {
-    void onCurrentRefresh(T data);
+  public interface OnServerRemovedToNewFocusListener {
+    void onNewFocusServer(QChatFragmentServerInfo serverInfo);
   }
 }

@@ -11,20 +11,20 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 import com.netease.yunxin.kit.alog.ALog;
-import com.netease.yunxin.kit.common.ui.activities.BaseActivity;
 import com.netease.yunxin.kit.common.ui.utils.AvatarColor;
 import com.netease.yunxin.kit.common.ui.viewmodel.LoadStatus;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatChannelMember;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatRoleOptionEnum;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatRoleResourceEnum;
 import com.netease.yunxin.kit.qchatkit.ui.R;
+import com.netease.yunxin.kit.qchatkit.ui.common.QChatChannelBaseActivity;
 import com.netease.yunxin.kit.qchatkit.ui.databinding.QChatMemberPermissionActivityBinding;
 import com.netease.yunxin.kit.qchatkit.ui.model.QChatConstant;
 import java.util.HashMap;
 import java.util.Map;
 
-/** member permission setting modify member's channel permission */
-public class QChatMemberPermissionActivity extends BaseActivity {
+/** 话题成员权限设置页面 */
+public class QChatMemberPermissionActivity extends QChatChannelBaseActivity {
 
   private static final String TAG = "QChatMemberPermissionActivity";
   private QChatMemberPermissionActivityBinding viewBiding;
@@ -60,6 +60,7 @@ public class QChatMemberPermissionActivity extends BaseActivity {
     }
   }
 
+  /** 初始化数据 */
   private void initData() {
     Bundle bundle = getIntent().getExtras();
     if (bundle != null && bundle.containsKey(QChatConstant.CHANNEL_MEMBER)) {
@@ -70,6 +71,7 @@ public class QChatMemberPermissionActivity extends BaseActivity {
       finish();
       return;
     }
+    configServerIdAndChannelId(channelMember.getServerId(), channelMember.getChannelId());
     ALog.d(TAG, "initData", "channelMember:" + channelMember.toString());
     //observer member permission data change
     viewModel
@@ -92,6 +94,7 @@ public class QChatMemberPermissionActivity extends BaseActivity {
             });
   }
 
+  /** 加载权限数据，根据权限信息来配置开关状态 */
   private void loadPermissionData() {
     Map<QChatRoleResourceEnum, QChatRoleOptionEnum> auth = channelMember.getAuths();
     if (auth.size() > 0) {
@@ -140,6 +143,7 @@ public class QChatMemberPermissionActivity extends BaseActivity {
     }
   }
 
+  /** 开关状态变化 */
   private void switchChange(QChatRoleResourceEnum type, int value) {
     Map<QChatRoleResourceEnum, QChatRoleOptionEnum> valueMap = new HashMap<>();
     valueMap.put(type, QChatRoleOptionEnum.Companion.typeOfValue(value));
@@ -151,6 +155,7 @@ public class QChatMemberPermissionActivity extends BaseActivity {
         valueMap);
   }
 
+  /** 启动权限设置页面 */
   public static void launch(Activity activity, QChatChannelMember data) {
     Intent intent = new Intent(activity, QChatMemberPermissionActivity.class);
     Bundle bundle = new Bundle();

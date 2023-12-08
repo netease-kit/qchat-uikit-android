@@ -26,7 +26,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/white_round_bg"
+            android:background="@drawable/bg_qchat_white_round"
             android:padding="@dimen/dimen_16_dp"
             android:layout_marginVertical="@dimen/dimen_15_dp">
 
@@ -89,9 +89,10 @@
             android:gravity="center_vertical"
             android:textSize="@dimen/text_size_16"
             android:textColor="@color/color_333333"
-            android:background="@drawable/white_round_bg"
+            android:background="@drawable/bg_qchat_white_round"
             android:paddingStart="@dimen/dimen_10_dp"
             android:maxLines="1"
+            android:hint="@string/qchat_server_name_hint"
             android:inputType="text"
             android:maxLength="50"
             android:layout_marginTop="@dimen/dimen_8_dp" />
@@ -114,9 +115,10 @@
             android:paddingStart="@dimen/dimen_10_dp"
             android:maxLines="1"
             android:inputType="text"
+            android:hint="@string/qchat_server_topic_hint"
             android:maxLength="64"
             android:textColor="@color/color_333333"
-            android:background="@drawable/white_round_bg"
+            android:background="@drawable/bg_qchat_white_round"
             android:layout_marginTop="@dimen/dimen_8_dp" />
 
         <TextView
@@ -132,7 +134,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dimen_8_dp"
-            android:background="@drawable/white_round_bg"
+            android:background="@drawable/bg_qchat_white_round"
             android:orientation="vertical">
 
             <RelativeLayout
@@ -196,7 +198,7 @@
             android:gravity="center"
             android:paddingVertical="@dimen/dimen_12_dp"
             android:layout_marginTop="@dimen/dimen_24_dp"
-            android:background="@drawable/white_round_bg" />
+            android:background="@drawable/bg_qchat_white_round" />
 
     </LinearLayout>
 

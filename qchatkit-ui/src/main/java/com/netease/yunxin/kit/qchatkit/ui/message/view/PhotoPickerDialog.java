@@ -7,6 +7,7 @@ package com.netease.yunxin.kit.qchatkit.ui.message.view;
 import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.Window;
@@ -19,8 +20,10 @@ import com.netease.yunxin.kit.qchatkit.ui.R;
 import com.netease.yunxin.kit.qchatkit.ui.common.permission.PermissionUtils;
 import com.netease.yunxin.kit.qchatkit.ui.databinding.QChatDialogPhotoChoiceBinding;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
+/** 图片选择弹窗 */
 public class PhotoPickerDialog extends Dialog {
   private static final String TAG = "PhotoChoiceDialog";
   private QChatDialogPhotoChoiceBinding binding;
@@ -30,6 +33,9 @@ public class PhotoPickerDialog extends Dialog {
       new String[] {
         Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE
       };
+
+  private final String[] permission13ForAlbum =
+      new String[] {Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO};
 
   public PhotoPickerDialog(@NonNull Activity activity) {
     super(activity, R.style.BottomDialogTheme);
@@ -70,7 +76,8 @@ public class PhotoPickerDialog extends Dialog {
                     @Override
                     public void onGranted(List<String> permissionsGranted) {
                       PhotoPickerDialog.this.dismiss();
-                      if (permissionsGranted.containsAll(Arrays.asList(permissionForCamera))) {
+                      HashSet<String> permissionSet = new HashSet<>(permissionsGranted);
+                      if (permissionSet.containsAll(Arrays.asList(permissionForCamera))) {
                         localCallback.onSuccess(0);
                       } else {
                         Toast.makeText(
@@ -101,16 +108,24 @@ public class PhotoPickerDialog extends Dialog {
         v -> {
           FetchCallback<Integer> localCallback = callback;
           PhotoPickerDialog.this.dismiss();
-          if (PermissionUtils.checkPermission(getContext(), permissionForAlbum)) {
+          final String[] permissionInfo;
+          // 根据系统版本判断，如果是Android13则采用Manifest.permission.READ_MEDIA_IMAGES
+          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissionInfo = permission13ForAlbum;
+          } else {
+            permissionInfo = permissionForAlbum;
+          }
+          if (PermissionUtils.checkPermission(getContext(), permissionInfo)) {
             localCallback.onSuccess(1);
             return;
           }
-          PermissionUtils.requirePermissions(getContext(), permissionForAlbum)
+          PermissionUtils.requirePermissions(getContext(), permissionInfo)
               .request(
                   new PermissionUtils.PermissionCallback() {
                     @Override
                     public void onGranted(List<String> permissionsGranted) {
-                      if (permissionsGranted.containsAll(Arrays.asList(permissionForAlbum))) {
+                      HashSet<String> permissionSet = new HashSet<>(permissionsGranted);
+                      if (permissionSet.containsAll(Arrays.asList(permissionInfo))) {
                         localCallback.onSuccess(1);
                       } else {
                         Toast.makeText(

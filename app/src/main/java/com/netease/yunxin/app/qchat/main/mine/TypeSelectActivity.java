@@ -28,6 +28,9 @@ public class TypeSelectActivity extends BaseActivity {
   private static final String TAG = "TypeSelectActivity";
   private TypeSelectActivityBinding viewBinding;
 
+  private int[] ids =
+      new int[] {R.id.type_select_rb_0, R.id.type_select_rb_1, R.id.type_select_rb_2};
+
   @Override
   protected void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -40,7 +43,7 @@ public class TypeSelectActivity extends BaseActivity {
 
   private void initView() {
     String title = getIntent().getStringExtra(Constant.TITLE);
-    int selected = getIntent().getIntExtra(Constant.SELECTED_INDEX, 0);
+    int selected = getIntent().getIntExtra(Constant.SELECTED_INDEX, -1);
     ArrayList<String> groupList = getIntent().getStringArrayListExtra(Constant.CHOICE_LIST);
     viewBinding.typeSelectTitleBar.setTitle(title);
     if (groupList != null && groupList.size() > 0) {
@@ -50,6 +53,9 @@ public class TypeSelectActivity extends BaseActivity {
               (int) getResources().getDimension(R.dimen.dimen_50_dp));
       for (int index = 0; index < groupList.size(); index++) {
         RadioButton radioButton = createRadioButton(index, groupList.get(index));
+        if (index < ids.length) {
+          radioButton.setId(ids[index]);
+        }
         if (index == selected) {
           radioButton.setChecked(true);
         }
@@ -72,9 +78,16 @@ public class TypeSelectActivity extends BaseActivity {
 
   private void back() {
     int checkedId = viewBinding.typeRadioGroup.getCheckedRadioButtonId();
+    int checkIndex = 0;
+    for (int index = 0; index < ids.length; index++) {
+      if (ids[index] == checkedId) {
+        checkIndex = index;
+        break;
+      }
+    }
     Intent intent = new Intent();
     intent.putExtra(Constant.EDIT_TYPE, Constant.EDIT_SEXUAL);
-    intent.putExtra(Constant.SELECTED_INDEX, checkedId);
+    intent.putExtra(Constant.SELECTED_INDEX, checkIndex);
     setResult(RESULT_OK, intent);
     ALog.d(TAG, "onBackPressed", "page back:" + checkedId);
     finish();

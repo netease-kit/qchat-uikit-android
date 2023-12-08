@@ -8,7 +8,6 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_marginTop="-12dp"
     android:layout_height="@dimen/dimen_50_dp">
 
     <com.netease.yunxin.kit.common.ui.widgets.RoundFrameLayout

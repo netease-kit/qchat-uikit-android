@@ -16,7 +16,6 @@ import com.netease.yunxin.kit.qchatkit.repo.QChatChannelRepo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatChannelInfo;
 import com.netease.yunxin.kit.qchatkit.ui.R;
 import com.netease.yunxin.kit.qchatkit.ui.model.QChatConstant;
-import java.util.List;
 
 /** channel setting view model */
 public class ChannelSettingViewModel extends BaseViewModel {
@@ -29,19 +28,19 @@ public class ChannelSettingViewModel extends BaseViewModel {
     return resultLiveData;
   }
 
-  /** fetch channel info base on channel Id */
+  /** 根据话题ID 查询话题信息 */
   public void fetchChannelInfo(long channelId) {
     ALog.d(TAG, "fetchChannelInfo", "channelId:" + channelId);
     QChatChannelRepo.fetchChannelInfo(
         channelId,
-        new FetchCallback<List<QChatChannelInfo>>() {
+        new FetchCallback<QChatChannelInfo>() {
           @Override
-          public void onSuccess(@Nullable List<QChatChannelInfo> param) {
-            if (param != null && param.size() > 0) {
+          public void onSuccess(@Nullable QChatChannelInfo param) {
+            if (param != null) {
               fetchResult.setStatus(LoadStatus.Success);
-              fetchResult.setData(param.get(0));
+              fetchResult.setData(param);
               resultLiveData.postValue(fetchResult);
-              ALog.d(TAG, "fetchChannelInfo", "onSuccess:" + param.get(0).toString());
+              ALog.d(TAG, "fetchChannelInfo", "onSuccess:");
             }
           }
 
@@ -63,6 +62,7 @@ public class ChannelSettingViewModel extends BaseViewModel {
         });
   }
 
+  /** 删除话题 */
   public void deleteChannel(long channelId) {
 
     QChatChannelRepo.deleteChannel(
@@ -93,6 +93,7 @@ public class ChannelSettingViewModel extends BaseViewModel {
         });
   }
 
+  /** 更新话题 */
   public void updateChannel(@NonNull long channelId, @NonNull String name, @NonNull String topic) {
 
     QChatChannelRepo.updateChannel(

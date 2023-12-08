@@ -13,7 +13,7 @@ import com.netease.yunxin.kit.common.ui.activities.BaseActivity;
 import com.netease.yunxin.kit.qchatkit.ui.R;
 import com.netease.yunxin.kit.qchatkit.ui.databinding.QChatCreateServerWayActivityBinding;
 
-/** The entrance of creating server. */
+/** 创建/加入圈组社区的选择入口 */
 public class QChatCreateWayActivity extends BaseActivity {
 
   private QChatCreateServerWayActivityBinding binding;
@@ -38,17 +38,29 @@ public class QChatCreateWayActivity extends BaseActivity {
 
   private void initView() {
     binding.tvClose.setOnClickListener(v -> finish());
-    // creating a server by self.
+    // 创建普通社区
     binding.tvCreateSelf.setOnClickListener(
         v -> {
-          launcher.launch(new Intent(QChatCreateWayActivity.this, QChatCreateBySelfActivity.class));
+          QChatCreateBySelfActivity.launch(launcher, QChatCreateWayActivity.this, false);
           overridePendingTransition(R.anim.anim_from_end_to_start, R.anim.anim_empty_with_time);
         });
-    // search and join a server.
+    // 查询及加入普通社区
     binding.tvJoinOther.setOnClickListener(
         v -> {
-          launcher.launch(
-              new Intent(QChatCreateWayActivity.this, QChatJoinOtherServerActivity.class));
+          QChatJoinOtherServerActivity.launch(launcher, QChatCreateWayActivity.this, false);
+          overridePendingTransition(R.anim.anim_from_end_to_start, R.anim.anim_empty_with_time);
+        });
+
+    // 创建公告频道
+    binding.tvCreateSelfAnnounce.setOnClickListener(
+        v -> {
+          QChatCreateBySelfActivity.launch(launcher, QChatCreateWayActivity.this, true);
+          overridePendingTransition(R.anim.anim_from_end_to_start, R.anim.anim_empty_with_time);
+        });
+    // 查询及加入公告频道
+    binding.tvJoinOtherAnnounce.setOnClickListener(
+        v -> {
+          QChatJoinOtherServerActivity.launch(launcher, QChatCreateWayActivity.this, true);
           overridePendingTransition(R.anim.anim_from_end_to_start, R.anim.anim_empty_with_time);
         });
   }

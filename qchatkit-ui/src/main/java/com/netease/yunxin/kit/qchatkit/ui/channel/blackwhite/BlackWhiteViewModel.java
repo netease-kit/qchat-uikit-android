@@ -23,20 +23,21 @@ import com.netease.yunxin.kit.qchatkit.ui.model.QChatServerMemberBean;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * black name list and white name list view model to fetch member list and add member to member list
- */
+/** 黑白名单列表ViewModel */
 public class BlackWhiteViewModel extends BaseViewModel {
 
   private static final String TAG = "BlackWhiteViewModel";
+  // 成员查询结果LiveData
   private final MutableLiveData<FetchResult<List<QChatBaseBean>>> resultLiveData =
       new MutableLiveData<>();
   private final FetchResult<List<QChatBaseBean>> fetchResult = new FetchResult<>(LoadStatus.Finish);
 
+  // 添加成员结果LiveData
   private final MutableLiveData<FetchResult<QChatChannelMember>> addLiveData =
       new MutableLiveData<>();
   private final FetchResult<QChatChannelMember> addResult = new FetchResult<>(LoadStatus.Finish);
 
+  // 删除成员结果LiveData
   private final MutableLiveData<FetchResult<QChatChannelMember>> removeLiveData =
       new MutableLiveData<>();
   private final FetchResult<QChatChannelMember> removeResult = new FetchResult<>(LoadStatus.Finish);
@@ -56,11 +57,12 @@ public class BlackWhiteViewModel extends BaseViewModel {
     return removeLiveData;
   }
 
+  /** 查询频道成员列表 */
   public void fetchMemberList(long serverId, long channelId, QChatChannelModeEnum type) {
     fetchMemberData(serverId, channelId, type, 0);
   }
 
-  /** load header entrance */
+  /** 加载页面顶部功能按钮数据 */
   public ArrayList<QChatBaseBean> loadHeader() {
     ArrayList<QChatBaseBean> addList = new ArrayList<>();
     QChatArrowBean addMember = new QChatArrowBean("添加成员", 0, 0);
@@ -68,7 +70,7 @@ public class BlackWhiteViewModel extends BaseViewModel {
     return addList;
   }
 
-  /** fetch member list */
+  /** 分页加载成员列表数据 */
   private void fetchMemberData(
       long serverId, long channelId, QChatChannelModeEnum type, long offset) {
     ALog.d(TAG, "fetchMemberData");
@@ -121,7 +123,7 @@ public class BlackWhiteViewModel extends BaseViewModel {
         });
   }
 
-  /** delete member from channel black or white name list */
+  /** 移除成员 */
   public void deleteMember(
       long serverId, long channelId, int channelType, String accId, int position) {
     ArrayList<String> accIdList = new ArrayList<>();
@@ -159,7 +161,7 @@ public class BlackWhiteViewModel extends BaseViewModel {
         });
   }
 
-  /** add member from channel black or white name list */
+  /** 添加成员 */
   public void addMember(
       long serverId, long channelId, List<String> accIdList, QChatChannelModeEnum type) {
     QChatChannelRepo.addChannelBlackWhiteMembers(
@@ -199,7 +201,7 @@ public class BlackWhiteViewModel extends BaseViewModel {
         });
   }
 
-  /** fetch more member list */
+  /** 成员列表加载更多 */
   public void loadMore(long serverId, long channelId, QChatChannelModeEnum type) {
     long offset = 0;
     if (lastRoleInfo != null) {
@@ -208,6 +210,7 @@ public class BlackWhiteViewModel extends BaseViewModel {
     fetchMemberData(serverId, channelId, type, offset);
   }
 
+  /** 是否还有更多数据 */
   public boolean hasMore() {
     return roleHasMore;
   }

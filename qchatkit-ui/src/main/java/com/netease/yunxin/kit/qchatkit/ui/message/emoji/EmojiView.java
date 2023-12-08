@@ -22,7 +22,7 @@ import com.netease.yunxin.kit.qchatkit.ui.R;
 import java.util.ArrayList;
 import java.util.List;
 
-/** emoji and stick viewpager */
+/** 聊天页面底部表情列表View */
 public class EmojiView {
 
   private final ViewPager emojiPager;

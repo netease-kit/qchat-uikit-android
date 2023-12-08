@@ -12,13 +12,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.netease.yunxin.kit.common.ui.activities.BaseActivity;
 import com.netease.yunxin.kit.qchatkit.ui.R;
 import com.netease.yunxin.kit.qchatkit.ui.databinding.QChatCommonListActivityBinding;
 import com.netease.yunxin.kit.qchatkit.ui.model.QChatBaseBean;
 import java.util.List;
 
-public abstract class CommonListActivity extends BaseActivity
+public abstract class CommonListActivity extends QChatChannelBaseActivity
     implements CommonViewHolderFactory<QChatBaseBean> {
 
   protected QChatCommonListActivityBinding viewBinding;
@@ -68,10 +67,11 @@ public abstract class CommonListActivity extends BaseActivity
     viewBinding.commonLayout.setBackgroundColor(getResources().getColor(color));
   }
 
-  public void showEmptyView(String title, boolean show) {
+  public void showEmptyView(String title, int iconRes, boolean show) {
     if (show) {
       viewBinding.commonEmptyLayout.setVisibility(View.VISIBLE);
       viewBinding.commonEmptyTv.setText(title);
+      viewBinding.ivEmptyTip.setImageResource(iconRes);
       viewBinding.commonActRecyclerView.setVisibility(View.GONE);
     } else {
       viewBinding.commonActRecyclerView.setVisibility(View.VISIBLE);

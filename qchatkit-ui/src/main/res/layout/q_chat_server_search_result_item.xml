@@ -31,6 +31,7 @@
         android:textColor="@color/color_333333"
         android:textSize="16dp"
         app:layout_constraintBottom_toTopOf="@id/tvServerId"
+        android:layout_marginEnd="@dimen/dimen_8_dp"
         app:layout_constraintEnd_toStartOf="@id/tvActionAndTip"
         app:layout_constraintStart_toEndOf="@id/cavIcon"
         app:layout_constraintTop_toTopOf="parent"

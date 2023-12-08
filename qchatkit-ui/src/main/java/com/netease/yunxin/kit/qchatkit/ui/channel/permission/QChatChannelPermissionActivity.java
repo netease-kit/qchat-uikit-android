@@ -38,8 +38,9 @@ import com.netease.yunxin.kit.qchatkit.ui.model.QChatChannelMemberBean;
 import com.netease.yunxin.kit.qchatkit.ui.model.QChatChannelRoleBean;
 import com.netease.yunxin.kit.qchatkit.ui.model.QChatConstant;
 import com.netease.yunxin.kit.qchatkit.ui.model.QChatViewType;
+import com.netease.yunxin.kit.qchatkit.ui.utils.QChatUtils;
 
-/** channel permission setting include member and role */
+/** 话题权限设置页面 */
 public class QChatChannelPermissionActivity extends CommonListActivity {
 
   private static final String TAG = "QChatChannelPermissionActivity";
@@ -48,7 +49,7 @@ public class QChatChannelPermissionActivity extends CommonListActivity {
   private long channelId;
   private long serverId;
   private boolean editStatus = false;
-  //进入页面重新加载状态，0开始加载，2加载完成
+  // 进入页面重新加载状态，0开始加载，2加载完成
   private int reloadStatus = 2;
 
   @Override
@@ -57,7 +58,8 @@ public class QChatChannelPermissionActivity extends CommonListActivity {
     viewModel = new ViewModelProvider(this).get(ChannelPermissionViewModel.class);
     channelId = getIntent().getLongExtra(QChatConstant.CHANNEL_ID, 0);
     serverId = getIntent().getLongExtra(QChatConstant.SERVER_ID, 0);
-
+    configServerIdAndChannelId(serverId, channelId);
+    // 监听身份组查询结果
     viewModel
         .getRoleLiveData()
         .observe(
@@ -95,6 +97,7 @@ public class QChatChannelPermissionActivity extends CommonListActivity {
               updateTitleAction();
             });
 
+    // 监听成员查询结果
     viewModel
         .getMemberLiveData()
         .observe(
@@ -124,6 +127,7 @@ public class QChatChannelPermissionActivity extends CommonListActivity {
               updateTitleAction();
             });
 
+    // 监听成员更多查询结果
     viewModel
         .getRoleMoreLiveData()
         .observe(
@@ -135,9 +139,11 @@ public class QChatChannelPermissionActivity extends CommonListActivity {
                 ALog.d(TAG, "getRoleMoreLiveData", "Remove");
               }
             });
+    // 记录页面更多折叠状态
+    QChatChannelPermissionExpandableHelper.init();
   }
 
-  /** if title type is last item ,it should be remove */
+  /** 检测adapter状态控制是否展示跟多和标题 */
   private void checkAdapterData() {
     while (recyclerViewAdapter.getItemViewType(recyclerViewAdapter.getItemCount() - 1)
             == QChatViewType.CORNER_VIEW_TYPE
@@ -152,10 +158,15 @@ public class QChatChannelPermissionActivity extends CommonListActivity {
   protected void onResume() {
     super.onResume();
     ALog.d(TAG, "onResume");
-    loadHeaderData();
-    reloadStatus = 0;
-    updateTitleAction();
-    viewModel.fetchData(serverId, channelId);
+    // 网络状态监听
+    QChatUtils.isConnectedToastAndRun(
+        this,
+        () -> {
+          loadHeaderData();
+          reloadStatus = 0;
+          updateTitleAction();
+          viewModel.fetchData(serverId, channelId);
+        });
   }
 
   @Override
@@ -172,7 +183,6 @@ public class QChatChannelPermissionActivity extends CommonListActivity {
       viewBinding.commonActTitleView.setActionText(R.string.qchat_edit);
     } else {
       viewBinding.commonActTitleView.setActionText(R.string.qchat_complete);
-      viewModel.loadMoreRole();
     }
     editStatus = !editStatus;
     recyclerViewAdapter.setEditStatus(editStatus);
@@ -186,6 +196,7 @@ public class QChatChannelPermissionActivity extends CommonListActivity {
     }
   }
 
+  /** 加载标题数据 */
   private void loadHeaderData() {
     ALog.d(TAG, "loadHeaderData");
     String[] titleArray =
@@ -217,11 +228,15 @@ public class QChatChannelPermissionActivity extends CommonListActivity {
       ArrowViewHolder arrowViewHolder = new ArrowViewHolder(viewBinding);
       arrowViewHolder.setItemOnClickListener(
           (data, position) -> {
-            if (QChatConstant.ROUTER_ADD_ROLE.equals(data.router)) {
-              QChatChannelAddRoleActivity.launch(this, serverId, channelId);
-            } else if (QChatConstant.ROUTER_ADD_MEMBER.equals(data.router)) {
-              QChatChannelAddMemberActivity.launch(this, serverId, channelId);
-            }
+            QChatUtils.isConnectedToastAndRun(
+                this,
+                () -> {
+                  if (QChatConstant.ROUTER_ADD_ROLE.equals(data.router)) {
+                    QChatChannelAddRoleActivity.launch(this, serverId, channelId);
+                  } else if (QChatConstant.ROUTER_ADD_MEMBER.equals(data.router)) {
+                    QChatChannelAddMemberActivity.launch(this, serverId, channelId);
+                  }
+                });
           });
       return arrowViewHolder;
     } else if (viewType == QChatViewType.MORE_VIEW_TYPE) {
@@ -230,7 +245,8 @@ public class QChatChannelPermissionActivity extends CommonListActivity {
       MoreViewHolder moreViewHolder = new MoreViewHolder(viewBinding);
       moreViewHolder.setItemOnClickListener(
           (data, position) -> {
-            viewModel.loadMoreRole();
+            QChatChannelPermissionExpandableHelper.reverse();
+            recyclerViewAdapter.notifyDataSetChanged();
           });
       return moreViewHolder;
     } else if (viewType == QChatViewType.CHANNEL_MEMBER_VIEW_TYPE) {
@@ -238,7 +254,7 @@ public class QChatChannelPermissionActivity extends CommonListActivity {
           QChatChannelMemberConerViewHolderBinding.inflate(getLayoutInflater(), parent, false);
       MemberViewHolder viewHolder = new MemberViewHolder(viewHolderBinding);
       viewHolder.setItemOnClickListener(
-          (data, position) -> {;
+          (data, position) -> {
             QChatMemberPermissionActivity.launch(
                 this, ((QChatChannelMemberBean) data).channelMember);
           });
@@ -276,6 +292,7 @@ public class QChatChannelPermissionActivity extends CommonListActivity {
     viewModel.loadMoreMember();
   }
 
+  /** 展示删除弹窗 */
   private void showDeleteDialog(QChatBaseBean data, int position) {
     if (data == null) {
       return;
@@ -307,19 +324,22 @@ public class QChatChannelPermissionActivity extends CommonListActivity {
             new ChoiceListener() {
               @Override
               public void onNegative() {
-                //do nothing
+                // do nothing
                 ALog.d(TAG, "showDeleteDialog", "onNegative");
               }
 
               @Override
               public void onPositive() {
                 ALog.d(TAG, "showDeleteDialog", "onPositive");
-                viewModel.delete(data, findAdapterIndex(data));
+                QChatUtils.isConnectedToastAndRun(
+                    QChatChannelPermissionActivity.this,
+                    () -> viewModel.delete(data, findAdapterIndex(data)));
               }
             })
         .show(getSupportFragmentManager());
   }
 
+  /** 查找adapter中的位置 */
   private int findAdapterIndex(QChatBaseBean bean) {
     int count = recyclerViewAdapter.getItemCount();
     for (int index = 0; index < count; index++) {
@@ -331,6 +351,7 @@ public class QChatChannelPermissionActivity extends CommonListActivity {
     return -1;
   }
 
+  /** 启动权限设置页面 */
   public static void launch(Activity activity, long serverId, long channelId) {
     Intent intent = new Intent(activity, QChatChannelPermissionActivity.class);
     intent.putExtra(QChatConstant.SERVER_ID, serverId);

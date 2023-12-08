@@ -13,11 +13,15 @@ import android.widget.BaseAdapter;
 import com.netease.yunxin.kit.qchatkit.ui.R;
 import com.netease.yunxin.kit.qchatkit.ui.databinding.QChatEmojiItemLayoutBinding;
 
+/** 聊天页面底部表情Adapter */
 public class EmojiAdapter extends BaseAdapter {
 
   private final Context context;
 
   private final int startIndex;
+
+  private int perPageSize = EmojiView.EMOJI_PER_PAGE;
+  private boolean showDel = true;
 
   public EmojiAdapter(Context mContext, int startIndex) {
     this.context = mContext;
@@ -26,8 +30,16 @@ public class EmojiAdapter extends BaseAdapter {
 
   public int getCount() {
     int count = EmojiManager.getDisplayCount() - startIndex + 1;
-    count = Math.min(count, EmojiView.EMOJI_PER_PAGE + 1);
+    count = Math.min(count, perPageSize + 1);
     return count;
+  }
+
+  public void setPageSize(int pageSize) {
+    this.perPageSize = pageSize;
+  }
+
+  public void setShowDel(boolean showDel) {
+    this.showDel = showDel;
   }
 
   @Override
@@ -48,8 +60,8 @@ public class EmojiAdapter extends BaseAdapter {
     convertView = viewBinding.getRoot();
     int count = EmojiManager.getDisplayCount();
     int index = startIndex + position;
-    if (position == EmojiView.EMOJI_PER_PAGE || index == count) {
-      viewBinding.ivEmoji.setBackgroundResource(R.drawable.ic_emoji_del);
+    if ((position == perPageSize || index == count) && showDel) {
+      viewBinding.ivEmoji.setBackgroundResource(R.drawable.ic_qchat_emoji_del);
     } else if (index < count) {
       viewBinding.ivEmoji.setBackground(EmojiManager.getDisplayDrawable(context, index));
     }
