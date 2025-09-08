@@ -103,30 +103,30 @@ public class NimSDKOptionConfig {
   private static MixPushConfig buildMixPushConfig() {
     MixPushConfig config = new MixPushConfig();
     // xiaomi
-    //    config.xmAppId = "2882303761520055541";
-    //    config.xmAppKey = "5222005592541";
-    //    config.xmCertificateName = "QCHAT_MI_PUSH";
+    //    config.xmAppId = "";
+    //    config.xmAppKey = "";
+    //    config.xmCertificateName = "";
 
     // huawei
-    //    config.hwAppId = "107694011";
-    //    config.hwCertificateName = "QCHAT_HW_PUSH";
+    //    config.hwAppId = "";
+    //    config.hwCertificateName = "";
 
     // meizu
-    //    config.mzAppId = "148192";
-    //    config.mzAppKey = "6068c5a8323542deaf83ad5b6d3ca9e2";
-    //    config.mzCertificateName = "KIT_MEIZU_PUSH";
+    //    config.mzAppId = "";
+    //    config.mzAppKey = "";
+    //    config.mzCertificateName = "";
 
     // fcm
-    //        config.fcmCertificateName = "DEMO_FCM_PUSH";
+    //        config.fcmCertificateName = "";
 
     // vivo
-    //    config.vivoCertificateName = "QCHAT_VIVO_PUSH";
+    //    config.vivoCertificateName = "";
 
     // oppo
-    //    config.oppoAppId = "30962355";
-    //    config.oppoAppKey = "333874ef549a4bc5a7d15e84340d84fe";
-    //    config.oppoAppSercet = "1ab0919867e44d4cb097f368d5f8ab42";
-    //    config.oppoCertificateName = "QCHAT_OPPO_PUSH";
+    //    config.oppoAppId = "";
+    //    config.oppoAppKey = "";
+    //    config.oppoAppSercet = "";
+    //    config.oppoCertificateName = "";
     return config;
   }
 }
