@@ -15,6 +15,14 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import com.netease.lava.nertc.sdk.NERtcOption;
 import com.netease.nimlib.sdk.avsignalling.constant.ChannelType;
+import com.netease.nimlib.sdk.v2.V2NIMError;
+import com.netease.nimlib.sdk.v2.auth.V2NIMLoginListener;
+import com.netease.nimlib.sdk.v2.auth.enums.V2NIMLoginClientChange;
+import com.netease.nimlib.sdk.v2.auth.enums.V2NIMLoginStatus;
+import com.netease.nimlib.sdk.v2.auth.model.V2NIMKickedOfflineDetail;
+import com.netease.nimlib.sdk.v2.auth.model.V2NIMLoginClient;
+import com.netease.nimlib.sdk.v2.user.V2NIMUser;
+import com.netease.yunxin.app.qchat.BuildConfig;
 import com.netease.yunxin.app.qchat.CustomConfig;
 import com.netease.yunxin.app.qchat.R;
 import com.netease.yunxin.app.qchat.databinding.ActivityMainBinding;
@@ -26,17 +34,14 @@ import com.netease.yunxin.app.qchat.welcome.WelcomeActivity;
 import com.netease.yunxin.kit.alog.ALog;
 import com.netease.yunxin.kit.call.p2p.NECallEngine;
 import com.netease.yunxin.kit.call.p2p.model.NECallInitRtcMode;
-import com.netease.yunxin.kit.chatkit.repo.ContactRepo;
 import com.netease.yunxin.kit.common.ui.activities.BaseActivity;
 import com.netease.yunxin.kit.contactkit.ui.normal.contact.ContactFragment;
 import com.netease.yunxin.kit.conversationkit.ui.normal.page.ConversationFragment;
-import com.netease.yunxin.kit.corekit.im.IMKitClient;
-import com.netease.yunxin.kit.corekit.im.model.UserInfo;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallbackImpl;
+import com.netease.yunxin.kit.corekit.im2.IMKitClient;
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
 import com.netease.yunxin.kit.corekit.model.ErrorMsg;
 import com.netease.yunxin.kit.corekit.model.ResultInfo;
-import com.netease.yunxin.kit.corekit.qchat.QChatKitClient;
+import com.netease.yunxin.kit.login.AuthorManager;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatServerInfo;
 import com.netease.yunxin.kit.qchatkit.ui.server.QChatServerFragment;
 import com.netease.yunxin.kit.qchatkit.ui.square.QChatSquareFragment;
@@ -235,7 +240,12 @@ public class MainActivity extends BaseActivity {
                         if (mQChatServerFragment != null) {
                             mQChatServerFragment.enterQChatServer(
                                     serverInfo,
-                                    new FetchCallbackImpl<Boolean>() {
+                                    new FetchCallback<Boolean>() {
+                                        @Override
+                                        public void onError(int code, @Nullable String s) {
+
+                                        }
+
                                         @Override
                                         public void onSuccess(@Nullable Boolean param) {
                                             if (param!=null&&param){
@@ -307,48 +317,60 @@ public class MainActivity extends BaseActivity {
   }
 
   private void configCallKit() {
+
     CallKitUIOptions options =
         new CallKitUIOptions.Builder()
             // 必要：音视频通话 sdk appKey，用于通话中使用
             .rtcAppKey(DataUtils.readAppKey(this))
-            // 必要：当前用户 AccId
-            .currentUserAccId(QChatKitClient.account())
             // 通话接听成功的超时时间单位 毫秒，默认30s
             .timeOutMillisecond(30 * 1000L)
             // 此处为 收到来电时展示的 notification 相关配置，如图标，提示语等。
             .notificationConfigFetcher(
                 invitedInfo -> {
-                    UserInfo info = ContactRepo.getUserInfoFromLocal(invitedInfo.callerAccId);
-                    String content =
-                            (info != null ? info.getUserInfoName() : invitedInfo.callerAccId)
-                                    + (invitedInfo.callType == ChannelType.AUDIO.getValue()
-                                    ? getString(R.string.incoming_call_notify_audio)
-                                    : getString(R.string.incoming_call_notify_video));
-                    ALog.d("=======" + content);
-                    return new CallKitNotificationConfig(R.mipmap.ic_logo, null, null, content);
+                  V2NIMUser currentUser = IMKitClient.currentUser();
+                  String content =
+                      (currentUser != null ? currentUser.getName() : invitedInfo.callerAccId)
+                          + (invitedInfo.callType == ChannelType.AUDIO.getValue()
+                              ? getString(R.string.incoming_call_notify_audio)
+                              : getString(R.string.incoming_call_notify_video));
+                  ALog.d("=======" + content);
+                  return new CallKitNotificationConfig(R.mipmap.ic_logo, null, null, content);
                 })
-                // 收到被叫时若 app 在后台，在恢复到前台时是否自动唤起被叫页面，默认为 true
-                .resumeBGInvitation(true)
-                // 请求 rtc token 服务，若非安全模式则不需设置(V1.8.0版本之前需要配置，V1.8.0及之后版本无需配置)
-                //.rtcTokenService((uid, callback) -> requestRtcToken(appKey, uid, callback)) // 自己实现的 token 请求方法
-                // 设置初始化 rtc sdk 相关配置，按照所需进行配置
-                .rtcSdkOption(new NERtcOption())
-                // 呼叫组件初始化 rtc 范围，NECallInitRtcMode.GLOBAL-全局初始化，
-                // NECallInitRtcMode.IN_NEED-每次通话进行初始化以及销毁，全局初始化有助于更快进入首帧页面，
-                // 当结合其他组件使用时存在rtc初始化冲突可设置NECallInitRtcMode.IN_NEED
-                // 或当结合其他组件使用时存在rtc初始化冲突可设置NECallInitRtcMode.IN_NEED_DELAY_TO_ACCEPT
-                .initRtcMode(NECallInitRtcMode.GLOBAL)
-                .build();
-      // 设置自定义话单消息发送
-      NECallEngine.sharedInstance().setCallRecordProvider(new CustomCallOrderProvider());
-      // 若重复初始化会销毁之前的初始化实例，重新初始化
-      CallKitUI.init(getApplicationContext(), options);
-    QChatKitClient.getAuthServiceObserver().observeOnlineStatus(
-            onlineStatus -> {
-              if (onlineStatus.wontAutoLogin()) {
-                CallKitUI.destroy();
-              }
-            },true);
+            // 收到被叫时若 app 在后台，在恢复到前台时是否自动唤起被叫页面，默认为 true
+            .resumeBGInvitation(true)
+            // 请求 rtc token 服务，若非安全模式则不需设置(V1.8.0版本之前需要配置，V1.8.0及之后版本无需配置)
+            //.rtcTokenService((uid, callback) -> requestRtcToken(appKey, uid, callback)) // 自己实现的 token 请求方法
+            // 设置初始化 rtc sdk 相关配置，按照所需进行配置
+            .rtcSdkOption(new NERtcOption())
+            // 呼叫组件初始化 rtc 范围，NECallInitRtcMode.GLOBAL-全局初始化，
+            // NECallInitRtcMode.IN_NEED-每次通话进行初始化以及销毁，全局初始化有助于更快进入首帧页面，
+            // 当结合其他组件使用时存在rtc初始化冲突可设置NECallInitRtcMode.IN_NEED
+            // 或当结合其他组件使用时存在rtc初始化冲突可设置NECallInitRtcMode.IN_NEED_DELAY_TO_ACCEPT
+            .initRtcMode(NECallInitRtcMode.GLOBAL)
+            .build();
+    // 设置自定义话单消息发送
+    NECallEngine.sharedInstance().setCallRecordProvider(new CustomCallOrderProvider());
+    // 若重复初始化会销毁之前的初始化实例，重新初始化
+    CallKitUI.init(getApplicationContext(), options);
+    IMKitClient.addLoginListener(
+        new V2NIMLoginListener() {
+          @Override
+          public void onLoginStatus(V2NIMLoginStatus status) {
+            if (status == V2NIMLoginStatus.V2NIM_LOGIN_STATUS_LOGOUT) {
+              CallKitUI.destroy();
+            }
+          }
+
+          @Override
+          public void onLoginFailed(V2NIMError error) {}
+
+          @Override
+          public void onKickedOffline(V2NIMKickedOfflineDetail detail) {}
+
+          @Override
+          public void onLoginClientChanged(
+              V2NIMLoginClientChange change, List<V2NIMLoginClient> clients) {}
+        });
   }
 
   private void loadConfig() {

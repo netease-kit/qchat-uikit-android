@@ -5,7 +5,7 @@
 package com.netease.yunxin.kit.qchatkit.ui.message.audio;
 
 import com.netease.nimlib.sdk.msg.attachment.AudioAttachment;
-import com.netease.yunxin.kit.corekit.im.audioplayer.Playable;
+import com.netease.yunxin.kit.corekit.im2.audioplayer.Playable;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatMessageInfo;
 
 /** 语义消息播放对象 */

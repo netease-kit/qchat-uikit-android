@@ -8,7 +8,7 @@ import android.content.Context;
 import android.view.View;
 import android.widget.Toast;
 import androidx.annotation.Nullable;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
 import com.netease.yunxin.kit.qchatkit.ui.R;
 
 public class QChatCallback<T> implements FetchCallback<T> {
@@ -31,7 +31,7 @@ public class QChatCallback<T> implements FetchCallback<T> {
   }
 
   @Override
-  public void onFailed(int code) {
+  public void onError(int code, @Nullable String msg) {
     showToast(code, context);
     if (process != null) {
       process.setVisibility(View.GONE);
@@ -48,18 +48,6 @@ public class QChatCallback<T> implements FetchCallback<T> {
               context.getString(R.string.qchat_server_request_fail) + code,
               Toast.LENGTH_SHORT)
           .show();
-    }
-  }
-
-  @Override
-  public void onException(@Nullable Throwable exception) {
-    Toast.makeText(
-            context,
-            context.getString(R.string.qchat_server_request_fail) + exception,
-            Toast.LENGTH_SHORT)
-        .show();
-    if (process != null) {
-      process.setVisibility(View.GONE);
     }
   }
 

@@ -17,7 +17,7 @@ import com.netease.yunxin.kit.common.ui.widgets.ShapeDrawable;
 import com.netease.yunxin.kit.common.utils.ImageUtils;
 import com.netease.yunxin.kit.common.utils.ScreenUtils;
 import com.netease.yunxin.kit.common.utils.SizeUtils;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
 import com.netease.yunxin.kit.qchatkit.repo.QChatMessageRepo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatMessageInfo;
 import com.netease.yunxin.kit.qchatkit.ui.R;
@@ -125,14 +125,7 @@ public class QChatImageMessageViewHolder extends QChatBaseMessageViewHolder {
             }
 
             @Override
-            public void onFailed(int code) {
-              Glide.with(itemView.getContext())
-                  .load(R.drawable.bg_image_loading_qchat)
-                  .into(imageBinding.messageImage);
-            }
-
-            @Override
-            public void onException(@Nullable Throwable exception) {
+            public void onError(int code, @Nullable String msg) {
               Glide.with(itemView.getContext())
                   .load(R.drawable.bg_image_loading_qchat)
                   .into(imageBinding.messageImage);

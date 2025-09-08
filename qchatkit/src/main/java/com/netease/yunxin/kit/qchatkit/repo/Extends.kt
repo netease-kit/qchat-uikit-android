@@ -59,6 +59,7 @@ import com.netease.yunxin.kit.qchatkit.repo.model.ChannelUpdateWhiteBlackRoleMem
 import com.netease.yunxin.kit.qchatkit.repo.model.ChannelVisibilityUpdate
 import com.netease.yunxin.kit.qchatkit.repo.model.Custom
 import com.netease.yunxin.kit.qchatkit.repo.model.MemberRoleAuthUpdate
+import com.netease.yunxin.kit.qchatkit.repo.model.MuteORRelease
 import com.netease.yunxin.kit.qchatkit.repo.model.MyMemberInfoUpdate
 import com.netease.yunxin.kit.qchatkit.repo.model.NextInfo
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatAnnounceMemberInfo
@@ -363,6 +364,7 @@ fun QChatSystemNotificationType.toInfo(): QChatSystemNotificationTypeInfo {
         QChatSystemNotificationType.VISITOR_CHANNEL_VISIBILITY_UPDATE -> VisitorChannelVisibilityUpdate
         QChatSystemNotificationType.MY_MEMBER_INFO_UPDATED -> MyMemberInfoUpdate
         QChatSystemNotificationType.CUSTOM -> Custom
+        QChatSystemNotificationType.MUTE_OR_RELEASE -> MuteORRelease
     }
 }
 

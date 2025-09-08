@@ -4,15 +4,16 @@
 
 package com.netease.yunxin.app.qchat.main.mine.setting;
 
-import androidx.annotation.Nullable;
+import android.content.Context;
 import androidx.lifecycle.MutableLiveData;
+import com.netease.nimlib.sdk.NIMClient;
 import com.netease.yunxin.app.qchat.R;
+import com.netease.yunxin.app.qchat.utils.DataUtils;
 import com.netease.yunxin.kit.common.ui.utils.ToastX;
 import com.netease.yunxin.kit.common.ui.viewmodel.BaseViewModel;
 import com.netease.yunxin.kit.common.ui.viewmodel.FetchResult;
-import com.netease.yunxin.kit.common.ui.viewmodel.LoadStatus;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
-import com.netease.yunxin.kit.corekit.im.repo.SettingRepo;
+import com.netease.yunxin.kit.corekit.im2.IMKitClient;
+import com.netease.yunxin.kit.qchatkit.repo.SettingRepo;
 
 public class SettingNotifyViewModel extends BaseViewModel {
 
@@ -29,39 +30,14 @@ public class SettingNotifyViewModel extends BaseViewModel {
     return toggleNotificationLiveDataLiveData;
   }
 
-  public boolean getToggleNotification() {
-    return SettingRepo.isPushNotify();
+  public boolean getToggleNotification(Context context) {
+    return DataUtils.getToggleNotification(context);
   }
 
-  public void setToggleNotification(boolean value) {
-    SettingRepo.setMessageNotification(value);
-    SettingRepo.setPushNotify(
-        value,
-        new FetchCallback<Void>() {
-          @Override
-          public void onSuccess(@Nullable Void param) {
-            ToastX.showShortToast(R.string.setting_success);
-            FetchResult<Boolean> fetchResult = new FetchResult<>(LoadStatus.Success);
-            fetchResult.setData(value);
-            toggleNotificationLiveDataLiveData.postValue(fetchResult);
-          }
-
-          @Override
-          public void onFailed(int code) {
-            ToastX.showShortToast(R.string.setting_fail);
-            FetchResult<Boolean> fetchResult = new FetchResult<>(LoadStatus.Error);
-            fetchResult.setData(value);
-            toggleNotificationLiveDataLiveData.postValue(fetchResult);
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            ToastX.showShortToast(R.string.setting_fail);
-            FetchResult<Boolean> fetchResult = new FetchResult<>(LoadStatus.Error);
-            fetchResult.setData(value);
-            toggleNotificationLiveDataLiveData.postValue(fetchResult);
-          }
-        });
+  public void setToggleNotification(Context context, boolean value) {
+    IMKitClient.toggleNotification(value);
+    DataUtils.saveToggleNotification(context, value);
+    ToastX.showShortToast(R.string.setting_success);
   }
 
   public boolean getRingToggle() {
@@ -80,45 +56,13 @@ public class SettingNotifyViewModel extends BaseViewModel {
     SettingRepo.setVibrateMode(mode);
   }
 
-  public boolean getMultiPortPushOpen() {
-    return SettingRepo.getMultiPortPushMode();
+  public boolean getPushShowNoDetail(Context context) {
+    return DataUtils.getNotificationHideContent(context);
   }
 
-  public void setMultiPortPushOpen(boolean mode) {
-    SettingRepo.setMultiPortPushMode(mode);
-  }
-
-  public boolean getPushShowNoDetail() {
-    return !SettingRepo.getPushShowDetail();
-  }
-
-  public void setPushShowNoDetail(boolean mode) {
-    SettingRepo.setPushShowDetail(
-        mode,
-        new FetchCallback<Void>() {
-          @Override
-          public void onSuccess(@Nullable Void param) {
-            ToastX.showShortToast(R.string.setting_success);
-            FetchResult<Boolean> fetchResult = new FetchResult<>(LoadStatus.Success);
-            fetchResult.setData(mode);
-            notifyDetailLiveData.postValue(fetchResult);
-          }
-
-          @Override
-          public void onFailed(int code) {
-            ToastX.showShortToast(R.string.setting_fail);
-            FetchResult<Boolean> fetchResult = new FetchResult<>(LoadStatus.Error);
-            fetchResult.setData(mode);
-            notifyDetailLiveData.postValue(fetchResult);
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            ToastX.showShortToast(R.string.setting_fail);
-            FetchResult<Boolean> fetchResult = new FetchResult<>(LoadStatus.Error);
-            fetchResult.setData(mode);
-            notifyDetailLiveData.postValue(fetchResult);
-          }
-        });
+  public void setPushShowNoDetail(Context context, boolean mode) {
+    NIMClient.getSDKOptions().statusBarNotificationConfig.hideContent = mode;
+    DataUtils.saveNotificationHideContent(context, mode);
+    ToastX.showShortToast(R.string.setting_success);
   }
 }

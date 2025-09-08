@@ -13,9 +13,9 @@ import com.netease.nimlib.sdk.msg.constant.MsgDirectionEnum;
 import com.netease.nimlib.sdk.msg.constant.MsgStatusEnum;
 import com.netease.nimlib.sdk.msg.constant.MsgTypeEnum;
 import com.netease.yunxin.kit.common.utils.storage.StorageUtil;
-import com.netease.yunxin.kit.corekit.im.audioplayer.BaseAudioControl;
-import com.netease.yunxin.kit.corekit.im.audioplayer.Playable;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
+import com.netease.yunxin.kit.corekit.im2.audioplayer.BaseAudioControl;
+import com.netease.yunxin.kit.corekit.im2.audioplayer.Playable;
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
 import com.netease.yunxin.kit.qchatkit.repo.QChatMessageRepo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatMessageInfo;
 import com.netease.yunxin.kit.qchatkit.ui.message.view.QChatMessageAdapter;
@@ -164,10 +164,7 @@ public class QChatMessageAudioControl extends BaseAudioControl<QChatMessageInfo>
             }
 
             @Override
-            public void onException(@Nullable Throwable exception) {}
-
-            @Override
-            public void onFailed(int code) {}
+            public void onError(int code, @Nullable String msg) {}
           });
       return;
     }

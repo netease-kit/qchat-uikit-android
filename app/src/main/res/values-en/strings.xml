@@ -85,4 +85,5 @@
     <string name="request_fail">Failed</string>
     <string name="user_fail">Failed</string>
     <string name="network_error">No internet</string>
+    <string name="imkit_email_fail">The email format is incorrect. Please check.</string>
 </resources>

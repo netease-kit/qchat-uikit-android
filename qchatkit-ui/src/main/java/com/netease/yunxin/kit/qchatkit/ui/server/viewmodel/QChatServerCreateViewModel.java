@@ -12,8 +12,7 @@ import com.netease.nimlib.sdk.qchat.enums.QChatRoleOption;
 import com.netease.nimlib.sdk.qchat.enums.QChatRoleResource;
 import com.netease.nimlib.sdk.qchat.result.QChatApplyServerJoinResult;
 import com.netease.yunxin.kit.common.ui.viewmodel.BaseViewModel;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallbackImpl;
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
 import com.netease.yunxin.kit.corekit.model.ErrorMsg;
 import com.netease.yunxin.kit.corekit.model.ResultInfo;
 import com.netease.yunxin.kit.qchatkit.repo.QChatChannelRepo;
@@ -118,17 +117,8 @@ public class QChatServerCreateViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             createServerResult.setValue(new ResultInfo<>(null, false, new ErrorMsg(code)));
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            createServerResult.setValue(
-                new ResultInfo<>(
-                    null,
-                    false,
-                    new ErrorMsg(-1, "createAnnouncementServer:onException", exception)));
           }
         });
   }
@@ -153,15 +143,8 @@ public class QChatServerCreateViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             createServerResult.setValue(new ResultInfo<>(null, false, new ErrorMsg(code)));
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            createServerResult.setValue(
-                new ResultInfo<>(
-                    null, false, new ErrorMsg(-1, "createNormalServer:onException", exception)));
           }
         });
   }
@@ -183,15 +166,8 @@ public class QChatServerCreateViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             searchServerResult.setValue(new ResultInfo<>(null, false, new ErrorMsg(code)));
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            searchServerResult.setValue(
-                new ResultInfo<>(
-                    null, false, new ErrorMsg(-1, "searchServer:onException", exception)));
           }
         });
   }
@@ -210,7 +186,7 @@ public class QChatServerCreateViewModel extends BaseViewModel {
                 searchResultInfo.serverInfo.getServerId(),
                 0,
                 1,
-                new FetchCallbackImpl<List<QChatChannelInfo>>() {
+                new FetchCallback<List<QChatChannelInfo>>() {
                   @Override
                   public void onSuccess(@Nullable List<QChatChannelInfo> channelInfo) {
                     searchResultInfo.channelInfo =
@@ -220,13 +196,7 @@ public class QChatServerCreateViewModel extends BaseViewModel {
                   }
 
                   @Override
-                  public void onFailed(int code) {
-                    joinServerResult.setValue(
-                        new Pair<>(searchResultInfo, new ResultInfo<>(param)));
-                  }
-
-                  @Override
-                  public void onException(@Nullable Throwable exception) {
+                  public void onError(int code, @Nullable String msg) {
                     joinServerResult.setValue(
                         new Pair<>(searchResultInfo, new ResultInfo<>(param)));
                   }
@@ -234,18 +204,9 @@ public class QChatServerCreateViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             joinServerResult.setValue(
                 new Pair<>(searchResultInfo, new ResultInfo<>(null, false, new ErrorMsg(code))));
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            joinServerResult.setValue(
-                new Pair<>(
-                    searchResultInfo,
-                    new ResultInfo<>(
-                        null, false, new ErrorMsg(-1, "joinServer:onException", exception))));
           }
         });
   }

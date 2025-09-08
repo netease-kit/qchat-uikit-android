@@ -7,8 +7,7 @@
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     android:installLocation="auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.netease.yunxin.app.qchat">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <!-- replace com.netease.yunxin.app.im with your package name -->
     <!-- add uses-permission into your AndroidManifest -->
@@ -65,7 +64,9 @@
         <meta-data
             android:name="com.amap.api.v2.apikey"
             android:value="amap_api_key" />
-
+        <meta-data
+            android:name="com.amap.api.v2.web.apikey"
+            android:value="amap_web_api_key" />
         <activity android:name=".welcome.WelcomeActivity"
             android:screenOrientation="portrait"
             android:exported="true">

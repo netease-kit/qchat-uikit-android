@@ -17,20 +17,21 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityOptionsCompat;
+import com.netease.nimlib.sdk.v2.user.V2NIMUser;
 import com.netease.yunxin.app.qchat.R;
 import com.netease.yunxin.app.qchat.about.AboutActivity;
 import com.netease.yunxin.app.qchat.databinding.FragmentMineBinding;
 import com.netease.yunxin.app.qchat.main.mine.setting.SettingActivity;
 import com.netease.yunxin.app.qchat.utils.Constant;
 import com.netease.yunxin.kit.alog.ALog;
+import com.netease.yunxin.kit.chatkit.repo.ContactRepo;
 import com.netease.yunxin.kit.common.ui.fragments.BaseFragment;
 import com.netease.yunxin.kit.common.ui.utils.AvatarColor;
 import com.netease.yunxin.kit.common.ui.utils.ToastX;
-import com.netease.yunxin.kit.corekit.im.IMKitClient;
-import com.netease.yunxin.kit.corekit.im.model.UserInfo;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
-import com.netease.yunxin.kit.corekit.im.repo.CommonRepo;
+import com.netease.yunxin.kit.corekit.im2.IMKitClient;
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class MineFragment extends BaseFragment {
@@ -98,33 +99,26 @@ public class MineFragment extends BaseFragment {
   private void refreshUserInfo(String account) {
     List<String> userInfoList = new ArrayList<>();
     userInfoList.add(account);
-    CommonRepo.getUserInfo(
-        account,
-        new FetchCallback<UserInfo>() {
+    ContactRepo.getUserInfo(
+        Collections.singletonList(account),
+        new FetchCallback<List<V2NIMUser>>() {
           @Override
-          public void onSuccess(@Nullable UserInfo param) {
-            if (param != null) {
-              updateUI(param);
+          public void onError(int errorCode, @Nullable String errorMsg) {
+            ToastX.showShortToast(R.string.user_fail);
+          }
+
+          @Override
+          public void onSuccess(@Nullable List<V2NIMUser> param) {
+            if (param != null && !param.isEmpty()) {
+              updateUI(param.get(0));
             }
-          }
-
-          @Override
-          public void onFailed(int code) {
-            ToastX.showShortToast(R.string.user_fail);
-            updateUI(new UserInfo(account, account, ""));
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            ToastX.showShortToast(R.string.user_fail);
-            updateUI(new UserInfo(account, account, ""));
           }
         });
   }
 
-  private void updateUI(UserInfo userInfo) {
+  private void updateUI(V2NIMUser userInfo) {
     String name =
-        TextUtils.isEmpty(userInfo.getName()) ? userInfo.getAccount() : userInfo.getName();
+        TextUtils.isEmpty(userInfo.getName()) ? userInfo.getAccountId() : userInfo.getName();
     binding.cavIcon.setData(
         userInfo.getAvatar(), name, AvatarColor.avatarColor(IMKitClient.account()));
     binding.tvName.setText(name);

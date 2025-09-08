@@ -67,12 +67,12 @@ public class QChatSquareFragment extends BaseFragment {
             viewBinding.groupEmpty.setVisibility(View.VISIBLE);
             if (!NetworkUtils.isConnected()) {
               Toast.makeText(
-                      getContext(), getString(R.string.common_network_error), Toast.LENGTH_SHORT)
+                      getContext(), getString(R.string.qchat_network_error_tip), Toast.LENGTH_SHORT)
                   .show();
             }
           }
         } else {
-          Toast.makeText(getContext(), getString(R.string.common_network_error), Toast.LENGTH_SHORT)
+          Toast.makeText(getContext(), getString(R.string.qchat_network_error_tip), Toast.LENGTH_SHORT)
               .show();
         }
       };

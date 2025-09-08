@@ -15,7 +15,7 @@ import android.view.WindowManager;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import com.netease.yunxin.kit.alog.ALog;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
 import com.netease.yunxin.kit.qchatkit.ui.R;
 import com.netease.yunxin.kit.qchatkit.ui.common.permission.PermissionUtils;
 import com.netease.yunxin.kit.qchatkit.ui.databinding.QChatDialogPhotoChoiceBinding;

@@ -7,7 +7,7 @@ package com.netease.yunxin.kit.qchatkit.ui.message.popmenu;
 import android.view.View;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.StringRes;
-import com.netease.yunxin.kit.corekit.im.IMKitClient;
+import com.netease.yunxin.kit.corekit.im2.IMKitClient;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatMessageInfo;
 import java.util.HashMap;
 import java.util.Map;

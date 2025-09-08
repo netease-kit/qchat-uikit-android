@@ -13,10 +13,10 @@ import androidx.annotation.Nullable;
 import com.netease.yunxin.kit.alog.ALog;
 import com.netease.yunxin.kit.common.ui.dialog.BaseBottomDialog;
 import com.netease.yunxin.kit.common.ui.utils.AvatarColor;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
-import com.netease.yunxin.kit.corekit.im.utils.RouterConstant;
-import com.netease.yunxin.kit.corekit.qchat.QChatKitClient;
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
+import com.netease.yunxin.kit.corekit.im2.utils.RouterConstant;
 import com.netease.yunxin.kit.corekit.route.XKitRouter;
+import com.netease.yunxin.kit.qchatkit.QChatKitClient;
 import com.netease.yunxin.kit.qchatkit.repo.QChatChannelRepo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatServerMemberInfo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatServerRoleInfo;
@@ -73,14 +73,8 @@ public class MemberProfileDialog extends BaseBottomDialog {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             ALog.d(TAG, "fetchMemberRoleList", "onFailed:" + code);
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            String errorMsg = exception != null ? exception.getMessage() : "";
-            ALog.d(TAG, "fetchMemberRoleList", "onException:" + errorMsg);
           }
         });
   }

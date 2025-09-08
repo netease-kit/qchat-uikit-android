@@ -12,11 +12,11 @@ import com.netease.nimlib.sdk.qchat.model.systemnotification.QChatDeleteServerRo
 import com.netease.nimlib.sdk.qchat.model.systemnotification.QChatKickServerMembersDoneAttachment;
 import com.netease.yunxin.kit.alog.ALog;
 import com.netease.yunxin.kit.common.ui.viewmodel.BaseViewModel;
-import com.netease.yunxin.kit.corekit.im.IMKitClient;
-import com.netease.yunxin.kit.corekit.im.model.EventObserver;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
+import com.netease.yunxin.kit.corekit.im2.IMKitClient;
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
 import com.netease.yunxin.kit.corekit.model.ErrorMsg;
 import com.netease.yunxin.kit.corekit.model.ResultInfo;
+import com.netease.yunxin.kit.qchatkit.EventObserver;
 import com.netease.yunxin.kit.qchatkit.repo.QChatRoleRepo;
 import com.netease.yunxin.kit.qchatkit.repo.QChatServerRepo;
 import com.netease.yunxin.kit.qchatkit.repo.QChatServiceObserverRepo;
@@ -131,12 +131,7 @@ public class UpdateInfoViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
-            permissionResult.setValue(false);
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
+          public void onError(int code, @Nullable String msg) {
             permissionResult.setValue(false);
           }
         });
@@ -166,17 +161,9 @@ public class UpdateInfoViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             ALog.e(TAG, "updateInfo:onFailed:" + code);
             updateInfoResult.setValue(new ResultInfo<>(null, false, new ErrorMsg(code)));
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            ALog.e(TAG, "updateInfo:onException:" + exception);
-            updateInfoResult.setValue(
-                new ResultInfo<>(
-                    null, false, new ErrorMsg(-1, "updateInfo:onException", exception)));
           }
         });
   }

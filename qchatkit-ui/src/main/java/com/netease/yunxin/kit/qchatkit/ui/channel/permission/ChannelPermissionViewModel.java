@@ -10,7 +10,7 @@ import com.netease.yunxin.kit.alog.ALog;
 import com.netease.yunxin.kit.common.ui.viewmodel.BaseViewModel;
 import com.netease.yunxin.kit.common.ui.viewmodel.FetchResult;
 import com.netease.yunxin.kit.common.ui.viewmodel.LoadStatus;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
 import com.netease.yunxin.kit.qchatkit.repo.QChatChannelRepo;
 import com.netease.yunxin.kit.qchatkit.repo.QChatRoleRepo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatChannelMember;
@@ -138,20 +138,10 @@ public class ChannelPermissionViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             ALog.d(TAG, "fetchRoleData", "onFailed:" + code);
             roleFetchResult.setError(
                 code, ErrorUtils.getErrorText(code, R.string.qchat_channel_fetch_role_error));
-            roleLiveData.setValue(roleFetchResult);
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            String errorMsg = exception != null ? exception.getMessage() : "";
-            ALog.d(TAG, "fetchRoleData", "exception:" + errorMsg);
-            roleFetchResult.setError(
-                QChatConstant.ERROR_CODE_CHANNEL_ROLE_FETCH,
-                R.string.qchat_channel_fetch_role_error);
             roleLiveData.setValue(roleFetchResult);
           }
         });
@@ -177,20 +167,10 @@ public class ChannelPermissionViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             ALog.d(TAG, "deleteRole", "code:" + code);
             roleFetchResult.setError(
                 code, ErrorUtils.getErrorText(code, R.string.qchat_channel_role_delete_error));
-            roleLiveData.setValue(roleFetchResult);
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            String errorMsg = exception != null ? exception.getMessage() : "";
-            ALog.d(TAG, "deleteRole", "exception:" + errorMsg);
-            roleFetchResult.setError(
-                QChatConstant.ERROR_CODE_CHANNEL_ROLE_DELETE,
-                R.string.qchat_channel_role_delete_error);
             roleLiveData.setValue(roleFetchResult);
           }
         });
@@ -237,20 +217,10 @@ public class ChannelPermissionViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             ALog.d(TAG, "fetchMemberData", "onFailed:" + code);
             memberFetchResult.setError(
                 code, ErrorUtils.getErrorText(code, R.string.qchat_channel_fetch_member_error));
-            memberLiveData.setValue(memberFetchResult);
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            String errorMsg = exception != null ? exception.getMessage() : "";
-            ALog.d(TAG, "fetchMemberData", "exception:" + errorMsg);
-            memberFetchResult.setError(
-                QChatConstant.ERROR_CODE_CHANNEL_MEMBER_FETCH,
-                R.string.qchat_channel_fetch_member_error);
             memberLiveData.setValue(memberFetchResult);
           }
         });
@@ -276,20 +246,10 @@ public class ChannelPermissionViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             ALog.d(TAG, "deleteMember", "onFailed:" + code);
             memberFetchResult.setError(
                 code, ErrorUtils.getErrorText(code, R.string.qchat_channel_member_delete_error));
-            memberLiveData.setValue(memberFetchResult);
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            String errorMsg = exception != null ? exception.getMessage() : "";
-            ALog.d(TAG, "deleteMember", "exception:" + errorMsg);
-            memberFetchResult.setError(
-                QChatConstant.ERROR_CODE_CHANNEL_ROLE_DELETE,
-                R.string.qchat_channel_member_delete_error);
             memberLiveData.setValue(memberFetchResult);
           }
         });

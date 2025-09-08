@@ -41,11 +41,11 @@ import com.netease.yunxin.kit.common.utils.CommonFileProvider;
 import com.netease.yunxin.kit.common.utils.KeyboardUtils;
 import com.netease.yunxin.kit.common.utils.NetworkUtils;
 import com.netease.yunxin.kit.common.utils.PermissionUtils;
-import com.netease.yunxin.kit.corekit.im.IMKitClient;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
-import com.netease.yunxin.kit.corekit.im.utils.RouterConstant;
-import com.netease.yunxin.kit.corekit.qchat.QChatKitClient;
+import com.netease.yunxin.kit.corekit.im2.IMKitClient;
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
+import com.netease.yunxin.kit.corekit.im2.utils.RouterConstant;
 import com.netease.yunxin.kit.corekit.route.XKitRouter;
+import com.netease.yunxin.kit.qchatkit.QChatKitClient;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatChannelInfo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatMessageInfo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatMessageQuickCommentDetailInfo;
@@ -786,7 +786,7 @@ public class MessageFragment extends BaseFragment {
         .setTitleStr(getString(R.string.qchat_message_action_recall))
         .setContentStr(getString(R.string.qchat_message_action_revoke_this_message))
         .setPositiveStr(getString(R.string.qchat_message_positive_recall))
-        .setNegativeStr(getString(R.string.cancel))
+        .setNegativeStr(getString(R.string.qchat_cancel))
         .setConfirmListener(
             new ChoiceListener() {
               @Override
@@ -808,7 +808,7 @@ public class MessageFragment extends BaseFragment {
         .setTitleStr(getString(R.string.qchat_message_action_delete))
         .setContentStr(getString(R.string.qchat_message_action_delete_this_message))
         .setPositiveStr(getString(R.string.qchat_message_action_delete))
-        .setNegativeStr(getString(R.string.cancel))
+        .setNegativeStr(getString(R.string.qchat_cancel))
         .setConfirmListener(
             new ChoiceListener() {
               @Override
@@ -877,6 +877,11 @@ public class MessageFragment extends BaseFragment {
     photoPickerDialog.show(
         new FetchCallback<Integer>() {
           @Override
+          public void onError(int code, @Nullable String msg) {
+            photoPickerDialog.dismiss();
+          }
+
+          @Override
           public void onSuccess(Integer param) {
             if (param == 0) {
               File file = FileUtils.getTempFile(requireActivity(), null);
@@ -901,16 +906,6 @@ public class MessageFragment extends BaseFragment {
               intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
               activityResultLauncher.launch(intent);
             }
-            photoPickerDialog.dismiss();
-          }
-
-          @Override
-          public void onFailed(int code) {
-            photoPickerDialog.dismiss();
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
             photoPickerDialog.dismiss();
           }
         });

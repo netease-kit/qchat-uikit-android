@@ -20,5 +20,6 @@
     <color name="color_eef1f4">#EEF1F4</color>
     <color name="color_eff1f4">#EFF1F4</color>
     <color name="transparent">#00000000</color>
+    <color name="color_ededed">#ededed</color>
 
 </resources>

@@ -30,9 +30,9 @@ import com.netease.yunxin.kit.common.ui.viewmodel.BaseViewModel;
 import com.netease.yunxin.kit.common.ui.viewmodel.FetchResult;
 import com.netease.yunxin.kit.common.ui.viewmodel.LoadStatus;
 import com.netease.yunxin.kit.corekit.event.EventCenter;
-import com.netease.yunxin.kit.corekit.im.model.EventObserver;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
-import com.netease.yunxin.kit.corekit.qchat.QChatKitClient;
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
+import com.netease.yunxin.kit.qchatkit.EventObserver;
+import com.netease.yunxin.kit.qchatkit.QChatKitClient;
 import com.netease.yunxin.kit.qchatkit.TimerCacheWithQChatMsg;
 import com.netease.yunxin.kit.qchatkit.repo.QChatMessageRepo;
 import com.netease.yunxin.kit.qchatkit.repo.QChatRoleRepo;
@@ -52,7 +52,6 @@ import com.netease.yunxin.kit.qchatkit.ui.R;
 import com.netease.yunxin.kit.qchatkit.ui.common.QChatCache;
 import com.netease.yunxin.kit.qchatkit.ui.message.model.QChatMsgEvent;
 import com.netease.yunxin.kit.qchatkit.ui.message.model.QChatQuickCommentImpl;
-import com.netease.yunxin.kit.qchatkit.ui.model.QChatConstant;
 import com.netease.yunxin.kit.qchatkit.ui.utils.MessageUtil;
 import com.netease.yunxin.kit.qchatkit.ui.utils.QChatUtils;
 import java.io.File;
@@ -201,13 +200,7 @@ public class MessageViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
-            FetchResult<QChatServerRoleInfo> fetchResult = new FetchResult<>(LoadStatus.Success);
-            serverRoleLiveData.setValue(fetchResult);
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
+          public void onError(int code, @Nullable String msg) {
             FetchResult<QChatServerRoleInfo> fetchResult = new FetchResult<>(LoadStatus.Success);
             serverRoleLiveData.setValue(fetchResult);
           }
@@ -230,18 +223,9 @@ public class MessageViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             ALog.d(TAG, "queryMessage", "onFailed:" + code);
             messageFetchResult.setError(code, R.string.qchat_channel_message_fetch_error);
-            messageLiveData.setValue(messageFetchResult);
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            String errorMsg = exception != null ? exception.getMessage() : "";
-            ALog.d(TAG, "fetchMessageHistory", "onException:" + errorMsg);
-            messageFetchResult.setError(
-                QChatConstant.ERROR_CODE_MESSAGE_FETCH, R.string.qchat_channel_message_fetch_error);
             messageLiveData.setValue(messageFetchResult);
           }
         });
@@ -285,33 +269,17 @@ public class MessageViewModel extends BaseViewModel {
                   }
 
                   @Override
-                  public void onFailed(int code) {
+                  public void onError(int code, @Nullable String msg) {
                     ALog.d(TAG, "queryMessageQuickComment", "onFailed:" + code);
-                    loadMessageData(fromTime, toTime, messageList);
-                  }
-
-                  @Override
-                  public void onException(@Nullable Throwable exception) {
-                    String errorMsg = exception != null ? exception.getMessage() : "";
-                    ALog.d(TAG, "queryMessageQuickComment", "onException:" + errorMsg);
                     loadMessageData(fromTime, toTime, messageList);
                   }
                 });
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             ALog.d(TAG, "queryMessage", "onFailed:" + code);
             messageFetchResult.setError(code, R.string.qchat_channel_message_fetch_error);
-            messageLiveData.setValue(messageFetchResult);
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            String errorMsg = exception != null ? exception.getMessage() : "";
-            ALog.d(TAG, "fetchMessageHistory", "onException:" + errorMsg);
-            messageFetchResult.setError(
-                QChatConstant.ERROR_CODE_MESSAGE_FETCH, R.string.qchat_channel_message_fetch_error);
             messageLiveData.setValue(messageFetchResult);
           }
         });
@@ -360,14 +328,8 @@ public class MessageViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             ALog.d(TAG, "queryMessageQuickComment", "onFailed:" + code);
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            String errorMsg = exception != null ? exception.getMessage() : "";
-            ALog.d(TAG, "queryMessageQuickComment", "onException:" + errorMsg);
           }
         });
   }
@@ -414,25 +376,12 @@ public class MessageViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             ALog.d(TAG, "sendMessage", "onFailed:" + code);
             sendMessageFetchResult.setError(code, R.string.qchat_channel_message_send_error);
             QChatMessageInfo messageInfo = new QChatMessageInfo(sendMessageParam.toQChatMessage());
             if (messageInfo.getMessage() != null) {
               messageInfo.getMessage().setSendMsgStatus(MsgStatusEnum.fail);
-              sendMessageFetchResult.setData(messageInfo);
-            }
-            sendMessageLiveData.setValue(sendMessageFetchResult);
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            String errorMsg = exception != null ? exception.getMessage() : "";
-            ALog.d(TAG, "sendMessage", "onException:" + errorMsg);
-            sendMessageFetchResult.setError(
-                QChatConstant.ERROR_CODE_SEND_MESSAGE, R.string.qchat_channel_message_send_error);
-            QChatMessageInfo messageInfo = new QChatMessageInfo(sendMessageParam.toQChatMessage());
-            if (messageInfo.getMessage() != null) {
               sendMessageFetchResult.setData(messageInfo);
             }
             sendMessageLiveData.setValue(sendMessageFetchResult);
@@ -453,13 +402,8 @@ public class MessageViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             QChatUtils.operateError(code);
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            QChatUtils.operateError(-1);
           }
         });
   }
@@ -490,13 +434,8 @@ public class MessageViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             QChatUtils.operateError(code);
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            QChatUtils.operateError(-1);
           }
         });
   }
@@ -527,13 +466,8 @@ public class MessageViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             QChatUtils.operateError(code);
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            QChatUtils.operateError(-1);
           }
         });
   }
@@ -550,16 +484,9 @@ public class MessageViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             ALog.d(TAG, "makeMessageRead", "onFailed:" + code);
             QChatUtils.operateError(code);
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            String errorMsg = exception != null ? exception.getMessage() : "";
-            ALog.d(TAG, "makeMessageRead", "onException:" + errorMsg);
-            QChatUtils.operateError(-1);
           }
         });
   }
@@ -588,15 +515,9 @@ public class MessageViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             ALog.d(LIB_TAG, TAG, "deleteMessage," + "onFailed:" + code);
             QChatUtils.operateError(code);
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            ALog.d(LIB_TAG, TAG, "deleteMessage," + "onException");
-            QChatUtils.operateError(-1);
           }
         });
   }
@@ -617,19 +538,13 @@ public class MessageViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             ALog.d(LIB_TAG, TAG, "revokeMessage," + "onFailed:" + code);
             if (code == ResponseCode.RES_OVERDUE) {
               ToastX.showShortToast(R.string.qchat_message_revoke_over_time);
             } else {
               QChatUtils.operateError(code);
             }
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            ALog.d(LIB_TAG, TAG, "revokeMessage," + "onException");
-            QChatUtils.operateError(-1);
           }
         });
   }

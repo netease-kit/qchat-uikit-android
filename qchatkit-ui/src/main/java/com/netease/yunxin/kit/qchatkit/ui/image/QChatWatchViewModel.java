@@ -15,8 +15,8 @@ import com.netease.yunxin.kit.alog.ALog;
 import com.netease.yunxin.kit.common.ui.viewmodel.BaseViewModel;
 import com.netease.yunxin.kit.common.ui.viewmodel.FetchResult;
 import com.netease.yunxin.kit.common.ui.viewmodel.LoadStatus;
-import com.netease.yunxin.kit.corekit.im.model.EventObserver;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
+import com.netease.yunxin.kit.qchatkit.EventObserver;
 import com.netease.yunxin.kit.qchatkit.repo.QChatMessageRepo;
 import com.netease.yunxin.kit.qchatkit.repo.QChatServiceObserverRepo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatMessageInfo;
@@ -158,14 +158,8 @@ public class QChatWatchViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             ALog.d(TAG, "download failed code:" + code);
-            onDownloadFail(message);
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            ALog.d(TAG, "download exception");
             onDownloadFail(message);
           }
         });

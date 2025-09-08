@@ -12,9 +12,9 @@ import com.netease.yunxin.kit.alog.ALog;
 import com.netease.yunxin.kit.common.ui.viewmodel.BaseViewModel;
 import com.netease.yunxin.kit.common.ui.viewmodel.FetchResult;
 import com.netease.yunxin.kit.common.ui.viewmodel.LoadStatus;
-import com.netease.yunxin.kit.corekit.im.IMKitClient;
-import com.netease.yunxin.kit.corekit.im.model.EventObserver;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
+import com.netease.yunxin.kit.corekit.im2.IMKitClient;
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
+import com.netease.yunxin.kit.qchatkit.EventObserver;
 import com.netease.yunxin.kit.qchatkit.repo.QChatChannelRepo;
 import com.netease.yunxin.kit.qchatkit.repo.QChatServiceObserverRepo;
 import com.netease.yunxin.kit.qchatkit.repo.model.ChannelRemove;
@@ -87,14 +87,8 @@ public class ChannelMessageViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             ALog.d(TAG, "fetchChannelInfo", "onFailed:" + code);
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            String errorMsg = exception != null ? exception.getMessage() : "";
-            ALog.d(TAG, "fetchChannelInfo", "onException:" + errorMsg);
           }
         });
   }

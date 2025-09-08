@@ -83,6 +83,7 @@
     <string name="login_fail">登录失败:%d</string>
     <string name="request_fail">操作失败</string>
     <string name="user_fail">用户信息获取失败</string>
+    <string name="imkit_email_fail">邮箱格式错误，请检查</string>
     <string name="network_error">当前网络不可用，请检查你的网络设置。</string>
 
 </resources>

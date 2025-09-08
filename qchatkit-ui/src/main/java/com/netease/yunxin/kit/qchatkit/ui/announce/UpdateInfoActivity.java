@@ -22,7 +22,7 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.Observer;
 import com.netease.yunxin.kit.common.ui.activities.BaseActivity;
 import com.netease.yunxin.kit.common.utils.NetworkUtils;
-import com.netease.yunxin.kit.corekit.im.IMKitClient;
+import com.netease.yunxin.kit.corekit.im2.IMKitClient;
 import com.netease.yunxin.kit.corekit.model.ResultInfo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatServerInfo;
 import com.netease.yunxin.kit.qchatkit.ui.R;

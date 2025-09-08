@@ -34,7 +34,7 @@ import com.netease.yunxin.kit.common.ui.dialog.CommonChoiceDialog;
 import com.netease.yunxin.kit.common.ui.utils.AvatarColor;
 import com.netease.yunxin.kit.common.utils.NetworkUtils;
 import com.netease.yunxin.kit.common.utils.SizeUtils;
-import com.netease.yunxin.kit.corekit.im.IMKitClient;
+import com.netease.yunxin.kit.corekit.im2.IMKitClient;
 import com.netease.yunxin.kit.qchatkit.repo.QChatRoleRepo;
 import com.netease.yunxin.kit.qchatkit.repo.QChatServerRepo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatServerMemberWithRoleInfo;
@@ -394,24 +394,13 @@ public class QChatServerMemberInfoActivity extends QChatServerCommonBaseActivity
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             rollbackRoles(item, add);
             Toast.makeText(
                     getApplicationContext(),
                     getString(R.string.qchat_server_request_fail) + code,
                     Toast.LENGTH_SHORT)
                 .show();
-            isHandingMemberRoles = false;
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            Toast.makeText(
-                    getApplicationContext(),
-                    getString(R.string.qchat_server_request_fail) + exception,
-                    Toast.LENGTH_SHORT)
-                .show();
-            rollbackRoles(item, add);
             isHandingMemberRoles = false;
           }
         }.setProcess(binding.flyProcess);
@@ -443,6 +432,7 @@ public class QChatServerMemberInfoActivity extends QChatServerCommonBaseActivity
 
   @Override
   public void onBackPressed() {
+    super.onBackPressed();
     finishWithResult(false);
   }
 

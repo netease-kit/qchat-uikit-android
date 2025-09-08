@@ -16,7 +16,7 @@ import com.netease.yunxin.kit.alog.ALog;
 import com.netease.yunxin.kit.common.ui.viewmodel.BaseViewModel;
 import com.netease.yunxin.kit.common.ui.viewmodel.FetchResult;
 import com.netease.yunxin.kit.common.ui.viewmodel.LoadStatus;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
 import com.netease.yunxin.kit.qchatkit.repo.QChatRoleRepo;
 import com.netease.yunxin.kit.qchatkit.ui.model.QChatConstant;
 import java.util.Collections;
@@ -53,6 +53,11 @@ public class ManagerEditViewModel extends BaseViewModel {
         200,
         new FetchCallback<List<QChatMemberRole>>() {
           @Override
+          public void onError(int code, @Nullable String s) {
+            ALog.d(LIB_TAG, TAG, "requestMemberInfo result onFailed:" + code);
+          }
+
+          @Override
           public void onSuccess(@Nullable List<QChatMemberRole> param) {
             ALog.d(LIB_TAG, TAG, "requestMemberInfo result success");
             FetchResult<QChatMemberRole> result = new FetchResult<>(LoadStatus.Success);
@@ -80,30 +85,14 @@ public class ManagerEditViewModel extends BaseViewModel {
                     }
 
                     @Override
-                    public void onFailed(int code) {
+                    public void onError(int code, @Nullable String msg) {
                       ALog.d(LIB_TAG, TAG, "addMemberRole result onFailed:" + code);
-                      updateLiveData.setValue(new FetchResult<>(LoadStatus.Success, false));
-                    }
-
-                    @Override
-                    public void onException(@Nullable Throwable exception) {
-                      ALog.d(LIB_TAG, TAG, "addMemberRole result onException");
                       updateLiveData.setValue(new FetchResult<>(LoadStatus.Success, false));
                     }
                   });
             } else {
               memberInfoLiveData.setValue(result);
             }
-          }
-
-          @Override
-          public void onFailed(int code) {
-            ALog.d(LIB_TAG, TAG, "requestMemberInfo result onFailed:" + code);
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            ALog.d(LIB_TAG, TAG, "requestMemberInfo result onException");
           }
         });
   }
@@ -123,7 +112,7 @@ public class ManagerEditViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             ALog.d(LIB_TAG, TAG, "updateMemberRole result onFailed:" + code);
             // 如果出现406代表参数没有修改，业务上按照成功处理
             if (code == QChatConstant.PARAM_ERROR_CODE) {
@@ -131,12 +120,6 @@ public class ManagerEditViewModel extends BaseViewModel {
             } else {
               updateLiveData.setValue(new FetchResult<>(LoadStatus.Success, false));
             }
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            ALog.d(LIB_TAG, TAG, "updateMemberRole result onException");
-            updateLiveData.setValue(new FetchResult<>(LoadStatus.Success, false));
           }
         });
   }
@@ -164,28 +147,16 @@ public class ManagerEditViewModel extends BaseViewModel {
                   }
 
                   @Override
-                  public void onFailed(int code) {
+                  public void onError(int code, @Nullable String msg) {
                     ALog.d(LIB_TAG, TAG, "removeMemberRole result onFailed:" + code);
-                    kickMemberLiveData.setValue(new FetchResult<>(LoadStatus.Success, false));
-                  }
-
-                  @Override
-                  public void onException(@Nullable Throwable exception) {
-                    ALog.d(LIB_TAG, TAG, "removeMemberRole result onException");
                     kickMemberLiveData.setValue(new FetchResult<>(LoadStatus.Success, false));
                   }
                 });
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             ALog.d(LIB_TAG, TAG, "removeMemberRole result onFailed:" + code);
-            kickMemberLiveData.setValue(new FetchResult<>(LoadStatus.Success, false));
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            ALog.d(LIB_TAG, TAG, "removeMemberRole result onException");
             kickMemberLiveData.setValue(new FetchResult<>(LoadStatus.Success, false));
           }
         });

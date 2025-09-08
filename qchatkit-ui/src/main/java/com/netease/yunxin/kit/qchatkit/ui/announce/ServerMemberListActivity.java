@@ -4,7 +4,7 @@
 
 package com.netease.yunxin.kit.qchatkit.ui.announce;
 
-import static com.netease.yunxin.kit.corekit.im.utils.RouterConstant.REQUEST_CONTACT_SELECTOR_KEY;
+import static com.netease.yunxin.kit.corekit.im2.utils.RouterConstant.REQUEST_CONTACT_SELECTOR_KEY;
 
 import android.content.Context;
 import android.content.Intent;
@@ -21,7 +21,7 @@ import com.netease.yunxin.kit.common.ui.activities.BaseActivity;
 import com.netease.yunxin.kit.common.ui.dialog.ChoiceListener;
 import com.netease.yunxin.kit.common.ui.dialog.CommonChoiceDialog;
 import com.netease.yunxin.kit.common.utils.NetworkUtils;
-import com.netease.yunxin.kit.corekit.im.utils.RouterConstant;
+import com.netease.yunxin.kit.corekit.im2.utils.RouterConstant;
 import com.netease.yunxin.kit.corekit.model.ErrorMsg;
 import com.netease.yunxin.kit.corekit.model.ResultInfo;
 import com.netease.yunxin.kit.corekit.route.XKitRouter;
@@ -97,7 +97,7 @@ public class ServerMemberListActivity extends BaseActivity {
         } else {
           Toast.makeText(
                   ServerMemberListActivity.this,
-                  getString(R.string.common_network_error),
+                  getString(R.string.qchat_network_error_tip),
                   Toast.LENGTH_SHORT)
               .show();
         }
@@ -315,7 +315,7 @@ public class ServerMemberListActivity extends BaseActivity {
       } else {
         Toast.makeText(
                 ServerMemberListActivity.this,
-                getString(R.string.common_network_error),
+                getString(R.string.qchat_network_error_tip),
                 Toast.LENGTH_SHORT)
             .show();
       }

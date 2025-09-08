@@ -53,18 +53,18 @@ public class SettingNotifyActivity extends BaseActivity {
   }
 
   private void initView() {
-    viewBinding.notifySc.setChecked(viewModel.getToggleNotification());
+    viewBinding.notifySc.setChecked(viewModel.getToggleNotification(this));
     viewBinding.notifySc.setOnClickListener(
-        v -> viewModel.setToggleNotification(viewBinding.notifySc.isChecked()));
+        v -> viewModel.setToggleNotification(this, viewBinding.notifySc.isChecked()));
     viewBinding.notifyRingSc.setChecked(viewModel.getRingToggle());
     viewBinding.notifyRingSc.setOnClickListener(
         v -> viewModel.setRingToggle(viewBinding.notifyRingSc.isChecked()));
     viewBinding.notifyShakeSc.setChecked(viewModel.getVibrateToggle());
     viewBinding.notifyShakeSc.setOnClickListener(
         v -> viewModel.setVibrateToggle(viewBinding.notifyShakeSc.isChecked()));
-    viewBinding.notifyShowInfoSc.setChecked(!viewModel.getPushShowNoDetail());
+    viewBinding.notifyShowInfoSc.setChecked(!viewModel.getPushShowNoDetail(this));
     viewBinding.notifyShowInfoSc.setOnClickListener(
-        v -> viewModel.setPushShowNoDetail(!viewBinding.notifyShowInfoSc.isChecked()));
+        v -> viewModel.setPushShowNoDetail(this, !viewBinding.notifyShowInfoSc.isChecked()));
     viewBinding.settingTitleBar.setOnBackIconClickListener(v -> onBackPressed());
   }
 }

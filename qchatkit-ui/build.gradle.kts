@@ -10,11 +10,12 @@ plugins {
 }
 
 android {
-    compileSdk = 33
+    namespace = "com.netease.yunxin.kit.qchatkit.ui"
+
+    compileSdk = 34
 
     defaultConfig {
         minSdk = 21
-        targetSdk = 33
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
         buildConfigField("String", "versionName", "\"9.4.1\"")
@@ -29,6 +30,7 @@ android {
 
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 
     compileOptions {
@@ -40,7 +42,7 @@ android {
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     api(project(":qchatkit"))
-    api("com.netease.yunxin.kit.common:common-ui:1.3.2")
+    api("com.netease.yunxin.kit.common:common-ui:1.7.0")
     api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.21")
     implementation("androidx.appcompat:appcompat:1.4.2") 
     implementation("com.google.android.material:material:1.5.0") 

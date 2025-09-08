@@ -30,6 +30,7 @@
         android:orientation="vertical"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/setting_title_bar"
+        android:visibility="gone"
         tools:ignore="SpUsage">
 
         <FrameLayout android:id="@+id/notify_fl"

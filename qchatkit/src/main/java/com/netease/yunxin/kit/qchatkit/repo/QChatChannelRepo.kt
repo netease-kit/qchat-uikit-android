@@ -11,11 +11,10 @@ import com.netease.nimlib.sdk.qchat.enums.QChatChannelBlackWhiteType
 import com.netease.nimlib.sdk.qchat.model.QChatChannelIdInfo
 import com.netease.nimlib.sdk.qchat.model.QChatMessage
 import com.netease.yunxin.kit.alog.ALog
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback
-import com.netease.yunxin.kit.corekit.im.utils.toInform
-import com.netease.yunxin.kit.corekit.qchat.provider.QChatChannelProvider
-import com.netease.yunxin.kit.corekit.qchat.provider.QChatMessageProvider
-import com.netease.yunxin.kit.corekit.qchat.provider.QChatRoleProvider
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback
+import com.netease.yunxin.kit.qchatkit.provider.QChatChannelProvider
+import com.netease.yunxin.kit.qchatkit.provider.QChatMessageProvider
+import com.netease.yunxin.kit.qchatkit.provider.QChatRoleProvider
 import com.netease.yunxin.kit.qchatkit.repo.model.NextInfo
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatChannelInfo
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatChannelInfoWithLastMessage
@@ -28,6 +27,7 @@ import com.netease.yunxin.kit.qchatkit.repo.model.QChatServerMemberInfo
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatServerRoleInfo
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatSubscribeTypeInfo
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatUnreadInfoItem
+import com.netease.yunxin.kit.qchatkit.toInform
 import kotlin.math.min
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

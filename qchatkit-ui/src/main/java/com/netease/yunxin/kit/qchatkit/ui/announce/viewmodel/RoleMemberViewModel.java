@@ -10,11 +10,11 @@ import androidx.lifecycle.MutableLiveData;
 import com.netease.nimlib.sdk.qchat.model.systemnotification.QChatDeleteServerRoleMembersAttachment;
 import com.netease.nimlib.sdk.qchat.model.systemnotification.QChatKickServerMembersDoneAttachment;
 import com.netease.yunxin.kit.common.ui.viewmodel.BaseViewModel;
-import com.netease.yunxin.kit.corekit.im.IMKitClient;
-import com.netease.yunxin.kit.corekit.im.model.EventObserver;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
+import com.netease.yunxin.kit.corekit.im2.IMKitClient;
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
 import com.netease.yunxin.kit.corekit.model.ErrorMsg;
 import com.netease.yunxin.kit.corekit.model.ResultInfo;
+import com.netease.yunxin.kit.qchatkit.EventObserver;
 import com.netease.yunxin.kit.qchatkit.repo.QChatRoleRepo;
 import com.netease.yunxin.kit.qchatkit.repo.QChatServerRepo;
 import com.netease.yunxin.kit.qchatkit.repo.QChatServiceObserverRepo;
@@ -162,21 +162,14 @@ public final class RoleMemberViewModel extends BaseViewModel {
         Collections.singletonList(accId),
         new FetchCallback<List<String>>() {
           @Override
+          public void onError(int code, @Nullable String msg) {
+            kickManagerResult.setValue(new ResultInfo<>(null, false, new ErrorMsg(code, msg)));
+          }
+
+          @Override
           public void onSuccess(@Nullable List<String> param) {
             kickManagerResult.setValue(new ResultInfo<>(accId));
             QChatRoleRepo.removeMemberRole(serverId, channelId, accId, null);
-          }
-
-          @Override
-          public void onFailed(int code) {
-            kickManagerResult.setValue(new ResultInfo<>(null, false, new ErrorMsg(code)));
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            kickManagerResult.setValue(
-                new ResultInfo<>(
-                    null, false, new ErrorMsg(-1, "Error is " + exception, exception)));
           }
         });
   }
@@ -199,15 +192,8 @@ public final class RoleMemberViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             addManagersResult.setValue(new ResultInfo<>(null, false, new ErrorMsg(code)));
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            addManagersResult.setValue(
-                new ResultInfo<>(
-                    null, false, new ErrorMsg(-1, "Error is " + exception, exception)));
           }
         });
   }
@@ -232,15 +218,8 @@ public final class RoleMemberViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             result.setValue(new ResultInfo<>(null, false, new ErrorMsg(code)));
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            result.setValue(
-                new ResultInfo<>(
-                    null, false, new ErrorMsg(-1, "Error is " + exception, exception)));
           }
         });
   }
