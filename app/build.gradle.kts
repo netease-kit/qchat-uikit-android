@@ -63,8 +63,8 @@ dependencies {
     implementation("com.netease.yunxin.kit.chat:chatkit-ui:10.8.2")
     implementation("com.netease.yunxin.kit.locationkit:locationkit:10.8.2")
     implementation("com.netease.yunxin.kit.call:call-ui:3.5.0")
-    implementation("com.netease.nimlib:avsignalling:10.9.43-SNAPSHOT") //信令组件
-    implementation("com.netease.nimlib:basesdk:10.9.43-SNAPSHOT") //信令组件
+    implementation("com.netease.nimlib:avsignalling:10.9.45") //NIM信令
+    implementation("com.netease.nimlib:basesdk:10.9.45") //NIM SDK
     implementation("com.airbnb.android:lottie:5.0.3")
     implementation("com.github.bumptech.glide:glide:4.13.1")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")

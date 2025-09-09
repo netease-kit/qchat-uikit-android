@@ -44,6 +44,6 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
     implementation("com.google.android.material:material:1.5.0")
     api("com.netease.yunxin.kit.core:corekit-im2:1.7.0")
-    api("com.netease.nimlib:qchat:10.9.44-SNAPSHOT")
+    api("com.netease.nimlib:qchat:10.9.45")
 }
 
