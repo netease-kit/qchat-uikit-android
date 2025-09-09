@@ -18,9 +18,9 @@ import com.netease.yunxin.kit.alog.ALog;
 import com.netease.yunxin.kit.common.ui.viewmodel.BaseViewModel;
 import com.netease.yunxin.kit.common.ui.viewmodel.FetchResult;
 import com.netease.yunxin.kit.common.ui.viewmodel.LoadStatus;
-import com.netease.yunxin.kit.corekit.im.IMKitClient;
-import com.netease.yunxin.kit.corekit.im.model.EventObserver;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
+import com.netease.yunxin.kit.corekit.im2.IMKitClient;
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
+import com.netease.yunxin.kit.qchatkit.EventObserver;
 import com.netease.yunxin.kit.qchatkit.repo.QChatRoleRepo;
 import com.netease.yunxin.kit.qchatkit.repo.QChatServerRepo;
 import com.netease.yunxin.kit.qchatkit.repo.QChatServiceObserverRepo;
@@ -94,23 +94,17 @@ public class SettingViewModel extends BaseViewModel {
         observerServerInfo.getServerId(),
         new FetchCallback<QChatServerInfo>() {
           @Override
-          public void onSuccess(@Nullable QChatServerInfo server) {
-            ALog.d(LIB_TAG, TAG, "getServer result success");
-            FetchResult<QChatServerInfo> fetchResult = new FetchResult<>(LoadStatus.Success);
-            fetchResult.setData(server);
-            serverLiveData.setValue(fetchResult);
-          }
-
-          @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             QChatUtils.operateError(code);
             ALog.d(LIB_TAG, TAG, "getServer result onFailed:" + code);
           }
 
           @Override
-          public void onException(@Nullable Throwable exception) {
-            ALog.d(LIB_TAG, TAG, "getServer result onException");
-            QChatUtils.operateError(-1);
+          public void onSuccess(@Nullable QChatServerInfo server) {
+            ALog.d(LIB_TAG, TAG, "getServer result success");
+            FetchResult<QChatServerInfo> fetchResult = new FetchResult<>(LoadStatus.Success);
+            fetchResult.setData(server);
+            serverLiveData.setValue(fetchResult);
           }
         });
     requestRoleInfo();
@@ -136,14 +130,9 @@ public class SettingViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             QChatUtils.operateError(code);
             ALog.d(LIB_TAG, TAG, "fetchMemberJoinedRoles result onFailed:" + code);
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            ALog.d(LIB_TAG, TAG, "fetchMemberJoinedRoles result onException");
           }
         });
   }
@@ -164,14 +153,8 @@ public class SettingViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             ALog.d(LIB_TAG, TAG, "checkPermission result onFailed:" + code);
-            QChatUtils.operateError(-1);
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            ALog.d(LIB_TAG, TAG, "checkPermission result onException");
             QChatUtils.operateError(-1);
           }
         });
@@ -196,14 +179,8 @@ public class SettingViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             QChatUtils.operateError(code);
-            updateServerLiveData.setValue(new FetchResult<>(FetchResult.FetchType.Add, false));
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            QChatUtils.operateError(-1);
             updateServerLiveData.setValue(new FetchResult<>(FetchResult.FetchType.Add, false));
           }
         });
@@ -248,17 +225,9 @@ public class SettingViewModel extends BaseViewModel {
                     }
 
                     @Override
-                    public void onFailed(int code) {
+                    public void onError(int code, @Nullable String msg) {
                       ALog.d(LIB_TAG, TAG, "setEmojiApply result:onFailed=" + code);
                       QChatUtils.operateError(code);
-                      updateServerLiveData.setValue(
-                          new FetchResult<>(FetchResult.FetchType.Update, false));
-                    }
-
-                    @Override
-                    public void onException(@Nullable Throwable exception) {
-                      ALog.d(LIB_TAG, TAG, "setEmojiApply result:onException");
-                      QChatUtils.operateError(-1);
                       updateServerLiveData.setValue(
                           new FetchResult<>(FetchResult.FetchType.Update, false));
                     }
@@ -269,16 +238,9 @@ public class SettingViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             ALog.d(LIB_TAG, TAG, "setEmojiApply checkPermission result:onFailed=" + code);
             QChatUtils.operateError(code);
-            updateServerLiveData.setValue(new FetchResult<>(FetchResult.FetchType.Update, false));
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            ALog.d(LIB_TAG, TAG, "setEmojiApply checkPermission result:onException");
-            QChatUtils.operateError(-1);
             updateServerLiveData.setValue(new FetchResult<>(FetchResult.FetchType.Update, false));
           }
         });
@@ -300,16 +262,9 @@ public class SettingViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             ALog.d(LIB_TAG, TAG, "leaveServer result:onFailed=" + code);
             QChatUtils.operateError(code);
-            updateServerLiveData.setValue(new FetchResult<>(FetchResult.FetchType.Remove, false));
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            ALog.d(LIB_TAG, TAG, "leaveServer result:onException");
-            QChatUtils.operateError(-1);
             updateServerLiveData.setValue(new FetchResult<>(FetchResult.FetchType.Remove, false));
           }
         });
@@ -327,16 +282,9 @@ public class SettingViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             ALog.d(LIB_TAG, TAG, "deleteServer result:onFailed=" + code);
             QChatUtils.operateError(code);
-            updateServerLiveData.setValue(new FetchResult<>(FetchResult.FetchType.Remove, false));
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            ALog.d(LIB_TAG, TAG, "deleteServer result:onException");
-            QChatUtils.operateError(-1);
             updateServerLiveData.setValue(new FetchResult<>(FetchResult.FetchType.Remove, false));
           }
         });

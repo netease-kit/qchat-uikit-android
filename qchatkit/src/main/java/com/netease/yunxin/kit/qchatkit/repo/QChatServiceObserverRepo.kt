@@ -6,8 +6,8 @@
 
 package com.netease.yunxin.kit.qchatkit.repo
 
-import com.netease.yunxin.kit.corekit.im.model.EventObserver
-import com.netease.yunxin.kit.corekit.qchat.provider.QChatServiceObserverProvider
+import com.netease.yunxin.kit.qchatkit.EventObserver
+import com.netease.yunxin.kit.qchatkit.provider.QChatServiceObserverProvider
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatMessageDeleteEventInfo
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatMessageInfo
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatMessageRevokeEventInfo

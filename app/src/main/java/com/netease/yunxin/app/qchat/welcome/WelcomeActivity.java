@@ -10,8 +10,7 @@ import android.text.TextUtils;
 import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import com.netease.nimlib.sdk.auth.LoginInfo;
-import com.netease.nimlib.sdk.qchat.result.QChatLoginResult;
+import com.netease.yunxin.app.qchat.BuildConfig;
 import com.netease.yunxin.app.qchat.QChatApplication;
 import com.netease.yunxin.app.qchat.R;
 import com.netease.yunxin.app.qchat.databinding.ActivityWelcomeBinding;
@@ -21,9 +20,14 @@ import com.netease.yunxin.app.qchat.utils.DataUtils;
 import com.netease.yunxin.kit.alog.ALog;
 import com.netease.yunxin.kit.common.ui.activities.BaseActivity;
 import com.netease.yunxin.kit.common.ui.utils.ToastX;
-import com.netease.yunxin.kit.corekit.im.login.LoginCallback;
-import com.netease.yunxin.kit.corekit.qchat.QChatKitClient;
-
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
+import com.netease.yunxin.kit.login.AuthorManager;
+import com.netease.yunxin.kit.login.model.AuthorConfig;
+import com.netease.yunxin.kit.login.model.LoginResultCallback;
+import com.netease.yunxin.kit.login.model.LoginType;
+import com.netease.yunxin.kit.login.model.UserInfo;
+import com.netease.yunxin.kit.login.utils.action.FinishAction;
+import com.netease.yunxin.kit.qchatkit.QChatKitClient;
 
 /** Welcome Page is launch page */
 public class WelcomeActivity extends BaseActivity {
@@ -61,7 +65,7 @@ public class WelcomeActivity extends BaseActivity {
       String token = "";
 
       if (!TextUtils.isEmpty(account) && !TextUtils.isEmpty(token)) {
-          loginQChatAndIM(account,token);
+          loginQChat(account,token);
       } else {
           showLoginView();
       }
@@ -94,29 +98,28 @@ public class WelcomeActivity extends BaseActivity {
   /** launch login activity */
   private void launchLoginPage() {
     ALog.d(Constant.PROJECT_TAG, TAG, "launchLoginPage");
+    activityWelcomeBinding.getRoot().setVisibility(View.VISIBLE);
   }
 
   /** when your own page login success, you should login IM SDK */
-  private void loginQChatAndIM(String account, String token) {
+  private void loginQChat(String account, String token) {
     ALog.d(Constant.PROJECT_TAG, TAG, "loginIM");
     activityWelcomeBinding.getRoot().setVisibility(View.GONE);
-    LoginInfo loginInfo =
-        LoginInfo.LoginInfoBuilder.loginInfoDefault(account, token)
-            .withAppKey(DataUtils.readAppKey(this))
-            .build();
-    QChatKitClient.loginIMWithQChat(
-        loginInfo,
-        new LoginCallback<QChatLoginResult>() {
+    QChatKitClient.login(
+        account,
+        token,
+        null,
+        new FetchCallback<Void>() {
+          @Override
+          public void onSuccess(@Nullable Void unused) {
+            showMainActivityAndFinish();
+          }
+
           @Override
           public void onError(int errorCode, @NonNull String errorMsg) {
             ToastX.showShortToast(
                 String.format(getResources().getString(R.string.login_fail), errorCode));
             launchLoginPage();
-          }
-
-          @Override
-          public void onSuccess(@Nullable QChatLoginResult data) {
-            showMainActivityAndFinish();
           }
         });
   }

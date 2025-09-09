@@ -12,8 +12,8 @@ import com.netease.yunxin.kit.alog.ALog;
 import com.netease.yunxin.kit.common.ui.viewmodel.BaseViewModel;
 import com.netease.yunxin.kit.common.ui.viewmodel.FetchResult;
 import com.netease.yunxin.kit.common.ui.viewmodel.LoadStatus;
-import com.netease.yunxin.kit.corekit.im.IMKitClient;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
+import com.netease.yunxin.kit.corekit.im2.IMKitClient;
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
 import com.netease.yunxin.kit.qchatkit.repo.QChatRoleRepo;
 import com.netease.yunxin.kit.qchatkit.repo.QChatServerRepo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatChannelMember;
@@ -107,19 +107,9 @@ public class AddMemberViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             ALog.d(TAG, "fetchMemberData", "onFailed" + code);
             fetchResult.setError(code, R.string.qchat_channel_fetch_member_error);
-            resultLiveData.postValue(fetchResult);
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            String errorMsg = exception != null ? exception.getMessage() : "";
-            ALog.d(TAG, "fetchMemberData", "onException" + errorMsg);
-            fetchResult.setError(
-                QChatConstant.ERROR_CODE_CHANNEL_MEMBER_FETCH,
-                R.string.qchat_channel_fetch_member_error);
             resultLiveData.postValue(fetchResult);
           }
         });
@@ -147,7 +137,7 @@ public class AddMemberViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             ALog.d(TAG, "fetchMemberData", "onFailed:" + code + accId);
             int tipRes;
             if (code == ResponseCode.RES_ENONEXIST) {
@@ -158,16 +148,6 @@ public class AddMemberViewModel extends BaseViewModel {
               tipRes = R.string.qchat_channel_add_member_error;
             }
             addResult.setError(code, ErrorUtils.getErrorText(code, tipRes));
-            addLiveData.postValue(addResult);
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            String errorMsg = exception != null ? exception.getMessage() : "";
-            ALog.d(TAG, "addMemberToChannel", "onException:" + errorMsg + accId);
-            addResult.setError(
-                QChatConstant.ERROR_CODE_CHANNEL_MEMBER_ADD,
-                R.string.qchat_channel_add_member_error);
             addLiveData.postValue(addResult);
           }
         });

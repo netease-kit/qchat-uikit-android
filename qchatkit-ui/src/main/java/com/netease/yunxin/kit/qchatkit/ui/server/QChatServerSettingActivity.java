@@ -23,10 +23,10 @@ import com.netease.yunxin.kit.common.ui.utils.AvatarColor;
 import com.netease.yunxin.kit.common.ui.utils.CommonCallback;
 import com.netease.yunxin.kit.common.ui.utils.ToastX;
 import com.netease.yunxin.kit.common.utils.NetworkUtils;
-import com.netease.yunxin.kit.corekit.im.IMKitClient;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
-import com.netease.yunxin.kit.corekit.im.repo.CommonRepo;
+import com.netease.yunxin.kit.corekit.im2.IMKitClient;
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
 import com.netease.yunxin.kit.qchatkit.repo.QChatServerRepo;
+import com.netease.yunxin.kit.qchatkit.repo.ResourceRepo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatServerInfo;
 import com.netease.yunxin.kit.qchatkit.ui.R;
 import com.netease.yunxin.kit.qchatkit.ui.common.QChatCallback;
@@ -131,7 +131,7 @@ public class QChatServerSettingActivity extends QChatServerCommonBaseActivity {
               public void onSuccess(@Nullable File param) {
                 if (NetworkUtils.isConnected()) {
                   // 头像上传
-                  CommonRepo.uploadImage(
+                  ResourceRepo.uploadFile(
                       param,
                       new FetchCallback<String>() {
                         @Override
@@ -145,7 +145,7 @@ public class QChatServerSettingActivity extends QChatServerCommonBaseActivity {
                         }
 
                         @Override
-                        public void onFailed(int code) {
+                        public void onError(int code, @Nullable String msg) {
                           if (code != 0) {
                             Toast.makeText(
                                     getApplicationContext(),
@@ -154,16 +154,6 @@ public class QChatServerSettingActivity extends QChatServerCommonBaseActivity {
                                 .show();
                           }
                           ALog.e(TAG, "upload icon failed code = " + code);
-                        }
-
-                        @Override
-                        public void onException(@Nullable Throwable exception) {
-                          Toast.makeText(
-                                  getApplicationContext(),
-                                  getString(R.string.qchat_server_request_fail),
-                                  Toast.LENGTH_SHORT)
-                              .show();
-                          ALog.e(TAG, "upload icon", exception);
                         }
                       });
                 } else {

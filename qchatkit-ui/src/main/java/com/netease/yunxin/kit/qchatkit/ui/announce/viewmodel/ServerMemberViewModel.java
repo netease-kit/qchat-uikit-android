@@ -14,11 +14,11 @@ import com.netease.nimlib.sdk.qchat.model.systemnotification.QChatAddServerRoleM
 import com.netease.nimlib.sdk.qchat.model.systemnotification.QChatDeleteServerRoleMembersAttachment;
 import com.netease.nimlib.sdk.qchat.model.systemnotification.QChatKickServerMembersDoneAttachment;
 import com.netease.yunxin.kit.common.ui.viewmodel.BaseViewModel;
-import com.netease.yunxin.kit.corekit.im.IMKitClient;
-import com.netease.yunxin.kit.corekit.im.model.EventObserver;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
+import com.netease.yunxin.kit.corekit.im2.IMKitClient;
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
 import com.netease.yunxin.kit.corekit.model.ErrorMsg;
 import com.netease.yunxin.kit.corekit.model.ResultInfo;
+import com.netease.yunxin.kit.qchatkit.EventObserver;
 import com.netease.yunxin.kit.qchatkit.repo.QChatRoleRepo;
 import com.netease.yunxin.kit.qchatkit.repo.QChatServerRepo;
 import com.netease.yunxin.kit.qchatkit.repo.QChatServiceObserverRepo;
@@ -190,6 +190,11 @@ public final class ServerMemberViewModel extends BaseViewModel {
             QChatRoleResource.MANAGE_ROLE),
         new FetchCallback<Map<QChatRoleResource, QChatRoleOption>>() {
           @Override
+          public void onError(int i, @Nullable String s) {
+            permissionResult.setValue(false);
+          }
+
+          @Override
           public void onSuccess(@Nullable Map<QChatRoleResource, QChatRoleOption> param) {
             if (param == null) {
               permissionResult.setValue(false);
@@ -203,16 +208,6 @@ public final class ServerMemberViewModel extends BaseViewModel {
             }
             permissionResult.setValue(true);
           }
-
-          @Override
-          public void onFailed(int code) {
-            permissionResult.setValue(false);
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            permissionResult.setValue(false);
-          }
         });
   }
 
@@ -225,20 +220,13 @@ public final class ServerMemberViewModel extends BaseViewModel {
         accId,
         new FetchCallback<Void>() {
           @Override
+          public void onError(int code, @Nullable String msg) {
+            kickMemberResult.setValue(new ResultInfo<>(null, false, new ErrorMsg(code, msg)));
+          }
+
+          @Override
           public void onSuccess(@Nullable Void param) {
             kickMemberResult.setValue(new ResultInfo<>(accId));
-          }
-
-          @Override
-          public void onFailed(int code) {
-            kickMemberResult.setValue(new ResultInfo<>(null, false, new ErrorMsg(code)));
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            kickMemberResult.setValue(
-                new ResultInfo<>(
-                    null, false, new ErrorMsg(-1, "Error is " + exception, exception)));
           }
         });
   }
@@ -252,24 +240,17 @@ public final class ServerMemberViewModel extends BaseViewModel {
         accIdList,
         new FetchCallback<List<String>>() {
           @Override
+          public void onError(int code, @Nullable String msg) {
+            inviteMembersResult.setValue(new ResultInfo<>(null, false, new ErrorMsg(code, msg)));
+          }
+
+          @Override
           public void onSuccess(@Nullable List<String> param) {
             if (param != null && param.size() == accIdList.size()) {
               inviteMembersResult.setValue(new ResultInfo<>(null, false));
             } else {
               inviteMembersResult.setValue(new ResultInfo<>(param));
             }
-          }
-
-          @Override
-          public void onFailed(int code) {
-            inviteMembersResult.setValue(new ResultInfo<>(null, false, new ErrorMsg(code)));
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            inviteMembersResult.setValue(
-                new ResultInfo<>(
-                    null, false, new ErrorMsg(-1, "Error is " + exception, exception)));
           }
         });
   }
@@ -285,6 +266,11 @@ public final class ServerMemberViewModel extends BaseViewModel {
         ownerId,
         new FetchCallback<Pair<List<QChatAnnounceMemberInfo>, List<String>>>() {
           @Override
+          public void onError(int code, @Nullable String s) {
+            result.setValue(new ResultInfo<>(null, false, new ErrorMsg(code)));
+          }
+
+          @Override
           public void onSuccess(@Nullable Pair<List<QChatAnnounceMemberInfo>, List<String>> param) {
             if (param != null) {
               if (param.second != null) {
@@ -294,18 +280,6 @@ public final class ServerMemberViewModel extends BaseViewModel {
             } else {
               result.setValue(new ResultInfo<>());
             }
-          }
-
-          @Override
-          public void onFailed(int code) {
-            result.setValue(new ResultInfo<>(null, false, new ErrorMsg(code)));
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            result.setValue(
-                new ResultInfo<>(
-                    null, false, new ErrorMsg(-1, "Error is " + exception, exception)));
           }
         });
   }

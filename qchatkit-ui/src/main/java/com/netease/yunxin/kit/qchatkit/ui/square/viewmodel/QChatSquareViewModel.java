@@ -9,12 +9,11 @@ import android.util.Pair;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;
 import com.netease.yunxin.kit.common.ui.viewmodel.BaseViewModel;
-import com.netease.yunxin.kit.corekit.im.IMKitClient;
-import com.netease.yunxin.kit.corekit.im.model.EventObserver;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallbackImpl;
+import com.netease.yunxin.kit.corekit.im2.IMKitClient;
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
 import com.netease.yunxin.kit.corekit.model.ErrorMsg;
 import com.netease.yunxin.kit.corekit.model.ResultInfo;
+import com.netease.yunxin.kit.qchatkit.EventObserver;
 import com.netease.yunxin.kit.qchatkit.repo.QChatServerRepo;
 import com.netease.yunxin.kit.qchatkit.repo.QChatServiceObserverRepo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatServerInfo;
@@ -104,13 +103,16 @@ public final class QChatSquareViewModel extends BaseViewModel {
                   getServerInfo(
                       item.getServerId(),
                       info.joined,
-                      new FetchCallbackImpl<QChatServerInfoWithJoinState>() {
+                      new FetchCallback<QChatServerInfoWithJoinState>() {
                         @Override
                         public void onSuccess(@Nullable QChatServerInfoWithJoinState param) {
                           if (param != null) {
                             serverInfoUpdate.setValue(param);
                           }
                         }
+
+                        @Override
+                        public void onError(int code, @Nullable String msg) {}
                       });
                 }
               }
@@ -163,16 +165,10 @@ public final class QChatSquareViewModel extends BaseViewModel {
   public void initForSearchTypeList() {
     SquareDataSourceHelper.getInstance()
         .requestSquareSearchType(
-            new FetchCallbackImpl<ResultInfo<List<QChatSquarePageInfo>>>() {
+            new FetchCallback<ResultInfo<List<QChatSquarePageInfo>>>() {
               @Override
-              public void onFailed(int code) {
+              public void onError(int code, @Nullable String msg) {
                 squareSearchTypeResult.setValue(new ResultInfo<>(null, false, new ErrorMsg(code)));
-              }
-
-              @Override
-              public void onException(@Nullable Throwable exception) {
-                squareSearchTypeResult.setValue(
-                    new ResultInfo<>(null, false, new ErrorMsg(-1, "failed", exception)));
               }
 
               @Override
@@ -211,16 +207,9 @@ public final class QChatSquareViewModel extends BaseViewModel {
               }
 
               @Override
-              public void onFailed(int code) {
+              public void onError(int code, @Nullable String msg) {
                 initForServerListResult.setValue(
                     new ResultInfo<>(Collections.emptyList(), false, new ErrorMsg(code)));
-              }
-
-              @Override
-              public void onException(@Nullable Throwable exception) {
-                initForServerListResult.setValue(
-                    new ResultInfo<>(
-                        Collections.emptyList(), false, new ErrorMsg(-1, "failed", exception)));
               }
             });
   }
@@ -236,7 +225,7 @@ public final class QChatSquareViewModel extends BaseViewModel {
     }
     QChatServerRepo.getServerMembers(
         serverAccountList,
-        new FetchCallbackImpl<List<QChatServerMemberInfo>>() {
+        new FetchCallback<List<QChatServerMemberInfo>>() {
           @Override
           public void onSuccess(@Nullable List<QChatServerMemberInfo> param) {
             if (param != null) {
@@ -253,6 +242,9 @@ public final class QChatSquareViewModel extends BaseViewModel {
               }
             }
           }
+
+          @Override
+          public void onError(int code, @Nullable String msg) {}
         });
   }
 
@@ -281,7 +273,7 @@ public final class QChatSquareViewModel extends BaseViewModel {
 
     QChatServerRepo.getServers(
         Collections.singletonList(serverId),
-        new FetchCallbackImpl<List<QChatServerInfo>>() {
+        new FetchCallback<List<QChatServerInfo>>() {
           @Override
           public void onSuccess(@Nullable List<QChatServerInfo> param) {
             if (param != null && !param.isEmpty()) {
@@ -294,6 +286,9 @@ public final class QChatSquareViewModel extends BaseViewModel {
               }
             }
           }
+
+          @Override
+          public void onError(int code, @Nullable String msg) {}
         });
   }
 }

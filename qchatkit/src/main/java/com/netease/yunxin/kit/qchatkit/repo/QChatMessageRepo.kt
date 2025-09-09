@@ -11,13 +11,13 @@ import com.netease.nimlib.sdk.qchat.param.QChatDownloadAttachmentParam
 import com.netease.nimlib.sdk.qchat.param.QChatRevokeMessageParam
 import com.netease.nimlib.sdk.qchat.param.QChatSendMessageParam
 import com.netease.nimlib.sdk.qchat.param.QChatUpdateParam
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback
-import com.netease.yunxin.kit.corekit.im.utils.toInform
-import com.netease.yunxin.kit.corekit.qchat.provider.QChatMessageProvider
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback
+import com.netease.yunxin.kit.qchatkit.provider.QChatMessageProvider
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatGetQuickCommentsResultInfo
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatMessageInfo
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatMessageQuickCommentDetailInfo
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatSendMessageInfo
+import com.netease.yunxin.kit.qchatkit.toInform
 import kotlin.math.min
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -117,7 +117,7 @@ object QChatMessageRepo {
     ) {
         CoroutineScope(Dispatchers.Main).launch {
             val quickCommentMap = mutableMapOf<Long, QChatMessageQuickCommentDetailInfo>()
-            if (msgList?.isNotEmpty()) {
+            if (msgList.isNotEmpty()) {
                 val maxSizeForRequest = 20
                 val totalCount = msgList.size
                 var startIndex = 0

@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -18,10 +19,13 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
-import com.netease.nimlib.sdk.uinfo.constant.GenderEnum;
+import com.netease.nimlib.sdk.v2.user.V2NIMUser;
+import com.netease.nimlib.sdk.v2.user.params.V2NIMUserUpdateParams;
 import com.netease.yunxin.app.qchat.R;
 import com.netease.yunxin.app.qchat.databinding.ActivityMineInfoBinding;
 import com.netease.yunxin.app.qchat.utils.Constant;
+import com.netease.yunxin.kit.chatkit.repo.ContactRepo;
+import com.netease.yunxin.kit.chatkit.repo.ResourceRepo;
 import com.netease.yunxin.kit.common.ui.activities.BaseActivity;
 import com.netease.yunxin.kit.common.ui.photo.BasePhotoChoiceDialog;
 import com.netease.yunxin.kit.common.ui.photo.PhotoChoiceDialog;
@@ -31,20 +35,18 @@ import com.netease.yunxin.kit.common.ui.utils.ToastX;
 import com.netease.yunxin.kit.common.ui.widgets.datepicker.CustomDatePicker;
 import com.netease.yunxin.kit.common.ui.widgets.datepicker.DateFormatUtils;
 import com.netease.yunxin.kit.common.utils.NetworkUtils;
-import com.netease.yunxin.kit.corekit.im.IMKitClient;
-import com.netease.yunxin.kit.corekit.im.model.UserField;
-import com.netease.yunxin.kit.corekit.im.model.UserInfo;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
-import com.netease.yunxin.kit.corekit.im.repo.CommonRepo;
+import com.netease.yunxin.kit.common.utils.SizeUtils;
+import com.netease.yunxin.kit.corekit.im2.IMKitClient;
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collections;
+import java.util.List;
 
 public class MineInfoActivity extends BaseActivity {
   private ActivityMineInfoBinding binding;
   private ActivityResultLauncher<Intent> launcher;
-  private UserInfo userInfo;
+  private V2NIMUser userInfo;
   private int resultCode = RESULT_CANCELED;
 
   @Override
@@ -66,7 +68,10 @@ public class MineInfoActivity extends BaseActivity {
                       result.getData().getStringExtra(Constant.EDIT_TYPE), Constant.EDIT_SEXUAL)) {
                 int select = result.getData().getIntExtra(Constant.SELECTED_INDEX, -1);
                 if (select >= 0) {
-                  updateUserInfo(UserField.Gender, select + 1);
+                  V2NIMUserUpdateParams.V2NIMUserUpdateParamsBuilder builder =
+                      V2NIMUserUpdateParams.V2NIMUserUpdateParamsBuilder.builder();
+                  builder.withGender(select + 1);
+                  updateUserInfo(builder.build());
                 }
 
               } else if (result.getResultCode() == RESULT_OK) {
@@ -104,9 +109,9 @@ public class MineInfoActivity extends BaseActivity {
           content.add(getResources().getString(R.string.sexual_male));
           content.add(getResources().getString(R.string.sexual_female));
           int selectIndex = -1;
-          if (userInfo.getGenderEnum() == GenderEnum.MALE) {
+          if (userInfo.getGender() == 1) {
             selectIndex = 0;
-          } else if (userInfo.getGenderEnum() == GenderEnum.FEMALE) {
+          } else if (userInfo.getGender() == 2) {
             selectIndex = 1;
           }
           TypeSelectActivity.launch(
@@ -116,27 +121,44 @@ public class MineInfoActivity extends BaseActivity {
               selectIndex,
               launcher);
         });
+    setCommonSkin();
+  }
+
+  private void setCommonSkin() {
+    int cornerRadius = SizeUtils.dp2px(4);
+    binding.cavAvatar.setCornerRadius(cornerRadius);
+
+    changeStatusBarColor(R.color.color_ededed);
+
+    binding.clRoot.setBackgroundResource(R.color.color_ededed);
+
+    binding.llUserInfo.setBackgroundResource(R.color.color_white);
+    ViewGroup.MarginLayoutParams layoutParamsN =
+        (ViewGroup.MarginLayoutParams) binding.llUserInfo.getLayoutParams();
+    layoutParamsN.setMargins(0, SizeUtils.dp2px(4), 0, 0);
+    binding.llUserInfo.setLayoutParams(layoutParamsN);
+
+    binding.flSign.setBackgroundResource(R.color.color_white);
+    ViewGroup.MarginLayoutParams layoutParamsS =
+        (ViewGroup.MarginLayoutParams) binding.flSign.getLayoutParams();
+    layoutParamsS.setMargins(0, SizeUtils.dp2px(6), 0, 0);
+    binding.flSign.setLayoutParams(layoutParamsS);
   }
 
   private void loadData(String account) {
-    CommonRepo.getUserInfo(
-        account,
-        new FetchCallback<UserInfo>() {
+    ContactRepo.getUserInfo(
+        Collections.singletonList(account),
+        new FetchCallback<List<V2NIMUser>>() {
           @Override
-          public void onSuccess(@Nullable UserInfo param) {
-            refreshUserInfo(param);
+          public void onSuccess(@Nullable List<V2NIMUser> param) {
+            if (param != null && !param.isEmpty()) {
+              refreshUserInfo(param.get(0));
+            }
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int errorCode, @Nullable String errorMsg) {
             ToastX.showShortToast(R.string.user_fail);
-            refreshUserInfo(new UserInfo(account, account, ""));
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            ToastX.showShortToast(R.string.user_fail);
-            refreshUserInfo(new UserInfo(account, account, ""));
           }
         });
   }
@@ -147,72 +169,60 @@ public class MineInfoActivity extends BaseActivity {
             IMKitClient.getApplicationContext().getSystemService(Context.CLIPBOARD_SERVICE);
     ClipData clipData = null;
     if (userInfo != null) {
-      clipData = ClipData.newPlainText(null, userInfo.getAccount());
+      clipData = ClipData.newPlainText(null, userInfo.getAccountId());
+    }
+    if (clipData == null) {
+      return;
     }
     cmb.setPrimaryClip(clipData);
     ToastX.showShortToast(R.string.action_copy_success);
   }
 
   private void choicePhoto() {
-    BasePhotoChoiceDialog choiceDialog;
-    choiceDialog = new PhotoChoiceDialog(this);
+    BasePhotoChoiceDialog choiceDialog = new PhotoChoiceDialog(this);
     choiceDialog.show(
         new CommonCallback<File>() {
           @Override
           public void onSuccess(@Nullable File param) {
+            if (param == null) {
+              return;
+            }
             if (NetworkUtils.isConnected()) {
-              CommonRepo.uploadImage(
+              ResourceRepo.uploadFile(
                   param,
                   new FetchCallback<String>() {
                     @Override
+                    public void onError(int errorCode, @Nullable String errorMsg) {
+                      Toast.makeText(
+                              getApplicationContext(),
+                              getString(R.string.request_fail),
+                              Toast.LENGTH_SHORT)
+                          .show();
+                    }
+
+                    @Override
                     public void onSuccess(@Nullable String urlParam) {
-                      Map<UserField, Object> map = new HashMap<>(1);
-                      map.put(UserField.Avatar, urlParam);
-                      CommonRepo.updateUserInfo(
-                          map,
+                      V2NIMUserUpdateParams.V2NIMUserUpdateParamsBuilder builder =
+                          V2NIMUserUpdateParams.V2NIMUserUpdateParamsBuilder.builder();
+                      builder.withAvatar(urlParam);
+                      ContactRepo.updateSelfUserProfile(
+                          builder.build(),
                           new FetchCallback<Void>() {
+                            @Override
+                            public void onError(int errorCode, @Nullable String errorMsg) {
+                              Toast.makeText(
+                                      getApplicationContext(),
+                                      getString(R.string.request_fail),
+                                      Toast.LENGTH_SHORT)
+                                  .show();
+                            }
+
                             @Override
                             public void onSuccess(@Nullable Void param) {
                               resultCode = RESULT_OK;
                               loadData(IMKitClient.account());
                             }
-
-                            @Override
-                            public void onFailed(int code) {
-                              Toast.makeText(
-                                      getApplicationContext(),
-                                      getString(R.string.request_fail),
-                                      Toast.LENGTH_SHORT)
-                                  .show();
-                            }
-
-                            @Override
-                            public void onException(@Nullable Throwable exception) {
-                              Toast.makeText(
-                                      getApplicationContext(),
-                                      getString(R.string.request_fail),
-                                      Toast.LENGTH_SHORT)
-                                  .show();
-                            }
                           });
-                    }
-
-                    @Override
-                    public void onFailed(int code) {
-                      Toast.makeText(
-                              getApplicationContext(),
-                              getString(R.string.request_fail),
-                              Toast.LENGTH_SHORT)
-                          .show();
-                    }
-
-                    @Override
-                    public void onException(@Nullable Throwable exception) {
-                      Toast.makeText(
-                              getApplicationContext(),
-                              getString(R.string.request_fail),
-                              Toast.LENGTH_SHORT)
-                          .show();
                     }
                   });
             } else {
@@ -240,7 +250,7 @@ public class MineInfoActivity extends BaseActivity {
         });
   }
 
-  private void refreshUserInfo(UserInfo userInfo) {
+  private void refreshUserInfo(V2NIMUser userInfo) {
     if (userInfo == null) {
       return;
     }
@@ -251,17 +261,17 @@ public class MineInfoActivity extends BaseActivity {
         AvatarColor.avatarColor(IMKitClient.account()));
     binding.tvName.setText(userInfo.getName());
     int sexualValue = R.string.sexual_unknown;
-    if (userInfo.getGenderEnum() == GenderEnum.MALE) {
+    if (userInfo.getGender() == 1) {
       sexualValue = R.string.sexual_male;
-    } else if (userInfo.getGenderEnum() == GenderEnum.FEMALE) {
+    } else if (userInfo.getGender() == 2) {
       sexualValue = R.string.sexual_female;
     }
-    binding.tvAccount.setText(userInfo.getAccount());
+    binding.tvAccount.setText(userInfo.getAccountId());
     binding.tvSexual.setText(sexualValue);
     binding.tvBirthday.setText(userInfo.getBirthday());
     binding.tvPhone.setText(userInfo.getMobile());
     binding.tvEmail.setText(userInfo.getEmail());
-    binding.tvSign.setText(userInfo.getSignature());
+    binding.tvSign.setText(userInfo.getSign());
   }
 
   private void showTimerPicker(String date) {
@@ -275,11 +285,11 @@ public class MineInfoActivity extends BaseActivity {
     CustomDatePicker mTimerPicker =
         new CustomDatePicker(
             this,
-            new CustomDatePicker.Callback() {
-              @Override
-              public void onTimeSelected(long timestamp) {
-                updateUserInfo(UserField.Birthday, DateFormatUtils.long2Str(timestamp, false));
-              }
+            timestamp -> {
+              V2NIMUserUpdateParams.V2NIMUserUpdateParamsBuilder builder =
+                  V2NIMUserUpdateParams.V2NIMUserUpdateParamsBuilder.builder();
+              builder.withBirthday(DateFormatUtils.long2Str(timestamp, false));
+              updateUserInfo(builder.build());
             },
             beginTime,
             endTime);
@@ -294,22 +304,13 @@ public class MineInfoActivity extends BaseActivity {
     mTimerPicker.show(date);
   }
 
-  private void updateUserInfo(UserField field, Object value) {
-    Map<UserField, Object> map = new HashMap<>(1);
-    map.put(field, value);
-    CommonRepo.updateUserInfo(
-        map,
+  private void updateUserInfo(V2NIMUserUpdateParams params) {
+    ContactRepo.updateSelfUserProfile(
+        params,
         new FetchCallback<Void>() {
           @Override
-          public void onSuccess(@Nullable Void param) {
-            resultCode = RESULT_OK;
-            //                binding.tvBirthday.setText(birthday);
-            loadData(IMKitClient.account());
-          }
-
-          @Override
-          public void onFailed(int code) {
-            if (code == Constant.NETWORK_ERROR_CODE) {
+          public void onError(int errorCode, @Nullable String errorMsg) {
+            if (errorCode == Constant.NETWORK_ERROR_CODE) {
               Toast.makeText(
                       getApplicationContext(),
                       getString(R.string.network_error),
@@ -323,10 +324,9 @@ public class MineInfoActivity extends BaseActivity {
           }
 
           @Override
-          public void onException(@Nullable Throwable exception) {
-            Toast.makeText(
-                    getApplicationContext(), getString(R.string.request_fail), Toast.LENGTH_SHORT)
-                .show();
+          public void onSuccess(@Nullable Void param) {
+            resultCode = RESULT_OK;
+            loadData(IMKitClient.account());
           }
         });
   }

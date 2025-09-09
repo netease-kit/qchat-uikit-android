@@ -131,7 +131,7 @@ public class QChatSquareSubFragment extends BaseFragment {
         (data, holder) -> {
           if (!NetworkUtils.isConnected()) {
             Toast.makeText(
-                    getContext(), getString(R.string.common_network_error), Toast.LENGTH_SHORT)
+                    getContext(), getString(R.string.qchat_network_error_tip), Toast.LENGTH_SHORT)
                 .show();
             return;
           }
@@ -206,8 +206,8 @@ public class QChatSquareSubFragment extends BaseFragment {
         List<QChatServerInfoWithJoinState> data = listResultInfo.getValue();
         actionForSuccess(data, clear);
       } else {
-        viewBinding.tvEmpty.setText(R.string.common_network_error);
-        Toast.makeText(getContext(), getString(R.string.common_network_error), Toast.LENGTH_SHORT)
+        viewBinding.tvEmpty.setText(R.string.qchat_network_error_tip);
+        Toast.makeText(getContext(), getString(R.string.qchat_network_error_tip), Toast.LENGTH_SHORT)
             .show();
       }
       if (viewBinding != null) {

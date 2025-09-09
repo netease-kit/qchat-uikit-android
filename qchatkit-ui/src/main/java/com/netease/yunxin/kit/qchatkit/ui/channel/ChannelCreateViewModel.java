@@ -10,7 +10,7 @@ import com.netease.yunxin.kit.alog.ALog;
 import com.netease.yunxin.kit.common.ui.viewmodel.BaseViewModel;
 import com.netease.yunxin.kit.common.ui.viewmodel.FetchResult;
 import com.netease.yunxin.kit.common.ui.viewmodel.LoadStatus;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
 import com.netease.yunxin.kit.qchatkit.repo.QChatChannelRepo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatChannelInfo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatChannelModeEnum;
@@ -50,7 +50,7 @@ public class ChannelCreateViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             if (code == QChatConstant.ERROR_CODE_IM_NO_PERMISSION) {
               fetchResult.setError(code, R.string.qchat_no_permission);
             } else {
@@ -58,15 +58,6 @@ public class ChannelCreateViewModel extends BaseViewModel {
             }
             resultLiveData.postValue(fetchResult);
             ALog.d(TAG, "createChannel", "onFailed" + code);
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            fetchResult.setError(
-                QChatConstant.ERROR_CODE_CHANNEL_CREATE, R.string.qchat_channel_create_error);
-            resultLiveData.postValue(fetchResult);
-            String errorMsg = exception != null ? exception.getMessage() : "";
-            ALog.d(TAG, "createChannel", "onException:" + errorMsg);
           }
         });
   }

@@ -16,15 +16,13 @@ import com.netease.nimlib.sdk.qchat.enums.QChatRoleType
 import com.netease.nimlib.sdk.qchat.result.QChatApplyServerJoinResult
 import com.netease.nimlib.sdk.qchat.result.QChatUpdateServerRoleResult
 import com.netease.yunxin.kit.alog.ALog
-import com.netease.yunxin.kit.corekit.im.login.LoginService
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback
-import com.netease.yunxin.kit.corekit.im.provider.NosProvider
-import com.netease.yunxin.kit.corekit.im.utils.toInform
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback
+import com.netease.yunxin.kit.corekit.im2.provider.LoginProvider
 import com.netease.yunxin.kit.corekit.model.ErrorMsg
 import com.netease.yunxin.kit.corekit.model.ResultInfo
-import com.netease.yunxin.kit.corekit.qchat.provider.QChatChannelProvider
-import com.netease.yunxin.kit.corekit.qchat.provider.QChatRoleProvider
-import com.netease.yunxin.kit.corekit.qchat.provider.QChatServerProvider
+import com.netease.yunxin.kit.qchatkit.provider.QChatChannelProvider
+import com.netease.yunxin.kit.qchatkit.provider.QChatRoleProvider
+import com.netease.yunxin.kit.qchatkit.provider.QChatServerProvider
 import com.netease.yunxin.kit.qchatkit.repo.model.NextInfo
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatAnnounceMemberInfo
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatChannelInfo
@@ -36,7 +34,7 @@ import com.netease.yunxin.kit.qchatkit.repo.model.QChatServerMemberWithRoleInfo
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatServerRoleInfo
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatServerRoleMemberInfo
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatServerWithSingleChannel
-import java.io.File
+import com.netease.yunxin.kit.qchatkit.toInform
 import java.util.Collections
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -170,7 +168,7 @@ object QChatServerRepo {
             )
             val serverInfo = createServerResult.value?.server?.toInfo()
             if (serverInfo == null) {
-                callBack?.onFailed(-1)
+                callBack?.onError(-1, "create server failed")
                 return@launch
             }
             val channelResult = createChannel(serverInfo.serverId, name).await()
@@ -328,12 +326,12 @@ object QChatServerRepo {
     /**
      * 通过NOS上传图片文件，并返回URL地址
      */
-    @JvmStatic
-    fun uploadServerIcon(file: File, callBack: FetchCallback<String>?) {
-        CoroutineScope(Dispatchers.Main).launch {
-            NosProvider.uploadImage(file, "image/jpeg").toInform(callBack) { it }
-        }
-    }
+//    @JvmStatic
+//    fun uploadServerIcon(file: File, callBack: FetchCallback<String>?) {
+//        CoroutineScope(Dispatchers.Main).launch {
+//            StorageProvider.uploadImage(file, "image/jpeg").toInform(callBack) { it }
+//        }
+//    }
 
     /**
      * 通过accid查询社区成员
@@ -362,9 +360,9 @@ object QChatServerRepo {
         callback: FetchCallback<List<QChatSearchResultInfo>>?
     ) {
         CoroutineScope(Dispatchers.Main).launch {
-            val accId = LoginService.account()
+            val accId = LoginProvider.currentAccount()
             if (accId == null) {
-                callback?.onException(IllegalStateException("not login."))
+                callback?.onError(-1, "currentAccount is null")
                 return@launch
             }
 
@@ -842,11 +840,7 @@ object QChatServerRepo {
             ownerId?.run {
                 val ownerInfoResult = getOwnerInfo(serverId, this)
                 if (!ownerInfoResult.success) {
-                    ownerInfoResult.msg?.exception?.run {
-                        callback?.onException(this)
-                    } ?: run {
-                        callback?.onFailed(ownerInfoResult.msg?.code ?: -1)
-                    }
+                    callback?.onError(ownerInfoResult.msg?.code ?: -1, ownerInfoResult.msg?.message)
                     return@launch
                 }
                 ownerInfoResult.value?.serverMembers?.map {
@@ -858,11 +852,10 @@ object QChatServerRepo {
             val roleMemberListResult =
                 getManagerRoleMemberList(serverId, roleId, timeTag, limit, anchorAccId)
             if (!roleMemberListResult.success) {
-                roleMemberListResult.msg?.exception?.run {
-                    callback?.onException(this)
-                } ?: run {
-                    callback?.onFailed(roleMemberListResult.msg?.code ?: -1)
-                }
+                callback?.onError(
+                    roleMemberListResult.msg?.code ?: -1,
+                    roleMemberListResult.msg?.message
+                )
                 return@launch
             }
             roleMemberListResult.value?.roleMemberList?.filter {

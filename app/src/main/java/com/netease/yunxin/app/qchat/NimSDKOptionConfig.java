@@ -6,8 +6,6 @@ package com.netease.yunxin.app.qchat;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.os.Environment;
-import android.text.TextUtils;
 import com.netease.nimlib.sdk.NotificationFoldStyle;
 import com.netease.nimlib.sdk.SDKOptions;
 import com.netease.nimlib.sdk.ServerAddresses;
@@ -20,7 +18,6 @@ import com.netease.yunxin.app.qchat.utils.Constant;
 import com.netease.yunxin.app.qchat.utils.DataUtils;
 import com.netease.yunxin.kit.alog.ALog;
 import com.netease.yunxin.kit.common.utils.ScreenUtils;
-import java.io.IOException;
 
 /** Nim SDK config info */
 public class NimSDKOptionConfig {
@@ -34,7 +31,6 @@ public class NimSDKOptionConfig {
     SDKOptions options = new SDKOptions();
     options.appKey = appKey;
     initStatusBarNotificationConfig(options);
-    options.sdkStorageRootPath = getAppCacheDir(context);
     options.preloadAttach = true;
     options.thumbnailSize = (int) (222.0 / 375.0 * ScreenUtils.getDisplayWidth());
     options.userInfoProvider = new PushUserInfoProvider(context);
@@ -55,6 +51,7 @@ public class NimSDKOptionConfig {
     // 打开消息撤回未读数-1的开关
     options.shouldConsiderRevokedMessageUnreadCount = true;
     options.enabledQChatMessageCache = true;
+    options.enableV2CloudConversation = true;
     return options;
   }
 
@@ -103,49 +100,33 @@ public class NimSDKOptionConfig {
     return config;
   }
 
-  /** config app image/voice/file/log directory */
-  static String getAppCacheDir(Context context) {
-    String storageRootPath = null;
-    try {
-      if (context.getExternalCacheDir() != null) {
-        storageRootPath = context.getExternalCacheDir().getCanonicalPath();
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    if (TextUtils.isEmpty(storageRootPath)) {
-      storageRootPath = Environment.getExternalStorageDirectory() + "/" + context.getPackageName();
-    }
-    return storageRootPath;
-  }
-
   private static MixPushConfig buildMixPushConfig() {
     MixPushConfig config = new MixPushConfig();
     // xiaomi
-    config.xmAppId = "";
-    config.xmAppKey = "";
-    config.xmCertificateName = "";
+    //    config.xmAppId = "";
+    //    config.xmAppKey = "";
+    //    config.xmCertificateName = "";
 
     // huawei
-    config.hwAppId = "";
-    config.hwCertificateName = "";
+    //    config.hwAppId = "";
+    //    config.hwCertificateName = "";
 
     // meizu
-    config.mzAppId = "";
-    config.mzAppKey = "";
-    config.mzCertificateName = "";
+    //    config.mzAppId = "";
+    //    config.mzAppKey = "";
+    //    config.mzCertificateName = "";
 
     // fcm
-    //        config.fcmCertificateName = "DEMO_FCM_PUSH";
+    //        config.fcmCertificateName = "";
 
     // vivo
-    config.vivoCertificateName = "";
+    //    config.vivoCertificateName = "";
 
     // oppo
-    config.oppoAppId = "";
-    config.oppoAppKey = "";
-    config.oppoAppSercet = "";
-    config.oppoCertificateName = "";
+    //    config.oppoAppId = "";
+    //    config.oppoAppKey = "";
+    //    config.oppoAppSercet = "";
+    //    config.oppoCertificateName = "";
     return config;
   }
 }

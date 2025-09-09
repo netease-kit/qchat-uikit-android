@@ -6,9 +6,14 @@
 
 package com.netease.yunxin.kit.qchatkit.observer
 
-import com.netease.nimlib.sdk.StatusCode
-import com.netease.yunxin.kit.corekit.im.model.EventObserver
-import com.netease.yunxin.kit.corekit.qchat.QChatKitClient
+import com.netease.nimlib.sdk.v2.V2NIMError
+import com.netease.nimlib.sdk.v2.auth.V2NIMLoginListener
+import com.netease.nimlib.sdk.v2.auth.enums.V2NIMLoginClientChange
+import com.netease.nimlib.sdk.v2.auth.enums.V2NIMLoginStatus
+import com.netease.nimlib.sdk.v2.auth.model.V2NIMKickedOfflineDetail
+import com.netease.nimlib.sdk.v2.auth.model.V2NIMLoginClient
+import com.netease.yunxin.kit.qchatkit.EventObserver
+import com.netease.yunxin.kit.qchatkit.QChatKitClient
 import com.netease.yunxin.kit.qchatkit.repo.QChatServiceObserverRepo
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatUnreadInfoChangedEventInfo
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatUnreadInfoItem
@@ -37,14 +42,30 @@ object ObserverUnreadInfoResultHelper {
             },
             true
         )
-        // observer unread notification to update unread info.
-        QChatKitClient.getAuthServiceObserver().observeOnlineStatus({ code ->
-            val currentAccount = QChatKitClient.account()
-            if (code == StatusCode.LOGINED && currentAccount != lastAccount) {
-                clear()
-                lastAccount = currentAccount
+        QChatKitClient.addLoginListener(object : V2NIMLoginListener {
+            override fun onLoginStatus(status: V2NIMLoginStatus?) {
+                if (status == V2NIMLoginStatus.V2NIM_LOGIN_STATUS_LOGINED) {
+                    val currentAccount = QChatKitClient.account()
+                    if (currentAccount != lastAccount) {
+                        clear()
+                        lastAccount = currentAccount
+                    }
+                }
             }
-        }, true)
+
+            override fun onLoginFailed(error: V2NIMError?) {
+            }
+
+            override fun onKickedOffline(detail: V2NIMKickedOfflineDetail?) {
+                clear()
+            }
+
+            override fun onLoginClientChanged(
+                change: V2NIMLoginClientChange?,
+                clients: MutableList<V2NIMLoginClient>?
+            ) {
+            }
+        })
     }
 
     /**

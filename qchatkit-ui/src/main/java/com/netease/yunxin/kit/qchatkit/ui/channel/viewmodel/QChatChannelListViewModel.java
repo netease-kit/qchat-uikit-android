@@ -11,14 +11,14 @@ import androidx.lifecycle.MutableLiveData;
 import com.netease.nimlib.sdk.msg.constant.MsgStatusEnum;
 import com.netease.nimlib.sdk.qchat.enums.QChatRoleOption;
 import com.netease.nimlib.sdk.qchat.enums.QChatRoleResource;
+import com.netease.yunxin.kit.alog.ALog;
 import com.netease.yunxin.kit.common.ui.viewmodel.BaseViewModel;
 import com.netease.yunxin.kit.corekit.event.EventCenter;
 import com.netease.yunxin.kit.corekit.event.EventNotify;
-import com.netease.yunxin.kit.corekit.im.model.EventObserver;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallbackImpl;
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
 import com.netease.yunxin.kit.corekit.model.ErrorMsg;
 import com.netease.yunxin.kit.corekit.model.ResultInfo;
+import com.netease.yunxin.kit.qchatkit.EventObserver;
 import com.netease.yunxin.kit.qchatkit.repo.QChatChannelRepo;
 import com.netease.yunxin.kit.qchatkit.repo.QChatMessageRepo;
 import com.netease.yunxin.kit.qchatkit.repo.QChatRoleRepo;
@@ -43,6 +43,7 @@ import java.util.Map;
 import java.util.Objects;
 
 public class QChatChannelListViewModel extends BaseViewModel {
+  private static final String TAG = "QChatChannelListViewModel";
   private static final int LOAD_MORE_LIMIT = 20;
   private final Map<Long, QChatMessageInfo> channelIdLastMessageMap = new HashMap<>();
 
@@ -219,7 +220,12 @@ public class QChatChannelListViewModel extends BaseViewModel {
     QChatRoleRepo.checkPermissions(
         serverId,
         Collections.singletonList(QChatRoleResource.MANAGE_CHANNEL),
-        new FetchCallbackImpl<Map<QChatRoleResource, QChatRoleOption>>() {
+        new FetchCallback<Map<QChatRoleResource, QChatRoleOption>>() {
+          @Override
+          public void onError(int code, @Nullable String msg) {
+            ALog.e(TAG, "checkPermissions:onError:" + code);
+          }
+
           final long innerServerId = serverId;
 
           @Override
@@ -278,7 +284,7 @@ public class QChatChannelListViewModel extends BaseViewModel {
     QChatMessageRepo.getLastMessageOfChannels(
         messageServerId,
         Collections.singletonList(messageChannelId),
-        new FetchCallbackImpl<Map<Long, QChatMessageInfo>>() {
+        new FetchCallback<Map<Long, QChatMessageInfo>>() {
           @Override
           public void onSuccess(@Nullable Map<Long, QChatMessageInfo> param) {
             if (param == null) {
@@ -287,6 +293,10 @@ public class QChatChannelListViewModel extends BaseViewModel {
             QChatMessageInfo newMessageInfo = param.get(messageChannelId);
             channelIdLastMessageMap.put(messageChannelId, newMessageInfo);
             messageUpdateResult.setValue(new Pair<>(messageChannelId, newMessageInfo));
+          }
+
+          public void onError(int code, @Nullable String msg) {
+            ALog.e(TAG, "getLastMessageOfChannels:onError:" + code);
           }
         });
   }
@@ -337,20 +347,11 @@ public class QChatChannelListViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             if (QChatChannelListViewModel.this.serverId != serverId) {
               return;
             }
-            notifyResult.setValue(new ResultInfo<>(null, false, new ErrorMsg(code)));
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            if (QChatChannelListViewModel.this.serverId != serverId) {
-              return;
-            }
-            notifyResult.setValue(
-                new ResultInfo<>(null, false, new ErrorMsg(-1, "failed", exception)));
+            notifyResult.setValue(new ResultInfo<>(null, false, new ErrorMsg(code, msg)));
           }
         });
   }

@@ -10,7 +10,7 @@ import com.netease.yunxin.kit.alog.ALog;
 import com.netease.yunxin.kit.common.ui.viewmodel.BaseViewModel;
 import com.netease.yunxin.kit.common.ui.viewmodel.FetchResult;
 import com.netease.yunxin.kit.common.ui.viewmodel.LoadStatus;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
 import com.netease.yunxin.kit.qchatkit.repo.QChatChannelRepo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatChannelMember;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatChannelModeEnum;
@@ -105,19 +105,9 @@ public class BlackWhiteViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             ALog.d(TAG, "fetchMemberData", "onFailed" + code);
             fetchResult.setError(code, R.string.qchat_channel_fetch_member_error);
-            resultLiveData.postValue(fetchResult);
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            String errorMsg = exception != null ? exception.getMessage() : "";
-            ALog.d(TAG, "fetchMemberData", "onException" + errorMsg);
-            fetchResult.setError(
-                QChatConstant.ERROR_CODE_CHANNEL_MEMBER_FETCH,
-                R.string.qchat_channel_fetch_member_error);
             resultLiveData.postValue(fetchResult);
           }
         });
@@ -143,20 +133,10 @@ public class BlackWhiteViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             removeResult.setError(code, R.string.qchat_channel_member_delete_error);
             removeLiveData.setValue(removeResult);
             ALog.d(TAG, "fetchMemberData", "onFailed" + code);
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            String errorMsg = exception != null ? exception.getMessage() : "";
-            ALog.d(TAG, "fetchMemberData", "onException" + errorMsg);
-            removeResult.setError(
-                QChatConstant.ERROR_CODE_CHANNEL_MEMBER_ADD,
-                R.string.qchat_channel_member_delete_error);
-            removeLiveData.setValue(removeResult);
           }
         });
   }
@@ -172,17 +152,7 @@ public class BlackWhiteViewModel extends BaseViewModel {
         new FetchCallback<Void>() {
 
           @Override
-          public void onException(@Nullable Throwable exception) {
-            String errorMsg = exception != null ? exception.getMessage() : "";
-            ALog.d(TAG, "fetchMemberData", "onException" + errorMsg);
-            addResult.setError(
-                QChatConstant.ERROR_CODE_CHANNEL_MEMBER_ADD,
-                R.string.qchat_channel_member_add_error);
-            addLiveData.postValue(addResult);
-          }
-
-          @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             ALog.d(TAG, "addMember", "onFailed" + code);
             if (code == QChatConstant.ERROR_CODE_IM_NO_PERMISSION) {
               addResult.setError(code, R.string.qchat_no_permission);

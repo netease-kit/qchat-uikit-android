@@ -4,7 +4,7 @@
 
 package com.netease.yunxin.kit.qchatkit.ui.server;
 
-import static com.netease.yunxin.kit.corekit.im.utils.RouterConstant.REQUEST_CONTACT_SELECTOR_KEY;
+import static com.netease.yunxin.kit.corekit.im2.utils.RouterConstant.REQUEST_CONTACT_SELECTOR_KEY;
 import static com.netease.yunxin.kit.qchatkit.ui.model.QChatConstant.MEMBER_OPERATOR_ACCID;
 import static com.netease.yunxin.kit.qchatkit.ui.model.QChatConstant.MEMBER_OPERATOR_TYPE;
 import static com.netease.yunxin.kit.qchatkit.ui.model.QChatConstant.MEMBER_OPERATOR_TYPE_CHANGED;
@@ -27,8 +27,8 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import com.netease.yunxin.kit.alog.ALog;
 import com.netease.yunxin.kit.common.utils.SizeUtils;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
-import com.netease.yunxin.kit.corekit.im.utils.RouterConstant;
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
+import com.netease.yunxin.kit.corekit.im2.utils.RouterConstant;
 import com.netease.yunxin.kit.corekit.route.XKitRouter;
 import com.netease.yunxin.kit.qchatkit.repo.QChatServerRepo;
 import com.netease.yunxin.kit.qchatkit.repo.model.NextInfo;
@@ -113,8 +113,7 @@ public class QChatServerMemberListActivity extends QChatServerBaseActivity {
                                 }
 
                                 @Override
-                                public void onFailed(int code) {
-                                  String msg = "invite failed, code is " + code;
+                                public void onError(int code, @Nullable String msg) {
                                   ALog.w(TAG, msg);
                                   if (code == QChatConstant.ERROR_CODE_IM_NO_PERMISSION) {
                                     Toast.makeText(
@@ -123,17 +122,6 @@ public class QChatServerMemberListActivity extends QChatServerBaseActivity {
                                             Toast.LENGTH_SHORT)
                                         .show();
                                   }
-                                }
-
-                                @Override
-                                public void onException(@Nullable Throwable exception) {
-                                  String msg = "invite failed, exceptions is " + exception;
-                                  ALog.w(TAG, msg);
-                                  Toast.makeText(
-                                          QChatServerMemberListActivity.this,
-                                          msg,
-                                          Toast.LENGTH_SHORT)
-                                      .show();
                                 }
                               }));
                 } else {
@@ -150,13 +138,8 @@ public class QChatServerMemberListActivity extends QChatServerBaseActivity {
                           }
 
                           @Override
-                          public void onFailed(int code) {
+                          public void onError(int code, @Nullable String msg) {
                             ALog.w(TAG, "update userinfo failed. Code is " + code);
-                          }
-
-                          @Override
-                          public void onException(@Nullable Throwable exception) {
-                            ALog.w(TAG, "update userinfo failed. Exception is " + exception);
                           }
                         });
                   } else if (type == MEMBER_OPERATOR_TYPE_DELETE) {
@@ -257,19 +240,11 @@ public class QChatServerMemberListActivity extends QChatServerBaseActivity {
             }
           }
 
-          public void onFailed(int code) {
+          @Override
+          public void onError(int code, @Nullable String msg) {
             Toast.makeText(
                     getApplicationContext(),
                     getString(R.string.qchat_server_request_fail) + code,
-                    Toast.LENGTH_SHORT)
-                .show();
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            Toast.makeText(
-                    getApplicationContext(),
-                    getString(R.string.qchat_server_request_fail) + exception,
                     Toast.LENGTH_SHORT)
                 .show();
           }

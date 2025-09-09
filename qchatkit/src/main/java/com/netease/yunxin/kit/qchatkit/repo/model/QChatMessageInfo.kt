@@ -41,7 +41,7 @@ class QChatMessageInfo(val message: QChatMessage) : QChatMessage by message, Ser
         return false
     }
 
-    fun getName(): String {
+    fun getName(): String? {
         if (TextUtils.isEmpty(fromNick)) {
             return fromAccount
         }

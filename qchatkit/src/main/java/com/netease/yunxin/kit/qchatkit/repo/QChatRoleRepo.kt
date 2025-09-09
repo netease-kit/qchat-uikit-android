@@ -13,10 +13,9 @@ import com.netease.nimlib.sdk.qchat.model.QChatMemberRole
 import com.netease.nimlib.sdk.qchat.result.QChatCreateServerRoleResult
 import com.netease.nimlib.sdk.qchat.result.QChatRemoveMembersFromServerRoleResult
 import com.netease.yunxin.kit.alog.ALog
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback
-import com.netease.yunxin.kit.corekit.im.utils.toInform
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback
 import com.netease.yunxin.kit.corekit.model.ResultInfo
-import com.netease.yunxin.kit.corekit.qchat.provider.QChatRoleProvider
+import com.netease.yunxin.kit.qchatkit.provider.QChatRoleProvider
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatChannelMember
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatChannelRoleInfo
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatRoleOptionEnum
@@ -24,6 +23,7 @@ import com.netease.yunxin.kit.qchatkit.repo.model.QChatRoleResourceEnum
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatServerRoleInfo
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatServerRoleMemberInfo
 import com.netease.yunxin.kit.qchatkit.repo.model.ServerRoleResult
+import com.netease.yunxin.kit.qchatkit.toInform
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -583,7 +583,7 @@ object QChatRoleRepo {
                 }
             val roleId = everyoneResult?.roleId
             if (everyoneResult == null || roleId == null) {
-                callback?.onFailed(-1)
+                callback?.onError(-1, "")
                 return@launch
             }
             QChatRoleProvider.updateServerRole(

@@ -15,11 +15,11 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 import com.netease.nimlib.sdk.msg.constant.MsgDirectionEnum;
 import com.netease.nimlib.sdk.msg.constant.MsgStatusEnum;
-import com.netease.nimlib.sdk.uinfo.model.NimUserInfo;
+import com.netease.nimlib.sdk.v2.user.V2NIMUser;
 import com.netease.yunxin.kit.common.ui.utils.AvatarColor;
 import com.netease.yunxin.kit.common.ui.utils.TimeFormatUtils;
 import com.netease.yunxin.kit.common.utils.SizeUtils;
-import com.netease.yunxin.kit.corekit.im.IMKitClient;
+import com.netease.yunxin.kit.corekit.im2.IMKitClient;
 import com.netease.yunxin.kit.qchatkit.repo.QChatUserRepo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatMessageInfo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatMessageQuickCommentDetailInfo;
@@ -126,25 +126,27 @@ public abstract class QChatBaseMessageViewHolder extends RecyclerView.ViewHolder
     if (isReceive) {
       baseViewBinding.otherUserAvatar.setVisibility(View.VISIBLE);
       String name = messageBean.getName();
-      QChatUserRepo.fetchUserAvatar(
-          messageBean.getFromAccount(),
-          new QChatCallback<String>(itemView.getContext()) {
-            @Override
-            public void onSuccess(@Nullable String param) {
-              baseViewBinding.otherUserAvatar.setData(
-                  param, name, AvatarColor.avatarColor(messageBean.getFromAccount()));
-            }
-          });
+      if (messageBean.getFromAccount() != null) {
+        QChatUserRepo.fetchUserAvatar(
+            messageBean.getFromAccount(),
+            new QChatCallback<String>(itemView.getContext()) {
+              @Override
+              public void onSuccess(@Nullable String param) {
+                baseViewBinding.otherUserAvatar.setData(
+                    param, name, AvatarColor.avatarColor(messageBean.getFromAccount()));
+              }
+            });
+      }
       baseViewBinding.myAvatar.setVisibility(View.GONE);
       baseViewBinding.messageStatus.setVisibility(View.GONE);
     } else {
       baseViewBinding.myAvatar.setVisibility(View.VISIBLE);
-      NimUserInfo userInfo = IMKitClient.getUserInfo();
+      V2NIMUser userInfo = IMKitClient.currentUser();
       if (userInfo != null) {
         String nickname =
-            TextUtils.isEmpty(userInfo.getName()) ? userInfo.getAccount() : userInfo.getName();
+            TextUtils.isEmpty(userInfo.getName()) ? userInfo.getAccountId() : userInfo.getName();
         baseViewBinding.myAvatar.setData(
-            userInfo.getAvatar(), nickname, AvatarColor.avatarColor(userInfo.getAccount()));
+            userInfo.getAvatar(), nickname, AvatarColor.avatarColor(userInfo.getAccountId()));
       }
       baseViewBinding.otherUserAvatar.setVisibility(View.GONE);
       baseViewBinding.messageStatus.setVisibility(View.VISIBLE);

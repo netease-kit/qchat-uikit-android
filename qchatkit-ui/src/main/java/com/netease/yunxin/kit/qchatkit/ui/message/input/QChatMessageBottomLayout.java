@@ -61,7 +61,7 @@ public class QChatMessageBottomLayout extends FrameLayout
 
   public void configEnable(boolean enable, String hint) {
     if (enable) {
-      mBinding.chatMessageInputEt.setBackgroundResource(R.color.color_ffffff);
+      mBinding.chatMessageInputEt.setBackgroundResource(R.color.color_white);
       mBinding.chatMessageInputEt.setEnabled(true);
     } else {
       mBinding.chatMessageInputEt.setBackgroundResource(R.color.color_e4e4e5);

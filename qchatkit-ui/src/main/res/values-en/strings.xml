@@ -99,10 +99,10 @@
     <string name="qchat_message_revoke_over_time">Too late to recall</string>
 
     <string name="qchat_permission_deny_tips">Can\'t use this function when you closed</string>
-    <string name="qchat_permission_default">Please give your permission</string>
-    <string name="qchat_permission_camera">Please give your phone camera permission</string>
-    <string name="qchat_permission_audio">Please give your phone micro permission</string>
-    <string name="qchat_permission_storage">Please give your phone storage permission</string>
+    <string name="qchat_permission_default">Shall grant your permission</string>
+    <string name="qchat_permission_camera">Grant camera access in setting</string>
+    <string name="qchat_permission_audio">Grant micro access in setting</string>
+    <string name="qchat_permission_storage">Grant storage access in setting</string>
     <!--server create -->
     <string name="qchat_fragment_no_server_tip">No community，let\'s join it</string>
     <string name="qchat_create_title">Server</string>
@@ -194,8 +194,8 @@
     <string name="qchat_channel_role_delete_content">If remove role of%s？</string> 
     <string name="qchat_channel_member_delete_title">Remove member</string> 
     <string name="qchat_channel_member_delete_content">If remover%s？</string> 
-    <string name="qchat_no_permission">No Permission</string> 
-    <string name="qchat_no_permission_content">No Permission to send message</string>
+    <string name="qchat_no_permission">No permission</string>
+    <string name="qchat_no_permission_content">No permission to send message</string>
     <string name="qchat_announce_role_manager">Manager</string>
     <string name="qchat_announce_role_owner">Owner</string>
 
@@ -221,7 +221,7 @@
     <string name="qchat_channel_permission_manager_message">Manage Message</string> 
     <string name="qchat_channel_permission_history_message">View historical messages</string>
     <string name="qchat_channel_permission_update_error">Failed to update permission</string>
-    <string name="dialog_permission_tips">Please give your permission</string>
+    <string name="dialog_permission_tips">Shall grant your permission</string>
 
     <!-- member permission-->
     <string name="qchat_channel_member_permission_title">Member Permission Setting</string> 
@@ -248,7 +248,7 @@
         message</string>
     <string name="qchat_message_action_delete_this_message">Really want to delete this
         message?</string>
-    <string name="qchat_message_removed_tip">This message was gone</string>
+    <string name="qchat_message_removed_tip">The message was removed.</string>
     <string name="qchat_message_revoked">Message Recalled</string>
     <string name="qchat_message_re_edit">Edit</string>
     <!-- error-->
@@ -260,7 +260,7 @@
 
     <!--message -->
     <string name="qchat_message_voice_in">Release to send</string>
-    <string name="qchat_message_camera_unavailable">camera unavailable</string>
+    <string name="qchat_message_camera_unavailable">Camera unavailable</string>
     <string name="qchat_pressed_to_speak">Hold to Talk</string>
     <string name="qchat_pressed_audio_too_short">Message too short</string>
     <string name="qchat_message_not_support_tips">[Unknown Message]</string>
@@ -275,15 +275,15 @@
     <string name="qchat_message_video_fail_try_again">Can\'t play video, try it again</string>
     <string name="qchat_message_video_time">%02d:%02d</string>
     <string name="qchat_message_revoke_edit_error">Time Out</string>
-    <string name="qchat_msg_type_location">[Location Message]</string>
+    <string name="qchat_msg_type_location">[Location]</string>
     <string name="qchat_msg_type_rtc_video">[Video Call]</string>
     <string name="qchat_msg_type_rtc_audio">[Audio Call]</string>
-    <string name="qchat_msg_type_image">[Photo Message]</string>
-    <string name="qchat_msg_type_audio">[Voice Message]</string>
-    <string name="qchat_msg_type_video">[Video Message]</string>
-    <string name="qchat_msg_type_file">[File Message]</string>
-    <string name="qchat_msg_type_notification">[Notification Message]</string>
-    <string name="qchat_msg_type_tip">[Tip Message]</string>
+    <string name="qchat_msg_type_image">[Photo]</string>
+    <string name="qchat_msg_type_audio">[Audio]</string>
+    <string name="qchat_msg_type_video">[Video]</string>
+    <string name="qchat_msg_type_file">[File]</string>
+    <string name="qchat_msg_type_notification">[Notification]</string>
+    <string name="qchat_msg_type_tip">[Reminder]</string>
     <string name="qchat_msg_type_custom">[Custom Message]</string>
     <string name="qchat_msg_type_no_tips">[Unknown Message]</string>
 

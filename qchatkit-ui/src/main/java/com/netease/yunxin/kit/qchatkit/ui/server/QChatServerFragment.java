@@ -28,8 +28,8 @@ import com.netease.yunxin.kit.common.ui.fragments.BaseFragment;
 import com.netease.yunxin.kit.common.utils.NetworkUtils;
 import com.netease.yunxin.kit.corekit.event.EventCenter;
 import com.netease.yunxin.kit.corekit.event.EventNotify;
-import com.netease.yunxin.kit.corekit.im.IMKitClient;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
+import com.netease.yunxin.kit.corekit.im2.IMKitClient;
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
 import com.netease.yunxin.kit.corekit.model.ErrorMsg;
 import com.netease.yunxin.kit.corekit.model.ResultInfo;
 import com.netease.yunxin.kit.qchatkit.observer.ObserverUnreadInfoResultHelper;
@@ -399,16 +399,9 @@ public class QChatServerFragment extends BaseFragment {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             if (callback != null) {
-              callback.onFailed(code);
-            }
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            if (callback != null) {
-              callback.onException(exception);
+              callback.onError(code, msg);
             }
           }
         });
@@ -438,7 +431,7 @@ public class QChatServerFragment extends BaseFragment {
                 Toast.LENGTH_SHORT)
             .show();
       } else {
-        Toast.makeText(getContext(), getString(R.string.common_network_error), Toast.LENGTH_SHORT)
+        Toast.makeText(getContext(), getString(R.string.qchat_network_error_tip), Toast.LENGTH_SHORT)
             .show();
       }
       if (loadMoreRecyclerViewDecorator != null) {

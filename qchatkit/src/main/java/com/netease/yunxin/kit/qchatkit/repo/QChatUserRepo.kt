@@ -6,9 +6,9 @@
 
 package com.netease.yunxin.kit.qchatkit.repo
 
-import com.netease.yunxin.kit.corekit.im.model.UserInfo
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback
-import com.netease.yunxin.kit.corekit.im.provider.UserInfoProvider
+import com.netease.nimlib.sdk.v2.user.V2NIMUser
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback
+import com.netease.yunxin.kit.corekit.im2.provider.V2UserInfoProvider
 
 /**
  * Q chat user repo
@@ -26,24 +26,21 @@ object QChatUserRepo {
         callBack: FetchCallback<String>
     ) {
         val list = listOf(accId)
-        UserInfoProvider.fetchUserInfo(
+        V2UserInfoProvider.getUserInfo(
             list,
-            object : FetchCallback<List<UserInfo>> {
-                override fun onSuccess(param: List<UserInfo>?) {
-                    if (param != null && param.isNotEmpty()) {
-                        val user = param[0]
+            object : FetchCallback<List<V2NIMUser>> {
+
+                override fun onError(errorCode: Int, errorMsg: String?) {
+                    callBack.onError(errorCode, errorMsg)
+                }
+
+                override fun onSuccess(data: List<V2NIMUser>?) {
+                    if (!data.isNullOrEmpty()) {
+                        val user = data[0]
                         callBack.onSuccess(user.avatar)
                     } else {
                         callBack.onSuccess(null)
                     }
-                }
-
-                override fun onFailed(code: Int) {
-                    callBack.onSuccess(null)
-                }
-
-                override fun onException(exception: Throwable?) {
-                    callBack.onSuccess(null)
                 }
             }
         )

@@ -22,9 +22,9 @@ import com.netease.yunxin.kit.common.ui.activities.BaseActivity;
 import com.netease.yunxin.kit.common.ui.photo.PhotoChoiceDialog;
 import com.netease.yunxin.kit.common.ui.utils.CommonCallback;
 import com.netease.yunxin.kit.common.utils.NetworkUtils;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
-import com.netease.yunxin.kit.corekit.im.repo.CommonRepo;
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
 import com.netease.yunxin.kit.corekit.model.ResultInfo;
+import com.netease.yunxin.kit.qchatkit.repo.ResourceRepo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatChannelInfo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatServerWithSingleChannel;
 import com.netease.yunxin.kit.qchatkit.ui.R;
@@ -176,7 +176,7 @@ public class QChatCreateBySelfActivity extends BaseActivity {
                   .show();
               return;
             }
-            CommonRepo.uploadImage(
+            ResourceRepo.uploadFile(
                 param,
                 new FetchCallback<String>() {
                   @Override
@@ -189,7 +189,7 @@ public class QChatCreateBySelfActivity extends BaseActivity {
                   }
 
                   @Override
-                  public void onFailed(int code) {
+                  public void onError(int code, @Nullable String msg) {
                     if (code != 0) {
                       Toast.makeText(
                               getApplicationContext(),
@@ -197,15 +197,6 @@ public class QChatCreateBySelfActivity extends BaseActivity {
                               Toast.LENGTH_SHORT)
                           .show();
                     }
-                  }
-
-                  @Override
-                  public void onException(@Nullable Throwable exception) {
-                    Toast.makeText(
-                            getApplicationContext(),
-                            getString(R.string.qchat_server_request_fail),
-                            Toast.LENGTH_SHORT)
-                        .show();
                   }
                 });
           }

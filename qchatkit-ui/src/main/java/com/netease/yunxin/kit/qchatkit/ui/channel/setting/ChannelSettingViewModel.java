@@ -11,7 +11,7 @@ import com.netease.yunxin.kit.alog.ALog;
 import com.netease.yunxin.kit.common.ui.viewmodel.BaseViewModel;
 import com.netease.yunxin.kit.common.ui.viewmodel.FetchResult;
 import com.netease.yunxin.kit.common.ui.viewmodel.LoadStatus;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
 import com.netease.yunxin.kit.qchatkit.repo.QChatChannelRepo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatChannelInfo;
 import com.netease.yunxin.kit.qchatkit.ui.R;
@@ -45,19 +45,10 @@ public class ChannelSettingViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             fetchResult.setError(code, R.string.qchat_channel_fetch_error);
             resultLiveData.postValue(fetchResult);
             ALog.d(TAG, "fetchChannelInfo", "onFailed:" + code);
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            fetchResult.setError(
-                QChatConstant.ERROR_CODE_CHANNEL_FETCH, R.string.qchat_channel_fetch_error);
-            resultLiveData.postValue(fetchResult);
-            String errorMsg = exception != null ? exception.getMessage() : "";
-            ALog.d(TAG, "fetchChannelInfo", "onException:" + errorMsg);
           }
         });
   }
@@ -75,19 +66,12 @@ public class ChannelSettingViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             if (code == QChatConstant.ERROR_CODE_IM_NO_PERMISSION) {
               fetchResult.setError(code, R.string.qchat_no_permission);
             } else {
               fetchResult.setError(code, R.string.qchat_channel_delete_error);
             }
-            resultLiveData.postValue(fetchResult);
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            fetchResult.setError(
-                QChatConstant.ERROR_CODE_CHANNEL_DELETE, R.string.qchat_channel_delete_error);
             resultLiveData.postValue(fetchResult);
           }
         });
@@ -108,19 +92,12 @@ public class ChannelSettingViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             if (code == QChatConstant.ERROR_CODE_IM_NO_PERMISSION) {
               fetchResult.setError(code, R.string.qchat_no_permission);
             } else {
               fetchResult.setError(code, R.string.qchat_channel_update_error);
             }
-            resultLiveData.postValue(fetchResult);
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            fetchResult.setError(
-                QChatConstant.ERROR_CODE_CHANNEL_DELETE, R.string.qchat_channel_update_error);
             resultLiveData.postValue(fetchResult);
           }
         });

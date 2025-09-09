@@ -10,13 +10,12 @@ import com.netease.yunxin.kit.alog.ALog;
 import com.netease.yunxin.kit.common.ui.viewmodel.BaseViewModel;
 import com.netease.yunxin.kit.common.ui.viewmodel.FetchResult;
 import com.netease.yunxin.kit.common.ui.viewmodel.LoadStatus;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
 import com.netease.yunxin.kit.qchatkit.repo.QChatRoleRepo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatChannelRoleInfo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatRoleOptionEnum;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatRoleResourceEnum;
 import com.netease.yunxin.kit.qchatkit.ui.R;
-import com.netease.yunxin.kit.qchatkit.ui.model.QChatConstant;
 import java.util.Map;
 
 /** 身份组权限配置ViewModel */
@@ -54,19 +53,9 @@ public class RolePermissionViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             ALog.d(TAG, "updateChannelRole", "onFailed:" + code);
             rolePermissionResult.setError(code, R.string.qchat_channel_permission_update_error);
-            rolePermissionLiveData.postValue(rolePermissionResult);
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            String errorMsg = exception != null ? exception.getMessage() : "";
-            ALog.d(TAG, "updateChannelRole", "onException:" + errorMsg);
-            rolePermissionResult.setError(
-                QChatConstant.ERROR_CODE_CHANNEL_MEMBER_ADD,
-                R.string.qchat_channel_permission_update_error);
             rolePermissionLiveData.postValue(rolePermissionResult);
           }
         });

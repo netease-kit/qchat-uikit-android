@@ -12,7 +12,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.netease.nimlib.sdk.qchat.result.QChatApplyServerJoinResult;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
 import com.netease.yunxin.kit.qchatkit.repo.QChatServerRepo;
 import com.netease.yunxin.kit.qchatkit.ui.R;
 import com.netease.yunxin.kit.qchatkit.ui.databinding.QChatViewVisitorTipBinding;
@@ -80,9 +80,9 @@ public class QChatVisitorTipView extends FrameLayout {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             if (callback != null) {
-              callback.onFailed(code);
+              callback.onError(code, msg);
             }
             if (code == ERROR_CODE_OVER_SERVER_LIMIT) {
               Toast.makeText(
@@ -91,13 +91,6 @@ public class QChatVisitorTipView extends FrameLayout {
             } else {
               Toast.makeText(getContext(), R.string.qchat_server_request_fail, Toast.LENGTH_SHORT)
                   .show();
-            }
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            if (callback != null) {
-              callback.onException(exception);
             }
           }
         });

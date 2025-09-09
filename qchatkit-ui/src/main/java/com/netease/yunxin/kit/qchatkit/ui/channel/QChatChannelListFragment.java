@@ -25,7 +25,7 @@ import com.netease.nimlib.sdk.qchat.enums.QChatRoleResource;
 import com.netease.yunxin.kit.alog.ALog;
 import com.netease.yunxin.kit.common.ui.fragments.BaseFragment;
 import com.netease.yunxin.kit.common.utils.NetworkUtils;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallbackImpl;
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
 import com.netease.yunxin.kit.corekit.model.ResultInfo;
 import com.netease.yunxin.kit.qchatkit.observer.ObserverUnreadInfoResultHelper;
 import com.netease.yunxin.kit.qchatkit.repo.QChatChannelRepo;
@@ -251,13 +251,16 @@ public class QChatChannelListFragment extends BaseFragment {
     long serverId = serverInfo.getServerId();
     QChatChannelRepo.fetchMaxChannelIdsByServerIdForVisitor(
         serverId,
-        new FetchCallbackImpl<List<Long>>() {
+        new FetchCallback<List<Long>>() {
           @Override
           public void onSuccess(@Nullable List<Long> param) {
             if (param != null) {
               QChatChannelRepo.subscribeAsVisitor(serverId, param, true, null);
             }
           }
+
+          @Override
+          public void onError(int code, @Nullable String msg) {}
         });
   }
 
@@ -315,7 +318,8 @@ public class QChatChannelListFragment extends BaseFragment {
         }
 
       } else if (!NetworkUtils.isConnected()) {
-        Toast.makeText(getContext(), getString(R.string.common_network_error), Toast.LENGTH_SHORT)
+        Toast.makeText(
+                getContext(), getString(R.string.qchat_network_error_tip), Toast.LENGTH_SHORT)
             .show();
       } else {
         Toast.makeText(

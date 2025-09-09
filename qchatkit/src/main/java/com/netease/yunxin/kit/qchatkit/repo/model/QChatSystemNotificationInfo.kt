@@ -50,6 +50,7 @@ object ServerMemberJoinByInviteCode : QChatSystemNotificationTypeInfo()
 object VisitorChannelVisibilityUpdate : QChatSystemNotificationTypeInfo()
 object MyMemberInfoUpdate : QChatSystemNotificationTypeInfo()
 object Custom : QChatSystemNotificationTypeInfo()
+object MuteORRelease : QChatSystemNotificationTypeInfo()
 
 class QChatSystemNotificationInfo(
     val serverId: Long?,

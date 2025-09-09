@@ -9,33 +9,31 @@ plugins {
     kotlin("android")
 }
 
-
 android {
-    compileSdk = 33
+    compileSdk = 34
+    namespace = "com.netease.yunxin.kit.qchatkit"
+    buildFeatures {
+        buildConfig = true
+    }
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString() // 确保与Java版本一致
+    }
 
     defaultConfig {
-        minSdk = 21
-        targetSdk = 33
+        minSdk = 24
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
-        buildConfigField("String", "versionName", "\"9.5.0\"")
+        buildConfigField("String", "versionName", "\"10.0.0\"")
     }
 
-    buildTypes {
-        getByName("release") {
-            isMinifyEnabled = true
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-        }
-    }
+//    buildTypes {
+//        getByName("release") {
+//            isMinifyEnabled = true
+//            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+//        }
+//    }
+//
 
-    buildFeatures {
-        viewBinding = true
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
 }
 dependencies {
 
@@ -45,6 +43,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
     implementation("com.google.android.material:material:1.5.0")
-    api("com.netease.yunxin.kit.core:corekit-qchat:1.4.5")
+    api("com.netease.yunxin.kit.core:corekit-im2:1.7.0")
+    api("com.netease.nimlib:qchat:10.9.45")
 }
 

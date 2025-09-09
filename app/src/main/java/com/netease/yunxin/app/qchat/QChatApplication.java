@@ -20,12 +20,13 @@ import com.netease.yunxin.app.qchat.utils.Constant;
 import com.netease.yunxin.app.qchat.utils.DataUtils;
 import com.netease.yunxin.app.qchat.welcome.WelcomeActivity;
 import com.netease.yunxin.kit.alog.ALog;
-import com.netease.yunxin.kit.corekit.im.IMKitClient;
-import com.netease.yunxin.kit.corekit.im.repo.SettingRepo;
-import com.netease.yunxin.kit.corekit.im.utils.RouterConstant;
-import com.netease.yunxin.kit.corekit.qchat.QChatKitClient;
+import com.netease.yunxin.kit.chatkit.IMKitConfigCenter;
+import com.netease.yunxin.kit.corekit.im2.IMKitClient;
+import com.netease.yunxin.kit.corekit.im2.utils.RouterConstant;
 import com.netease.yunxin.kit.corekit.route.XKitRouter;
+import com.netease.yunxin.kit.locationkit.LocationConfig;
 import com.netease.yunxin.kit.locationkit.LocationKitClient;
+import com.netease.yunxin.kit.qchatkit.QChatKitClient;
 import com.vivo.push.PushClient;
 import com.vivo.push.util.VivoPushException;
 import java.util.ArrayList;
@@ -41,7 +42,7 @@ public class QChatApplication extends MultiDexApplication {
   public void onCreate() {
     super.onCreate();
     ALog.d(Constant.PROJECT_TAG, TAG, "onCreate");
-    //app init
+    // app init
     registerActivityLifeCycle();
     AppCrashHandler.getInstance().initCrashHandler(this);
     Thread.setDefaultUncaughtExceptionHandler(AppCrashHandler.getInstance());
@@ -58,28 +59,31 @@ public class QChatApplication extends MultiDexApplication {
 
     if (NIMUtil.isMainProcess(this)) {
       ALog.d(Constant.PROJECT_TAG, TAG, "initUIKit:isMainProcess");
-      LocationKitClient.init(this);
-      //huawei push
+      // 地图组件初始化
+      LocationConfig locationConfig = new LocationConfig();
+      locationConfig.aMapWebServerKey = DataUtils.readAMapAppKey(this);
+      LocationKitClient.init(this, locationConfig);
+      // huawei push
       ActivityMgr.INST.init(this);
-      //oppo push
+      // oppo push
       HeytapPushManager.init(this, true);
       try {
-        //vivo push
+        // vivo push
         PushClient.getInstance(this).initialize();
       } catch (VivoPushException e) {
         e.printStackTrace();
       }
-      QChatKitClient.toggleNotification(SettingRepo.isPushNotify());
+      QChatKitClient.toggleNotification(DataUtils.getToggleNotification(this));
       QChatKitClient.registerMixPushMessageHandler(new PushMessageHandler());
-      IMKitClient.getConfigCenter().setTeamEnable(false);
+      IMKitConfigCenter.setEnableTeam(false);
     }
   }
 
   private final List<Activity> activities = new ArrayList<>();
 
-  //用于系统杀死应用之后，系统恢复应用，可能存在没有登录的异常
-  //此处如果在没有登录的情况下，其他页面打开的时候进行finish();除了MainActivity
-  //MainActivity启动进行登录检测，如果没有登录进行登录操作
+  // 用于系统杀死应用之后，系统恢复应用，可能存在没有登录的异常
+  // 此处如果在没有登录的情况下，其他页面打开的时候进行finish();除了MainActivity
+  // MainActivity启动进行登录检测，如果没有登录进行登录操作
   private void registerActivityLifeCycle() {
     registerActivityLifecycleCallbacks(
         new ActivityLifecycleCallbacks() {

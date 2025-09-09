@@ -21,7 +21,7 @@ import com.netease.yunxin.kit.common.ui.activities.BaseActivity;
 import com.netease.yunxin.kit.common.ui.dialog.ChoiceListener;
 import com.netease.yunxin.kit.common.ui.dialog.CommonChoiceDialog;
 import com.netease.yunxin.kit.common.utils.NetworkUtils;
-import com.netease.yunxin.kit.corekit.im.IMKitClient;
+import com.netease.yunxin.kit.corekit.im2.IMKitClient;
 import com.netease.yunxin.kit.corekit.model.ErrorMsg;
 import com.netease.yunxin.kit.corekit.model.ResultInfo;
 import com.netease.yunxin.kit.qchatkit.repo.model.NextInfo;
@@ -97,7 +97,7 @@ public class ManagerListActivity extends BaseActivity {
         } else {
           Toast.makeText(
                   ManagerListActivity.this,
-                  getString(R.string.common_network_error),
+                  getString(R.string.qchat_network_error_tip),
                   Toast.LENGTH_SHORT)
               .show();
         }
@@ -303,7 +303,7 @@ public class ManagerListActivity extends BaseActivity {
       } else {
         Toast.makeText(
                 ManagerListActivity.this,
-                getString(R.string.common_network_error),
+                getString(R.string.qchat_network_error_tip),
                 Toast.LENGTH_SHORT)
             .show();
       }

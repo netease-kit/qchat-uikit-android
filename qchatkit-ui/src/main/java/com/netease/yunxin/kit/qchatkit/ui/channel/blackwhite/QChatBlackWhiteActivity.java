@@ -22,7 +22,7 @@ import com.netease.yunxin.kit.common.ui.dialog.ChoiceListener;
 import com.netease.yunxin.kit.common.ui.dialog.CommonChoiceDialog;
 import com.netease.yunxin.kit.common.ui.viewmodel.FetchResult;
 import com.netease.yunxin.kit.common.ui.viewmodel.LoadStatus;
-import com.netease.yunxin.kit.corekit.im.IMKitClient;
+import com.netease.yunxin.kit.corekit.im2.IMKitClient;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatChannelModeEnum;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatServerMemberInfo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatServerRoleMemberInfo;

@@ -28,9 +28,9 @@ import com.netease.yunxin.kit.common.ui.utils.ToastX;
 import com.netease.yunxin.kit.common.ui.viewmodel.FetchResult;
 import com.netease.yunxin.kit.common.ui.viewmodel.LoadStatus;
 import com.netease.yunxin.kit.common.utils.NetworkUtils;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
-import com.netease.yunxin.kit.corekit.im.repo.CommonRepo;
-import com.netease.yunxin.kit.corekit.qchat.QChatKitClient;
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
+import com.netease.yunxin.kit.qchatkit.QChatKitClient;
+import com.netease.yunxin.kit.qchatkit.repo.ResourceRepo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatRoleOptionEnum;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatRoleResourceEnum;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatServerInfo;
@@ -214,20 +214,11 @@ public class SettingActivity extends BaseActivity {
                       @Override
                       public void onSuccess(@Nullable File param) {
                         if (NetworkUtils.isConnected()) {
-                          CommonRepo.uploadImage(
+                          ResourceRepo.uploadFile(
                               param,
                               new FetchCallback<String>() {
                                 @Override
-                                public void onSuccess(@Nullable String param) {
-                                  viewModel.updateServer(serverId, param, null);
-                                  viewBinding.ivAvatar.setData(
-                                      param,
-                                      serverInfo.getName(),
-                                      AvatarColor.avatarColor(serverInfo.getServerId()));
-                                }
-
-                                @Override
-                                public void onFailed(int code) {
+                                public void onError(int code, @Nullable String msg) {
                                   if (code != 0) {
                                     Toast.makeText(
                                             getApplicationContext(),
@@ -242,12 +233,12 @@ public class SettingActivity extends BaseActivity {
                                 }
 
                                 @Override
-                                public void onException(@Nullable Throwable exception) {
-                                  Toast.makeText(
-                                          getApplicationContext(),
-                                          getString(R.string.qchat_server_request_fail),
-                                          Toast.LENGTH_SHORT)
-                                      .show();
+                                public void onSuccess(@Nullable String param) {
+                                  viewModel.updateServer(serverId, param, null);
+                                  viewBinding.ivAvatar.setData(
+                                      param,
+                                      serverInfo.getName(),
+                                      AvatarColor.avatarColor(serverInfo.getServerId()));
                                 }
                               });
                         } else {

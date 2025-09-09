@@ -4,8 +4,6 @@
 
 package com.netease.yunxin.kit.qchatkit.ui.server.viewmodel;
 
-import static com.netease.yunxin.kit.qchatkit.ui.model.QChatConstant.ERROR_CODE_SERVER_LOAD;
-
 import android.text.TextUtils;
 import android.util.Pair;
 import androidx.annotation.Nullable;
@@ -15,11 +13,11 @@ import com.netease.nimlib.sdk.qchat.model.systemnotification.QChatCreateServerAt
 import com.netease.nimlib.sdk.qchat.model.systemnotification.QChatUpdateServerAttachment;
 import com.netease.yunxin.kit.common.ui.viewmodel.BaseViewModel;
 import com.netease.yunxin.kit.common.utils.SPUtils;
-import com.netease.yunxin.kit.corekit.im.IMKitClient;
-import com.netease.yunxin.kit.corekit.im.model.EventObserver;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
+import com.netease.yunxin.kit.corekit.im2.IMKitClient;
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
 import com.netease.yunxin.kit.corekit.model.ErrorMsg;
 import com.netease.yunxin.kit.corekit.model.ResultInfo;
+import com.netease.yunxin.kit.qchatkit.EventObserver;
 import com.netease.yunxin.kit.qchatkit.observer.ObserverUnreadInfoResultHelper;
 import com.netease.yunxin.kit.qchatkit.repo.QChatChannelRepo;
 import com.netease.yunxin.kit.qchatkit.repo.QChatServerRepo;
@@ -192,12 +190,7 @@ public final class QChatServerListViewModel extends BaseViewModel {
                         }
 
                         @Override
-                        public void onFailed(int code) {
-                          unreadInfoResult.setValue(Collections.singletonList(item.getServerId()));
-                        }
-
-                        @Override
-                        public void onException(@Nullable Throwable exception) {
+                        public void onError(int code, @Nullable String msg) {
                           unreadInfoResult.setValue(Collections.singletonList(item.getServerId()));
                         }
                       });
@@ -312,17 +305,9 @@ public final class QChatServerListViewModel extends BaseViewModel {
             result.setValue(new ResultInfo<>(param));
           }
 
-          public void onFailed(int code) {
-            result.setValue(new ResultInfo<>(null, false, new ErrorMsg(code)));
-          }
-
           @Override
-          public void onException(@Nullable Throwable exception) {
-            result.setValue(
-                new ResultInfo<>(
-                    null,
-                    false,
-                    new ErrorMsg(ERROR_CODE_SERVER_LOAD, "Error is " + exception, exception)));
+          public void onError(int code, @Nullable String msg) {
+            result.setValue(new ResultInfo<>(null, false, new ErrorMsg(code)));
           }
         });
   }
@@ -345,10 +330,7 @@ public final class QChatServerListViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {}
-
-          @Override
-          public void onException(@Nullable Throwable exception) {}
+          public void onError(int code, @Nullable String msg) {}
         });
   }
 
@@ -377,16 +359,9 @@ public final class QChatServerListViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
+          public void onError(int code, @Nullable String msg) {
             if (callback != null) {
-              callback.onFailed(code);
-            }
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
-            if (callback != null) {
-              callback.onException(exception);
+              callback.onError(code, msg);
             }
           }
         });

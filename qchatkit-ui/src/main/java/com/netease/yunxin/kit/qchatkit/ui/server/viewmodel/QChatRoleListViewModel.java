@@ -10,8 +10,8 @@ import com.netease.nimlib.sdk.qchat.enums.QChatRoleResource;
 import com.netease.yunxin.kit.common.ui.viewmodel.BaseViewModel;
 import com.netease.yunxin.kit.common.ui.viewmodel.FetchResult;
 import com.netease.yunxin.kit.common.ui.viewmodel.LoadStatus;
-import com.netease.yunxin.kit.corekit.im.model.EventObserver;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallback;
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
+import com.netease.yunxin.kit.qchatkit.EventObserver;
 import com.netease.yunxin.kit.qchatkit.repo.QChatRoleRepo;
 import com.netease.yunxin.kit.qchatkit.repo.QChatServiceObserverRepo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatSystemNotificationInfo;
@@ -71,12 +71,7 @@ public class QChatRoleListViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
-            roleListLiveData.setValue(new FetchResult<>(LoadStatus.Error));
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
+          public void onError(int code, @Nullable String msg) {
             roleListLiveData.setValue(new FetchResult<>(LoadStatus.Error));
           }
         });
@@ -99,12 +94,7 @@ public class QChatRoleListViewModel extends BaseViewModel {
           }
 
           @Override
-          public void onFailed(int code) {
-            rolePermissionLiveData.setValue(new FetchResult<>(LoadStatus.Error, false));
-          }
-
-          @Override
-          public void onException(@Nullable Throwable exception) {
+          public void onError(int code, @Nullable String msg) {
             rolePermissionLiveData.setValue(new FetchResult<>(LoadStatus.Error, false));
           }
         });

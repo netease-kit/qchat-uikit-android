@@ -23,8 +23,8 @@ import com.netease.nimlib.sdk.qchat.result.QChatApplyServerJoinResult;
 import com.netease.yunxin.kit.alog.ALog;
 import com.netease.yunxin.kit.common.ui.activities.BaseActivity;
 import com.netease.yunxin.kit.corekit.event.EventCenter;
-import com.netease.yunxin.kit.corekit.im.IMKitClient;
-import com.netease.yunxin.kit.corekit.im.provider.FetchCallbackImpl;
+import com.netease.yunxin.kit.corekit.im2.IMKitClient;
+import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
 import com.netease.yunxin.kit.corekit.model.ResultInfo;
 import com.netease.yunxin.kit.qchatkit.repo.QChatServerRepo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatSearchResultInfo;
@@ -166,7 +166,7 @@ public class QChatJoinOtherServerActivity extends BaseActivity {
                   QChatServerRepo.getServerMembers(
                       Collections.singletonList(
                           new Pair<>(data.serverInfo.getServerId(), IMKitClient.account())),
-                      new FetchCallbackImpl<List<QChatServerMemberInfo>>() {
+                      new FetchCallback<List<QChatServerMemberInfo>>() {
                         @Override
                         public void onSuccess(@Nullable List<QChatServerMemberInfo> param) {
                           if (param != null && !param.isEmpty()) {
@@ -174,6 +174,11 @@ public class QChatJoinOtherServerActivity extends BaseActivity {
                             setResult(RESULT_OK);
                             finish();
                           }
+                        }
+
+                        @Override
+                        public void onError(int code, String msg) {
+                          ALog.e(TAG, "getServerMembers failed. " + msg);
                         }
                       });
                 } else {
