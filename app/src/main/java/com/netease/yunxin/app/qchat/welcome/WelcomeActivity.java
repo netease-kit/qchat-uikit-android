@@ -10,23 +10,15 @@ import android.text.TextUtils;
 import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import com.netease.yunxin.app.qchat.BuildConfig;
 import com.netease.yunxin.app.qchat.QChatApplication;
 import com.netease.yunxin.app.qchat.R;
 import com.netease.yunxin.app.qchat.databinding.ActivityWelcomeBinding;
 import com.netease.yunxin.app.qchat.main.MainActivity;
 import com.netease.yunxin.app.qchat.utils.Constant;
-import com.netease.yunxin.app.qchat.utils.DataUtils;
 import com.netease.yunxin.kit.alog.ALog;
 import com.netease.yunxin.kit.common.ui.activities.BaseActivity;
 import com.netease.yunxin.kit.common.ui.utils.ToastX;
 import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
-import com.netease.yunxin.kit.login.AuthorManager;
-import com.netease.yunxin.kit.login.model.AuthorConfig;
-import com.netease.yunxin.kit.login.model.LoginResultCallback;
-import com.netease.yunxin.kit.login.model.LoginType;
-import com.netease.yunxin.kit.login.model.UserInfo;
-import com.netease.yunxin.kit.login.utils.action.FinishAction;
 import com.netease.yunxin.kit.qchatkit.QChatKitClient;
 
 /** Welcome Page is launch page */
@@ -61,8 +53,8 @@ public class WelcomeActivity extends BaseActivity {
     ALog.d(Constant.PROJECT_TAG, TAG, "startLogin");
 
       //填入你的 account and token
-      String account = "";
-      String token = "";
+      String account = "343030647976192";
+      String token = "29ee8025-84a0-4606-ae78-75a2206938cd";
 
       if (!TextUtils.isEmpty(account) && !TextUtils.isEmpty(token)) {
           loginQChat(account,token);

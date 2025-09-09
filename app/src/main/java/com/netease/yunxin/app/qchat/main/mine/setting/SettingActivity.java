@@ -17,8 +17,6 @@ import com.netease.yunxin.app.qchat.welcome.WelcomeActivity;
 import com.netease.yunxin.kit.chatkit.ui.custom.ChatConfigManager;
 import com.netease.yunxin.kit.common.ui.activities.BaseActivity;
 import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
-import com.netease.yunxin.kit.login.AuthorManager;
-import com.netease.yunxin.kit.login.model.LoginCallback;
 import com.netease.yunxin.kit.qchatkit.QChatKitClient;
 
 public class SettingActivity extends BaseActivity {
@@ -64,11 +62,6 @@ public class SettingActivity extends BaseActivity {
 
     viewBinding.tvLogout.setOnClickListener(
         v ->
-            AuthorManager.INSTANCE.logoutWitDialog(
-                this,
-                new LoginCallback<Void>() {
-                  @Override
-                  public void onSuccess(@Nullable Void unused) {
                     QChatKitClient.logout(
                         new FetchCallback<Void>() {
                           @Override
@@ -89,12 +82,7 @@ public class SettingActivity extends BaseActivity {
                             startActivity(new Intent(SettingActivity.this, WelcomeActivity.class));
                             finish();
                           }
-                        });
-                  }
-
-                  @Override
-                  public void onError(int i, @NonNull String s) {}
-                }));
+                        }));
 
     viewBinding.settingTitleBar.setOnBackIconClickListener(v -> onBackPressed());
   }
