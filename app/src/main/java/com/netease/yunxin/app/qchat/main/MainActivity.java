@@ -22,10 +22,12 @@ import com.netease.nimlib.sdk.v2.auth.enums.V2NIMLoginStatus;
 import com.netease.nimlib.sdk.v2.auth.model.V2NIMKickedOfflineDetail;
 import com.netease.nimlib.sdk.v2.auth.model.V2NIMLoginClient;
 import com.netease.nimlib.sdk.v2.user.V2NIMUser;
+import com.netease.yunxin.app.qchat.BuildConfig;
 import com.netease.yunxin.app.qchat.CustomConfig;
 import com.netease.yunxin.app.qchat.R;
 import com.netease.yunxin.app.qchat.databinding.ActivityMainBinding;
 import com.netease.yunxin.app.qchat.main.mine.MineFragment;
+import com.netease.yunxin.app.qchat.network.QChatSquareNetRequester;
 import com.netease.yunxin.app.qchat.utils.Constant;
 import com.netease.yunxin.app.qchat.utils.DataUtils;
 import com.netease.yunxin.app.qchat.welcome.WelcomeActivity;
@@ -38,6 +40,7 @@ import com.netease.yunxin.kit.conversationkit.ui.normal.page.ConversationFragmen
 import com.netease.yunxin.kit.corekit.im2.IMKitClient;
 import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
 import com.netease.yunxin.kit.corekit.model.ResultInfo;
+import com.netease.yunxin.kit.qchatkit.QChatKitClient;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatServerInfo;
 import com.netease.yunxin.kit.qchatkit.ui.server.QChatServerFragment;
 import com.netease.yunxin.kit.qchatkit.ui.square.QChatSquareFragment;
@@ -77,14 +80,14 @@ public class MainActivity extends BaseActivity {
     initView();
 
     // 配置圈组广场数据请求
-//    if (QChatKitClient.account() != null) {
-//      QChatSquareNetRequester.getInstance()
-//          .setup(
-//              BuildConfig.DEBUG ? QCHAT_SQUARE_SERVER_URL_DEBUG : QCHAT_SQUARE_SERVER_URL_RELEASE,
-//              DataUtils.readAppKey(this),
-//                  QChatKitClient.account(),
-//              "");
-//    }
+    if (QChatKitClient.account() != null) {
+      QChatSquareNetRequester.getInstance()
+          .setup(
+              BuildConfig.DEBUG ? QCHAT_SQUARE_SERVER_URL_DEBUG : QCHAT_SQUARE_SERVER_URL_RELEASE,
+              DataUtils.readAppKey(this),
+                  QChatKitClient.account(),
+              "");
+    }
   }
 
   @Override

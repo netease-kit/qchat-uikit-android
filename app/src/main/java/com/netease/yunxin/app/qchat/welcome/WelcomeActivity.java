@@ -25,8 +25,6 @@ import com.netease.yunxin.kit.qchatkit.QChatKitClient;
 public class WelcomeActivity extends BaseActivity {
 
   private static final String TAG = "WelcomeActivity";
-  private static final int LOGIN_PARENT_SCOPE = 2;
-  private static final int LOGIN_SCOPE = 7;
   private ActivityWelcomeBinding activityWelcomeBinding;
 
   @Override
@@ -53,8 +51,8 @@ public class WelcomeActivity extends BaseActivity {
     ALog.d(Constant.PROJECT_TAG, TAG, "startLogin");
 
       //填入你的 account and token
-      String account = "343030647976192";
-      String token = "29ee8025-84a0-4606-ae78-75a2206938cd";
+      String account = "";
+      String token = "";
 
       if (!TextUtils.isEmpty(account) && !TextUtils.isEmpty(token)) {
           loginQChat(account,token);
