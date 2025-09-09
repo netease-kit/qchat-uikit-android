@@ -55,7 +55,6 @@ dependencies {
     implementation("androidx.multidex:multidex:2.0.1")
     //local module code
     implementation(project(":qchatkit-ui"))
-    implementation("com.netease.yunxin.kit.auth:auth-login:1.0.5")
     // 修改为源码依赖
     implementation("com.netease.yunxin.kit.contact:contactkit-ui:10.8.2")
     implementation("com.netease.yunxin.kit.conversation:conversationkit-ui:10.8.2")
