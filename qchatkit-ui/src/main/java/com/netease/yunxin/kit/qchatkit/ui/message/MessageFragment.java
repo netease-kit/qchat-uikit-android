@@ -67,13 +67,17 @@ import com.netease.yunxin.kit.qchatkit.ui.message.view.QChatMessageAdapter;
 import com.netease.yunxin.kit.qchatkit.ui.message.view.QChatMessageListView;
 import com.netease.yunxin.kit.qchatkit.ui.model.QChatConstant;
 import com.netease.yunxin.kit.qchatkit.ui.server.viewmodel.QChatServerListViewModel;
+import com.netease.yunxin.kit.qchatkit.ui.model.ait.AitUserInfo;
 import com.netease.yunxin.kit.qchatkit.ui.utils.FileUtils;
 import com.netease.yunxin.kit.qchatkit.ui.utils.MessageUtil;
 import com.netease.yunxin.kit.qchatkit.ui.utils.QChatUtils;
 import com.netease.yunxin.kit.qchatkit.ui.utils.SendImageHelper;
+import com.netease.yunxin.kit.qchatkit.ui.view.ait.AitContactSelectorDialog;
+import com.netease.yunxin.kit.qchatkit.ui.view.ait.AitManager;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import org.json.JSONObject;
 
 /** 聊天页面Fragment */
 public class MessageFragment extends BaseFragment {
@@ -99,6 +103,9 @@ public class MessageFragment extends BaseFragment {
   private ActivityResultLauncher<String[]> permissionLauncher;
   private static final int COPY_SHOW_TIME = 1000;
   private static final int AUDIO_MIN_TIME = 1000;
+
+  /** @功能管理器 */
+  private AitManager aitManager;
 
   @Nullable
   @Override
@@ -127,6 +134,8 @@ public class MessageFragment extends BaseFragment {
     initLauncher();
     //初始化底部输入框，输入框的操作时间通过IMessageProxy回调到Fragment中
     viewBinding.qChatMessageBottomLayout.init(messageProxy);
+    //初始化@功能管理器
+    setupAitManager();
     //监听列表滑动，加载更多历史消息
     viewBinding.qChatMessageListRecyclerView.setLoadHandler(
         new IMessageLoadHandler() {
@@ -623,6 +632,43 @@ public class MessageFragment extends BaseFragment {
             }
           };
 
+  /**
+   * 初始化@功能管理器，绑定底部输入框的EditText，并监听触发事件
+   */
+  private void setupAitManager() {
+    aitManager = new AitManager();
+    aitManager.setAitTriggerListener(() -> showAitSelector());
+    // 将aitManager注入到BottomLayout，以便发送时提取@数据并绑定EditText
+    viewBinding.qChatMessageBottomLayout.setupAitManager(aitManager);
+  }
+
+  /**
+   * 弹出@成员选择对话框，用户选择后将成员信息插入输入框。
+   * 成员列表由 ViewModel 加载后通过 setData 填充。
+   */
+  private void showAitSelector() {
+    AitContactSelectorDialog dialog = new AitContactSelectorDialog();
+    dialog.setOnItemListener(new AitContactSelectorDialog.ItemListener() {
+      @Override
+      public void onSelect(AitUserInfo item) {
+        if (aitManager != null) {
+          aitManager.onMemberSelected(item);
+        }
+      }
+
+      @Override
+      public void onLoadMore() {
+        // 加载更多：由 ViewModel 异步拉取，拉取完成后调用 dialog.setData()
+        viewModel.fetchChannelMembers(serverId, channelId, members ->
+            dialog.setData(members));
+      }
+    });
+    // 首次展示时主动加载第一页成员
+    viewModel.fetchChannelMembers(serverId, channelId, members ->
+        dialog.setData(members));
+    dialog.show(getChildFragmentManager(), "AitContactSelectorDialog");
+  }
+
   /** 消息操作代理实现 */
   private final IMessageProxy messageProxy =
       new IMessageProxy() {
@@ -630,6 +676,15 @@ public class MessageFragment extends BaseFragment {
         public boolean sendTextMessage(String msg) {
           ALog.d(TAG, "sendTextMessage", "info:" + msg);
           QChatMessageInfo messageInfo = viewModel.sendTextMessage(msg);
+          viewBinding.qChatMessageListRecyclerView.appendMessage(messageInfo);
+          return true;
+        }
+
+        @Override
+        public boolean sendTextMessage(String msg, JSONObject aitData) {
+          ALog.d(TAG, "sendTextMessage with ait", "info:" + msg);
+          QChatMessageInfo messageInfo = viewModel.sendTextMessage(msg, aitData,
+              aitData != null && aitManager != null ? aitManager.getAitTeamMember() : null);
           viewBinding.qChatMessageListRecyclerView.appendMessage(messageInfo);
           return true;
         }

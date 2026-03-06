@@ -14,6 +14,8 @@ import com.netease.yunxin.app.qchat.QChatApplication;
 import com.netease.yunxin.app.qchat.R;
 import com.netease.yunxin.app.qchat.databinding.ActivityWelcomeBinding;
 import com.netease.yunxin.app.qchat.main.MainActivity;
+import com.netease.yunxin.app.qchat.main.mine.setting.ConfigDataUtils;
+import com.netease.yunxin.app.qchat.main.mine.setting.ConfigInfoActivity;
 import com.netease.yunxin.app.qchat.utils.Constant;
 import com.netease.yunxin.kit.alog.ALog;
 import com.netease.yunxin.kit.common.ui.activities.BaseActivity;
@@ -27,6 +29,10 @@ public class WelcomeActivity extends BaseActivity {
   private static final String TAG = "WelcomeActivity";
   private ActivityWelcomeBinding activityWelcomeBinding;
 
+  // 硬编码的默认账号（当配置中无账号时作为 fallback）
+  private static final String DEFAULT_ACCOUNT = "";
+  private static final String DEFAULT_TOKEN = "";
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -34,7 +40,7 @@ public class WelcomeActivity extends BaseActivity {
     QChatApplication.setColdStart(true);
     activityWelcomeBinding = ActivityWelcomeBinding.inflate(getLayoutInflater());
     setContentView(activityWelcomeBinding.getRoot());
-    startLogin();
+    showLoginView();
   }
 
   private void showMainActivityAndFinish() {
@@ -46,55 +52,68 @@ public class WelcomeActivity extends BaseActivity {
     finish();
   }
 
-  /** start login page, you can use to launch your own login */
-  private void startLogin() {
-    ALog.d(Constant.PROJECT_TAG, TAG, "startLogin");
-
-      //填入你的 account and token
-      String account = "";
-      String token = "";
-
-      if (!TextUtils.isEmpty(account) && !TextUtils.isEmpty(token)) {
-          loginQChat(account,token);
-      } else {
-          showLoginView();
-      }
-  }
-
+  /** 展示登录视图，点击登录按钮后触发登录 */
   private void showLoginView() {
     ALog.d(Constant.PROJECT_TAG, TAG, "showLoginView");
     activityWelcomeBinding.appDesc.setVisibility(View.GONE);
     activityWelcomeBinding.loginButton.setVisibility(View.VISIBLE);
     activityWelcomeBinding.appBottomIcon.setVisibility(View.GONE);
     activityWelcomeBinding.appBottomName.setVisibility(View.GONE);
-    activityWelcomeBinding.tvEmailLogin.setVisibility(View.VISIBLE);
+    activityWelcomeBinding.tvEmailLogin.setVisibility(View.GONE);
     activityWelcomeBinding.tvServerConfig.setVisibility(View.VISIBLE);
-    activityWelcomeBinding.vEmailLine.setVisibility(View.VISIBLE);
-    activityWelcomeBinding.loginButton.setOnClickListener(
-        view -> {
+    activityWelcomeBinding.vEmailLine.setVisibility(View.GONE);
 
-        });
-    activityWelcomeBinding.tvEmailLogin.setOnClickListener(
-        view -> {
+    // OpenClaw 智能体配置入口
+    if (activityWelcomeBinding.tvAgentConfig != null) {
+      activityWelcomeBinding.tvAgentConfig.setVisibility(View.VISIBLE);
+      activityWelcomeBinding.tvAgentConfig.setOnClickListener(
+          view -> {
+            Intent intent = new Intent(WelcomeActivity.this, ConfigInfoActivity.class);
+            startActivity(intent);
+          });
+    }
 
-        });
     activityWelcomeBinding.tvServerConfig.setOnClickListener(
         view -> {
           Intent intent = new Intent(WelcomeActivity.this, ServerActivity.class);
           startActivity(intent);
         });
+
+    // 登录按钮：点击后优先从配置中读取账号，fallback 到默认值
+    activityWelcomeBinding.loginButton.setOnClickListener(view -> performLogin());
   }
 
-  /** launch login activity */
-  private void launchLoginPage() {
-    ALog.d(Constant.PROJECT_TAG, TAG, "launchLoginPage");
-    activityWelcomeBinding.getRoot().setVisibility(View.VISIBLE);
+  /**
+   * 执行登录：优先使用 ConfigDataUtils 中保存的账号/Token，
+   * 若未配置则使用默认值。
+   */
+  private void performLogin() {
+    String account = ConfigDataUtils.getAccount(this);
+    String token = ConfigDataUtils.getToken(this);
+
+    // fallback 到硬编码默认值
+    if (TextUtils.isEmpty(account) || TextUtils.isEmpty(token)) {
+      ALog.d(Constant.PROJECT_TAG, TAG, "performLogin: no config found, use default account");
+      account = DEFAULT_ACCOUNT;
+      token = DEFAULT_TOKEN;
+    } else {
+      ALog.d(Constant.PROJECT_TAG, TAG, "performLogin: use config account");
+    }
+
+    loginQChat(account, token);
+  }
+
+  /** 设置登录中状态（禁用按钮，防止重复点击）*/
+  private void setLoginLoading(boolean loading) {
+    activityWelcomeBinding.loginButton.setEnabled(!loading);
+    activityWelcomeBinding.loginButton.setText(
+        loading ? getString(R.string.logging_in) : getString(R.string.welcome_button));
   }
 
   /** when your own page login success, you should login IM SDK */
   private void loginQChat(String account, String token) {
     ALog.d(Constant.PROJECT_TAG, TAG, "loginIM");
-    activityWelcomeBinding.getRoot().setVisibility(View.GONE);
+    setLoginLoading(true);
     QChatKitClient.login(
         account,
         token,
@@ -109,7 +128,7 @@ public class WelcomeActivity extends BaseActivity {
           public void onError(int errorCode, @NonNull String errorMsg) {
             ToastX.showShortToast(
                 String.format(getResources().getString(R.string.login_fail), errorCode));
-            launchLoginPage();
+            setLoginLoading(false);
           }
         });
   }

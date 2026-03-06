@@ -6,6 +6,7 @@ package com.netease.yunxin.kit.qchatkit.ui.utils;
 
 import android.Manifest;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.text.Editable;
@@ -14,6 +15,7 @@ import android.text.SpannableString;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.style.ClickableSpan;
+import android.text.style.ForegroundColorSpan;
 import android.text.style.ImageSpan;
 import android.view.View;
 import android.widget.TextView;
@@ -42,6 +44,7 @@ import com.netease.yunxin.kit.qchatkit.utils.MessageRevokeHelper;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.json.JSONException;
@@ -383,5 +386,65 @@ public class MessageUtil {
       }
     }
     detailInfo.setTotalCount(detailInfo.getTotalCount() - 1);
+  }
+
+  /**
+   * 解析消息扩展字段中的 yxAitMsg，并对消息内容中的@成员文字应用蓝色高亮。
+   *
+   * <p>yxAitMsg 结构示例：
+   * <pre>
+   * {
+   *   "yxAitMsg": {
+   *     "accId1": { "text": "@name ", "segments": [{"start": 0, "end": 6}] },
+   *     ...
+   *   }
+   * }
+   * </pre>
+   *
+   * @param content         消息原始文本
+   * @param remoteExtension 消息扩展字段 Map（来自 QChatMessage.getRemoteExtension()）
+   * @param aitColor        高亮颜色（可传 Color.parseColor("#337EFF")）
+   * @return 携带 ForegroundColorSpan 的 SpannableString；若无 ait 信息则返回普通 SpannableString
+   */
+  public static SpannableString applyAitHighlight(
+      String content, Map<String, Object> remoteExtension, int aitColor) {
+    if (TextUtils.isEmpty(content)) {
+      return new SpannableString("");
+    }
+    SpannableString spannable = new SpannableString(content);
+    if (remoteExtension == null || !remoteExtension.containsKey("yxAitMsg")) {
+      return spannable;
+    }
+    try {
+      // yxAitMsg 存入时是 JSONObject.toString()，取出为 String；也可能是 Map，统一转 JSONObject
+      Object raw = remoteExtension.get("yxAitMsg");
+      JSONObject aitMsg;
+      if (raw instanceof String) {
+        aitMsg = new JSONObject((String) raw);
+      } else {
+        aitMsg = new JSONObject(raw.toString());
+      }
+      java.util.Iterator<String> keys = aitMsg.keys();
+      while (keys.hasNext()) {
+        String accId = keys.next();
+        JSONObject memberInfo = aitMsg.getJSONObject(accId);
+        if (!memberInfo.has("segments")) continue;
+        org.json.JSONArray segments = memberInfo.getJSONArray("segments");
+        for (int i = 0; i < segments.length(); i++) {
+          JSONObject seg = segments.getJSONObject(i);
+          int start = seg.optInt("start", -1);
+          int end = seg.optInt("end", -1);
+          if (start < 0 || end <= start || end > content.length()) continue;
+          spannable.setSpan(
+              new ForegroundColorSpan(aitColor),
+              start,
+              end,
+              Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+      }
+    } catch (Exception e) {
+      ALog.w(TAG, "applyAitHighlight parse error", e);
+    }
+    return spannable;
   }
 }

@@ -6,10 +6,22 @@ package com.netease.yunxin.kit.qchatkit.ui.message.interfaces;
 
 import android.content.Context;
 import java.io.File;
+import org.json.JSONObject;
 
 public interface IMessageProxy {
 
   boolean sendTextMessage(String msg);
+
+  /**
+   * 发送文本消息，携带 @(Ait) 扩展数据。
+   * 默认实现回退到普通发送，子类可覆盖以处理 Ait 扩展。
+   *
+   * @param msg     消息正文
+   * @param aitData @扩展 JSON（存入 remoteExtension["yxAitMsg"]）
+   */
+  default boolean sendTextMessage(String msg, JSONObject aitData) {
+    return sendTextMessage(msg);
+  }
 
   boolean sendImage();
 

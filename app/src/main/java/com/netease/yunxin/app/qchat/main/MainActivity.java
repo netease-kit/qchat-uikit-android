@@ -30,6 +30,7 @@ import com.netease.yunxin.app.qchat.main.mine.MineFragment;
 import com.netease.yunxin.app.qchat.network.QChatSquareNetRequester;
 import com.netease.yunxin.app.qchat.utils.Constant;
 import com.netease.yunxin.app.qchat.utils.DataUtils;
+import com.netease.yunxin.app.qchat.utils.OpenClawUtils;
 import com.netease.yunxin.app.qchat.welcome.WelcomeActivity;
 import com.netease.yunxin.kit.alog.ALog;
 import com.netease.yunxin.kit.call.p2p.NECallEngine;
@@ -78,6 +79,9 @@ public class MainActivity extends BaseActivity {
     activityMainBinding = ActivityMainBinding.inflate(getLayoutInflater());
     setContentView(activityMainBinding.getRoot());
     initView();
+
+    // 检查并创建 OpenClaw 智能体会话
+    OpenClawUtils.checkAndCreateOpenClawSession(this, false);
 
     // 配置圈组广场数据请求
     if (QChatKitClient.account() != null) {

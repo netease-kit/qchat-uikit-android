@@ -335,5 +335,6 @@
     <string name="qchat_announcement_update_fail">Edit failed</string>
     <string name="qchat_message_quick_comment_max_count_tips">exceeds the limit</string>
     <string name="qchat_message_quick_comment_close_tips">emoji comment closed</string>
+    <string name="qchat_ait_selector_title">Mention Members</string>
 
 </resources>

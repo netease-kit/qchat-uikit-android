@@ -12,7 +12,7 @@ android {
     namespace = "com.netease.yunxin.app.qchat"
 
     defaultConfig {
-        applicationId = "com.netease.yunxin.app.qchat"
+        applicationId = "com.netease.yunxin.app.qchat.openclaw"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -31,7 +31,6 @@ android {
     buildFeatures {
         viewBinding = true
         buildConfig = true
-
     }
 
     packagingOptions {

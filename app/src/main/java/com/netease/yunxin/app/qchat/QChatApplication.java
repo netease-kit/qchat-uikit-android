@@ -16,6 +16,7 @@ import com.netease.yunxin.app.qchat.crash.AppCrashHandler;
 import com.netease.yunxin.app.qchat.main.MainActivity;
 import com.netease.yunxin.app.qchat.main.mine.MineInfoActivity;
 import com.netease.yunxin.app.qchat.push.PushMessageHandler;
+import com.netease.yunxin.app.qchat.main.mine.setting.ConfigDataUtils;
 import com.netease.yunxin.app.qchat.utils.Constant;
 import com.netease.yunxin.app.qchat.utils.DataUtils;
 import com.netease.yunxin.app.qchat.welcome.WelcomeActivity;
@@ -53,7 +54,11 @@ public class QChatApplication extends MultiDexApplication {
   }
 
   private void initUIKit() {
-    SDKOptions options = NimSDKOptionConfig.getSDKOptions(this, DataUtils.readAppKey(this));
+    // 优先使用用户通过配置页面保存的 AppKey，若无则 fallback 到 Manifest 中的默认值
+    String configAppKey = ConfigDataUtils.getAppKey(this);
+    String appKey = !TextUtils.isEmpty(configAppKey) ? configAppKey : DataUtils.readAppKey(this);
+    ALog.d(Constant.PROJECT_TAG, TAG, "initUIKit: using " + (!TextUtils.isEmpty(configAppKey) ? "config appKey" : "default appKey"));
+    SDKOptions options = NimSDKOptionConfig.getSDKOptions(this, appKey);
     QChatKitClient.init(this, null, options);
     ALog.d(Constant.PROJECT_TAG, TAG, "initUIKit");
 

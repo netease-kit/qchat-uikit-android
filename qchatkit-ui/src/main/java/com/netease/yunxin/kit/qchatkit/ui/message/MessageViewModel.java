@@ -25,6 +25,12 @@ import com.netease.nimlib.sdk.qchat.model.systemnotification.QChatServerEnterLea
 import com.netease.nimlib.sdk.qchat.param.QChatRevokeMessageParam;
 import com.netease.nimlib.sdk.qchat.param.QChatSendMessageParam;
 import com.netease.yunxin.kit.alog.ALog;
+import com.netease.yunxin.kit.qchatkit.ui.model.ait.AitUserInfo;
+import com.netease.yunxin.kit.qchatkit.ui.model.ait.AtContactsModel;
+import com.netease.yunxin.kit.qchatkit.ui.model.QChatConstant;
+import java.util.HashMap;
+import java.util.Map;
+import org.json.JSONObject;
 import com.netease.yunxin.kit.common.ui.utils.ToastX;
 import com.netease.yunxin.kit.common.ui.viewmodel.BaseViewModel;
 import com.netease.yunxin.kit.common.ui.viewmodel.FetchResult;
@@ -34,6 +40,7 @@ import com.netease.yunxin.kit.corekit.im2.extend.FetchCallback;
 import com.netease.yunxin.kit.qchatkit.EventObserver;
 import com.netease.yunxin.kit.qchatkit.QChatKitClient;
 import com.netease.yunxin.kit.qchatkit.TimerCacheWithQChatMsg;
+import com.netease.yunxin.kit.qchatkit.repo.QChatChannelRepo;
 import com.netease.yunxin.kit.qchatkit.repo.QChatMessageRepo;
 import com.netease.yunxin.kit.qchatkit.repo.QChatRoleRepo;
 import com.netease.yunxin.kit.qchatkit.repo.QChatServiceObserverRepo;
@@ -42,6 +49,7 @@ import com.netease.yunxin.kit.qchatkit.repo.model.QChatGetQuickCommentsResultInf
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatMessageDeleteEventInfo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatMessageInfo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatMessageRevokeEventInfo;
+import com.netease.yunxin.kit.qchatkit.repo.model.QChatServerMemberInfo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatServerRoleInfo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatSystemNotificationInfo;
 import com.netease.yunxin.kit.qchatkit.repo.model.QChatSystemNotificationTypeInfo;
@@ -338,10 +346,83 @@ public class MessageViewModel extends BaseViewModel {
     return hasForward;
   }
 
+  /**
+   * 获取频道成员列表，转换为 AitUserInfo 后通过回调返回。
+   * 用于 @ 选择弹窗中加载成员数据。
+   */
+  public interface FetchMembersCallback {
+    void onResult(List<AitUserInfo> members);
+  }
+
+  public void fetchChannelMembers(long serverId, long channelId, FetchMembersCallback callback) {
+    QChatChannelRepo.fetchChannelMembers(
+        serverId,
+        channelId,
+        0,
+        QChatConstant.MEMBER_PAGE_SIZE,
+        new FetchCallback<List<QChatServerMemberInfo>>() {
+          @Override
+          public void onSuccess(@Nullable List<QChatServerMemberInfo> param) {
+            List<AitUserInfo> result = new ArrayList<>();
+            if (param != null) {
+              for (QChatServerMemberInfo info : param) {
+                String accid = info.getAccId();
+                String nick = info.getNick();
+                if (nick == null || nick.isEmpty()) {
+                  nick = accid;
+                }
+                String avatar = info.getAvatarUrl();
+                result.add(new AitUserInfo(accid, nick, nick, avatar));
+              }
+            }
+            if (callback != null) {
+              callback.onResult(result);
+            }
+          }
+
+          @Override
+          public void onError(int code, @Nullable String msg) {
+            ALog.e(TAG, "fetchChannelMembers", "onError:" + code);
+            if (callback != null) {
+              callback.onResult(new ArrayList<>());
+            }
+          }
+        });
+  }
+
   public QChatMessageInfo sendTextMessage(String content) {
     QChatSendMessageParam sendMessageInfo =
         new QChatSendMessageParam(mServerId, mChannelId, MsgTypeEnum.text);
     sendMessageInfo.setBody(content);
+    return sendMessage(sendMessageInfo);
+  }
+
+  /**
+   * 发送带 @(Ait) 扩展数据的文本消息。
+   *
+   * @param content 消息正文
+   * @param aitData @扩展 JSON（格式见 AtContactsModel）
+   * @param mentionedAccids 被@的账号列表（用于推送通知）
+   */
+  public QChatMessageInfo sendTextMessage(
+      String content, JSONObject aitData, List<String> mentionedAccids) {
+    QChatSendMessageParam sendMessageInfo =
+        new QChatSendMessageParam(mServerId, mChannelId, MsgTypeEnum.text);
+    sendMessageInfo.setBody(content);
+    // 设置被@账号列表（推送通知用）
+    if (mentionedAccids != null && !mentionedAccids.isEmpty()) {
+      sendMessageInfo.setMentionedAccidList(mentionedAccids);
+    }
+    // 将 @信息 JSON 放入消息扩展（key: "yxAitMsg"）
+    if (aitData != null) {
+      try {
+        Map<String, Object> extension = new HashMap<>();
+        extension.put(AtContactsModel.AIT_REMOTE_EXTENSION_KEY, aitData.toString());
+        sendMessageInfo.setExtension(extension);
+      } catch (Exception e) {
+        ALog.e(TAG, "sendTextMessage with ait, set extension error", e.getMessage());
+      }
+    }
     return sendMessage(sendMessageInfo);
   }
 

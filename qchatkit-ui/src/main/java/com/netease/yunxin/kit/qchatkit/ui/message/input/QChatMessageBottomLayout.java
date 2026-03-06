@@ -39,8 +39,11 @@ import com.netease.yunxin.kit.qchatkit.ui.message.emoji.IEmojiSelectedListener;
 import com.netease.yunxin.kit.qchatkit.ui.message.interfaces.IItemActionListener;
 import com.netease.yunxin.kit.qchatkit.ui.message.interfaces.IMessageProxy;
 import com.netease.yunxin.kit.qchatkit.ui.utils.MessageUtil;
+import com.netease.yunxin.kit.qchatkit.ui.view.ait.AitManager;
+import com.netease.yunxin.kit.qchatkit.ui.view.ait.AitTextChangeListener;
 import java.io.File;
 import java.util.List;
+import org.json.JSONObject;
 
 /** 聊天页面底部输入框 自定义View，包括输入框，操作列表，更多，表情，录音等 */
 public class QChatMessageBottomLayout extends FrameLayout
@@ -52,6 +55,9 @@ public class QChatMessageBottomLayout extends FrameLayout
   //消息操作接口，由外部实现
   private IMessageProxy mProxy;
   private boolean mMute = false;
+
+  /** @功能管理器，由外部调用 setupAitManager 注入 */
+  private AitManager aitManager;
 
   private final ActionsPanel mActionsPanel = new ActionsPanel();
 
@@ -157,6 +163,59 @@ public class QChatMessageBottomLayout extends FrameLayout
         });
   }
 
+  /**
+   * 注入 AitManager，并将其作为 TextWatcher 挂载到输入框。
+   * 同时设置 AitTextChangeListener，以便 AitManager 可以回调修改 EditText 内容。
+   *
+   * @param manager 已配置好触发监听的 AitManager 实例
+   */
+  public void setupAitManager(AitManager manager) {
+    this.aitManager = manager;
+    // 将 AitManager 作为 TextWatcher 注册到输入框，需要在 emoticon watcher 之后注册
+    mBinding.chatMessageInputEt.addTextChangedListener(manager);
+    // 为 AitManager 提供操作 EditText 的回调
+    manager.setAitTextChangeListener(new AitTextChangeListener() {
+      @Override
+      public void onTextAdd(String text, int start, int length, boolean needAtSign) {
+        Editable editable = mBinding.chatMessageInputEt.getText();
+        if (editable == null) return;
+        editable.insert(start, text);
+
+        // 对插入的@文字（不含末尾空格）添加蓝色高亮
+        // needAtSign=false 时：输入框已有"@"在 start-1 位，高亮从 start-1 开始
+        // needAtSign=true  时：整段"@名字 "从 start 开始插入
+        int highlightStart = needAtSign ? start : start - 1;
+        // 末尾有一个空格，不高亮空格，因此高亮结束位置 = highlightStart + "@名字".length()
+        int highlightEnd = highlightStart + length + (needAtSign ? 0 : 1) - 1; // 去掉末尾空格
+        int safeEnd = Math.min(highlightEnd, editable.length());
+        if (highlightStart >= 0 && highlightStart < safeEnd) {
+          editable.setSpan(
+              new android.text.style.ForegroundColorSpan(
+                  mBinding.getRoot().getContext().getResources().getColor(
+                      com.netease.yunxin.kit.qchatkit.ui.R.color.color_337eff, null)),
+              highlightStart,
+              safeEnd,
+              android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+      }
+
+      @Override
+      public void onTextDelete(int start, int length) {
+        Editable editable = mBinding.chatMessageInputEt.getText();
+        if (editable == null) return;
+        int end = Math.min(start + length, editable.length());
+        editable.delete(start, end);
+      }
+    });
+  }
+
+  /**
+   * 获取当前 AitManager（供 Fragment 查询@扩展数据）
+   */
+  public AitManager getAitManager() {
+    return aitManager;
+  }
+
   public QChatMessageBottomLayoutBinding getViewBinding() {
     return mBinding;
   }
@@ -239,9 +298,20 @@ public class QChatMessageBottomLayout extends FrameLayout
     String originalMsg = mBinding.chatMessageInputEt.getEditableText().toString();
     String msg = originalMsg.trim();
     if (!TextUtils.isEmpty(msg) && mProxy != null) {
-      if (mProxy.sendTextMessage(originalMsg)) {
+      boolean sent;
+      if (aitManager != null && aitManager.hasAitMember()) {
+        // 有@成员时，携带 Ait 扩展数据发送
+        sent = mProxy.sendTextMessage(originalMsg, aitManager.getAitData());
+      } else {
+        sent = mProxy.sendTextMessage(originalMsg);
+      }
+      if (sent) {
         mBinding.chatMessageInputEt.setText("");
         clearReplyMsg();
+        // 重置 Ait 状态
+        if (aitManager != null) {
+          aitManager.reset();
+        }
       }
     }
   }

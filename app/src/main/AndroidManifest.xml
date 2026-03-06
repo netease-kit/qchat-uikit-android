@@ -126,6 +126,10 @@
             android:name=".welcome.ServerActivity"
             android:screenOrientation="portrait"
             android:exported="false" />
+        <activity
+            android:name=".main.mine.setting.ConfigInfoActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
 
         <!-- 小米推送配置 -->
         <service
@@ -176,17 +180,6 @@
                 <action android:name="com.xiaomi.mipush.ERROR"/>
             </intent-filter>
         </receiver>
-
-        <!-- 云信 NIM SDK 进程间通信provider-->
-        <provider
-            android:authorities="com.netease.yunxin.app.qchat.ipc.provider"
-            android:exported="false"
-            android:name="com.netease.nimlib.ipc.NIMContentProvider"
-            android:process=":core"/>
-        <provider
-            android:authorities="com.netease.yunxin.app.qchat.ipc.provider.preference"
-            android:exported="false"
-            android:name="com.netease.nimlib.ipc.cp.provider.PreferenceContentProvider"/>
 
         <!--华为推送配置-->
         <service

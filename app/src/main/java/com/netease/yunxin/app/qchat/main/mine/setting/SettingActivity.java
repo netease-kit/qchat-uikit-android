@@ -85,6 +85,10 @@ public class SettingActivity extends BaseActivity {
                         }));
 
     viewBinding.settingTitleBar.setOnBackIconClickListener(v -> onBackPressed());
+
+    // OpenClaw配置入口
+    viewBinding.configFl.setOnClickListener(
+        v -> startActivity(new Intent(SettingActivity.this, ConfigInfoActivity.class)));
   }
 
   @Override

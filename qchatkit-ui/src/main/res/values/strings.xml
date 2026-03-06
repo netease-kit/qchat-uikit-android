@@ -336,5 +336,6 @@
     <string name="qchat_announcement_update_fail">保存失败</string>
     <string name="qchat_message_quick_comment_max_count_tips">表情数已超限</string>
     <string name="qchat_message_quick_comment_close_tips">表情回复功能已关闭</string>
+    <string name="qchat_ait_selector_title">提及成员</string>
 
 </resources>
